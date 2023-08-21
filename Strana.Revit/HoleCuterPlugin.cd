@@ -1,21 +1,21 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
   <Class Name="Strana.RevitPlugins.BaseElements.IntersectingElement">
-    <Position X="0.5" Y="1.75" Width="1.5" />
+    <Position X="7" Y="7.75" Width="4" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAA=</HashCode>
+      <HashCode>EAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAA=</HashCode>
       <FileName>BaseElements\IntersectingElement.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Strana.RevitPlugins.BaseElements.MepElement">
-    <Position X="3" Y="7.5" Width="1.5" />
+    <Position X="1.5" Y="5.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AQAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AQAAAAEAAAQAAAAAAAgAAAAIAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>BaseElements\MepElement.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Strana.RevitPlugins.BaseElements.HoleTask">
-    <Position X="5.75" Y="2.25" Width="3" />
+    <Position X="13.75" Y="6.5" Width="3" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAgAAQAAAAA=</HashCode>
       <FileName>BaseElements\HoleTask.cs</FileName>
@@ -25,11 +25,33 @@
     </ShowAsAssociation>
   </Class>
   <Class Name="Strana.RevitPlugins.BaseElements.HoleTaskInnerSolid">
-    <Position X="9.75" Y="3" Width="2.25" />
+    <Position X="17.5" Y="7.5" Width="2.25" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAgAAAAAAAA=</HashCode>
       <FileName>BaseElements\HoleTaskInnerSolid.cs</FileName>
     </TypeIdentifier>
+  </Class>
+  <Class Name="Strana.RevitPlugins.BaseElements.LinkProject">
+    <Position X="6" Y="2.5" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAACQQAAAAAAAAQEAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>BaseElements\LinkProject.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Field Name="intersectingElements" />
+      <Field Name="mepElements" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="Strana.RevitPlugins.BaseElements.CurrentProject">
+    <Position X="0.5" Y="2.5" Width="3.5" />
+    <TypeIdentifier>
+      <HashCode>AABAAAAAAAAAAAAAAAAICAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>BaseElements\CurrentProject.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Field Name="linksProjects" />
+      <Field Name="communications" />
+    </ShowAsCollectionAssociation>
   </Class>
   <Font Name="Segoe UI" Size="9" />
 </ClassDiagram>

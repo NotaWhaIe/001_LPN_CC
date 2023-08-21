@@ -9,9 +9,9 @@ using Strana.RevitPlugins.Exstensions;
 namespace Strana.RevitPlugins.BaseElements
 {
     /// <summary>
-    /// This is a abstract class for all elements, who intersects with communications (walls, floors).
+    /// This is a class for all elements, who intersects with communications (walls, floors).
     /// </summary>
-    public abstract class IntersectingElement
+    public class IntersectingElement
     {
         private readonly Element communicationElement;
 
@@ -22,7 +22,7 @@ namespace Strana.RevitPlugins.BaseElements
         /// </summary>
         /// <param name="communicationElement">This is communicaion. </param>
         /// <see cref="MepElement"/>
-        protected IntersectingElement(Element communicationElement)
+        public IntersectingElement(Element communicationElement)
         {
             this.communicationElement = communicationElement;
             this.communicationType = communicationElement.GetElementType();

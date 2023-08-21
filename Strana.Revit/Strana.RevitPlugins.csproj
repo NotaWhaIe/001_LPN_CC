@@ -85,13 +85,17 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BaseElements\CurrentProject.cs" />
     <Compile Include="BaseElements\HoleTaskStatus.cs" />
     <Compile Include="BaseElements\IntersectingElement.cs" />
+    <Compile Include="BaseElements\LinkProject.cs" />
     <Compile Include="BaseElements\MepElement.cs" />
     <Compile Include="BaseElements\HoleTask.cs" />
     <Compile Include="BaseElements\HoleTaskInnerSolid.cs" />
     <Compile Include="BaseElements\MepElementGeometryType.cs" />
+    <Compile Include="Exstensions\RevitDocumentExstensions.cs" />
     <Compile Include="Exstensions\RevitElementExstensions.cs" />
+    <Compile Include="Exstensions\RevitLinkExstensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
