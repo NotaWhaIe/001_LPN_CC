@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Autodesk.Revit.DB;
 
-namespace Strana.RevitPlugins.Exstensions
+namespace Strana.Revit.Exstensions
 {
     /// <summary>
     /// This class conteins exstensions for revit link.

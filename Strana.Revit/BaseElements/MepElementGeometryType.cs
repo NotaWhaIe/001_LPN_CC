@@ -3,7 +3,7 @@
 // Licensed under the NC license. See LICENSE.md file in the project root for full license information.
 // </copyright>
 
-namespace Strana.RevitPlugins.BaseElements
+namespace Strana.Revit.BaseElements
 {
     /// <summary>
     /// This type of geometry mep element. Can be rounded and rectangle.

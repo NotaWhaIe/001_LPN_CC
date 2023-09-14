@@ -11,7 +11,7 @@ using Autodesk.Revit.DB.Electrical;
 using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.DB.Plumbing;
 
-namespace Strana.RevitPlugins.Exstensions
+namespace Strana.Revit.Exstensions
 {
     /// <summary>
     /// This exstensions for revit document.

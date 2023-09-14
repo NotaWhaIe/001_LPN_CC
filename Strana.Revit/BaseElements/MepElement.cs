@@ -4,9 +4,9 @@
 // </copyright>
 
 using Autodesk.Revit.DB;
-using Strana.RevitPlugins.Exstensions;
+using Strana.Revit.Exstensions;
 
-namespace Strana.RevitPlugins.BaseElements
+namespace Strana.Revit.BaseElements
 {
     /// <summary>
     /// This lineal revit element abstract class (Pipes, Ducts).

@@ -6,9 +6,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using Autodesk.Revit.DB;
-using Strana.RevitPlugins.Exstensions;
+using Strana.Revit.Exstensions;
 
-namespace Strana.RevitPlugins.BaseElements
+namespace Strana.Revit.BaseElements
 {
     /// <summary> Class for program logic. </summary>
     public class LinkProject

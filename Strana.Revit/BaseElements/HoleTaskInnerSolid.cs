@@ -5,7 +5,7 @@
 
 using Autodesk.Revit.DB;
 
-namespace Strana.RevitPlugins.BaseElements
+namespace Strana.Revit.BaseElements
 {
     /// <summary>
     /// This class create solid for HoleTask and get HoleTask solid.
