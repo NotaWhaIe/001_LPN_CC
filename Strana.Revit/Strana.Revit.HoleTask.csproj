@@ -94,15 +94,20 @@
     <Compile Include="BaseElements\HoleTask.cs" />
     <Compile Include="BaseElements\HoleTaskInnerSolid.cs" />
     <Compile Include="BaseElements\MepElementGeometryType.cs" />
-    <Compile Include="Exstensions\RevitDocumentExstensions.cs" />
-    <Compile Include="Exstensions\RevitElementExstensions.cs" />
-    <Compile Include="Exstensions\RevitLinkExstensions.cs" />
+    <Compile Include="Extensions\RevitElement\SolidGetter.cs" />
+    <Compile Include="Extensions\RevitDocumentExstensions.cs" />
+    <Compile Include="Extensions\RevitElementExstensions.cs" />
+    <Compile Include="Extensions\RevitLinkExstensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RevitCommands\CreateHoleTasks.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="HoleCuterPlugin.cd" />
     <None Include="packages.config" />
     <AdditionalFiles Include="stylecop.json" />
+    <None Include="Resources\GloryHole.addin" />
+    <None Include="Resources\HoleTask.addin" />
+    <None Include="Resources\README.md" />
   </ItemGroup>
   <ItemGroup>
     <Analyzer Include="..\packages\SonarAnalyzer.CSharp.9.7.0.75501\analyzers\Google.Protobuf.dll" />
@@ -112,6 +117,15 @@
     <Analyzer Include="..\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.CodeFixes.dll" />
     <Analyzer Include="..\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GloryHole\GloryHole.csproj">
+      <Project>{11f04b26-6601-47a1-be40-c22370664e4b}</Project>
+      <Name>GloryHole</Name>
+    </ProjectReference>
+  </ItemGroup>
   <ItemGroup />
+  <ItemGroup>
+    <Content Include="Resources\RevitRuneasyexample.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

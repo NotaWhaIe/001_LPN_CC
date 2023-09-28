@@ -189,8 +189,7 @@ namespace GloryHole
                             .OfCategory(BuiltInCategory.OST_Floors)
                             .OfClass(typeof(Floor))
                             .WhereElementIsNotElementType()
-                            .Cast<Floor>()
-                            .Where(f => f.get_Parameter(BuiltInParameter.FLOOR_PARAM_IS_STRUCTURAL).AsInteger() == 1)
+                            .Cast<Floor>()                           
                             .ToList();
 
                         //Обработка стен

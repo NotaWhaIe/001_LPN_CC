@@ -6,7 +6,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Autodesk.Revit.DB;
-using Strana.Revit.Exstensions;
+using Strana.Revit.Extension;
 
 namespace Strana.Revit.BaseElements
 {

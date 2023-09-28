@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+  <AddIn Type="Command">
+    <Text>HoleTask</Text>
+    <Description>Some description for HoleTasks</Description>
+    <Assembly>C:\Users\Gette.E\source\repos\Strana.Revit\Strana.Revit\bin\x64\Debug\Strana.Revit.HoleTask.dll</Assembly>
+    <FullClassName>Strana.Revit.HoleTask.RevitCommands.CreateHoleTasks</FullClassName>
+    <ClientId>4c36b241-0ea5-4210-ad1a-bc71a2507b86</ClientId>
+    <VendorId>com.typepad.thebuildingcoder</VendorId>
+    <VendorDescription>The Building Coder, http://thebuildingcoder.typepad.com</VendorDescription>
+  </AddIn>
+  </RevitAddIns>
