@@ -25,10 +25,12 @@ namespace Strana.Revit.HoleTask.Extension.RevitElement
         /// Get from wall and floor solid without holes.
         /// </summary>
         /// <param name="element">This is fooor or wall.</param>
+        /// <param name="revitLink">Transform solid by the given revit link instance.</param>
         /// <returns><seealso cref="Solid"/></returns>
         /// <remarks>now return solid with holes.</remarks>
-        public static Solid GetSolidWithoutHoles(this Element element)
+        public static Solid GetSolidWithoutHoles(this Element element, RevitLinkInstance revitLink)
         {
+            Transform transform = revitLink.GetTotalTransform();
             Solid solidWithHoles = element.GetSolidWithHoles();
             Face solidFacade = GetSolidMainFace(solidWithHoles);
             CurveLoop outerConture = MainOuterContourFromFace(solidFacade); // внешний контур
@@ -46,8 +48,8 @@ namespace Strana.Revit.HoleTask.Extension.RevitElement
                     0,
                     pathAttachmentParam,
                     outerLoops);
-
-            return solidWithoutHoles;
+ 
+            return SolidUtils.CreateTransformed(solidWithoutHoles, transform);
         }
 
         private static Solid GetSolidWithHoles(this Element element)
