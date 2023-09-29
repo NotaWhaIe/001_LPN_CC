@@ -48,18 +48,18 @@ namespace Strana.Revit.HoleTask.RevitCommands
                         if (solidCurve != null && solidCurve.SegmentCount > 0)
                         {
                             Curve intersectionCurve = solidCurve.GetCurveSegment(0);
-                            double mepDiameter = mepElement.get_Parameter(BuiltInParameter.RBS_CURVE_DIAMETER_PARAM)?.AsDouble() ?? 0.0;
+                            double mepDiameter = mepElement.get_Parameter(BuiltInParameter.RBS_CURVE_DIAMETER_PARAM)?.AsDouble() ?? 0;
                             double mepHeight;
                             double mepWidth;
-                            if (mepDiameter != 0.0)
+                            if (mepDiameter > 0)
                             {
                                 mepHeight = mepDiameter;
                                 mepWidth = mepDiameter;
                             }
                             else
                             {
-                                mepHeight = mepElement.get_Parameter(BuiltInParameter.RBS_CURVE_HEIGHT_PARAM)?.AsDouble() ?? 0.0;
-                                mepWidth = mepElement.get_Parameter(BuiltInParameter.RBS_CURVE_WIDTH_PARAM)?.AsDouble() ?? 0.0;
+                                mepHeight = mepElement.get_Parameter(BuiltInParameter.RBS_CURVE_HEIGHT_PARAM)?.AsDouble() ?? 0;
+                                mepWidth = mepElement.get_Parameter(BuiltInParameter.RBS_CURVE_WIDTH_PARAM)?.AsDouble() ?? 0;
                             }
 
                             SolidCreater.CreateSphereByPoint(doc, intersectionCurve.GetEndPoint(0));
