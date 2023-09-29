@@ -3,13 +3,9 @@
 // Licensed under the NC license. See LICENSE.md file in the project root for full license information.
 // </copyright>
 
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.UI;
 using Strana.Revit.HoleTask.ElementCollections;
 using Strana.Revit.HoleTask.Extension.RevitElement;
