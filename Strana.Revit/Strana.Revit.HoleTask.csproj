@@ -98,6 +98,7 @@
     <Compile Include="BaseElements\HoleTaskInnerSolid.cs" />
     <Compile Include="BaseElements\MepElementGeometryType.cs" />
     <Compile Include="ElementCollections\LinkInstanseCollections.cs" />
+    <Compile Include="ElementCollections\MepElementCollections.cs" />
     <Compile Include="Extensions\RevitElement\SolidGetter.cs" />
     <Compile Include="Extensions\RevitDocumentExstensions.cs" />
     <Compile Include="Extensions\RevitElementExstensions.cs" />
