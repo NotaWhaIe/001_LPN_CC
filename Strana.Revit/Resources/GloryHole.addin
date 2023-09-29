@@ -3,7 +3,7 @@
   <AddIn Type="Command">
     <Text>GloryHole</Text>
     <Description>Some description for CE_RSN plus</Description>
-    <Assembly>C:\Users\Gette.E\source\repos\Strana.Revit\Strana.Revit\bin\x64\Debug\GloryHole.dll</Assembly>
+    <Assembly>GloryHole.dll</Assembly>
     <FullClassName>GloryHole.GloryHoleCommand</FullClassName>
     <ClientId>4c36b241-0ea5-4210-ad2a-bc71a2507b86</ClientId>
     <VendorId>com.typepad.thebuildingcoder</VendorId>
