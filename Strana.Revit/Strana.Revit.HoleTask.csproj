@@ -115,7 +115,6 @@
     <AdditionalFiles Include="stylecop.json" />
     <None Include="Resources\GloryHole.addin" />
     <None Include="Resources\HoleTask.addin" />
-    <None Include="Resources\README.md" />
   </ItemGroup>
   <ItemGroup>
     <Analyzer Include="..\packages\SonarAnalyzer.CSharp.9.7.0.75501\analyzers\Google.Protobuf.dll" />
