@@ -1,0 +1,12 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Strana.Revit.HoleTask" GeneratedClassName="Confing">
+  <Profiles />
+  <Settings>
+    <Setting Name="floorHoleTaskPath" Type="System.String" Scope="User">
+      <Value Profile="(Default)">\\sb-sharegp\StranaDev_FamilyManager\430_Задания на отверстия\(Отв_Задание)_Перекрытия_Прямоугольное.rfa</Value>
+    </Setting>
+    <Setting Name="wallHoleTaskPath" Type="System.String" Scope="User">
+      <Value Profile="(Default)">\\sb-sharegp\StranaDev_FamilyManager\430_Задания на отверстия\(Отв_Задание)_Стены_Прямоугольное.rfa</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

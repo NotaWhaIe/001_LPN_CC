@@ -3,9 +3,9 @@
 // Licensed under the NC license. See LICENSE.md file in the project root for full license information.
 // </copyright>
 
-using Autodesk.Revit.DB;
 using System;
 using System.Collections.Generic;
+using Autodesk.Revit.DB;
 
 namespace Strana.Revit.HoleTask.Utils
 {

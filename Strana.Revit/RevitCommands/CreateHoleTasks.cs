@@ -30,6 +30,9 @@ namespace Strana.Revit.HoleTask.RevitCommands
         {
             UIDocument uidoc = commandData.Application.ActiveUIDocument;
             Document doc = uidoc.Document;
+            HoleTaskFamilyLoader familyLoader = new (doc);
+            FamilySymbol floorHoleFamilySymbol = familyLoader.FloorFamilySymbol;
+            FamilySymbol wallHoleFamilySymbol = familyLoader.WallFamilySymbol;
 
             foreach (RevitLinkInstance linkInstance in LinkInstanseCollections.RevitLinks(doc))
             {

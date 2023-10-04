@@ -97,6 +97,11 @@
     <Compile Include="BaseElements\HoleTask.cs" />
     <Compile Include="BaseElements\HoleTaskInnerSolid.cs" />
     <Compile Include="BaseElements\MepElementGeometryType.cs" />
+    <Compile Include="Confing.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Confing.settings</DependentUpon>
+    </Compile>
     <Compile Include="ElementCollections\LinkInstanseCollections.cs" />
     <Compile Include="ElementCollections\MepElementCollections.cs" />
     <Compile Include="Extensions\RevitElement\SolidGetter.cs" />
@@ -107,9 +112,15 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RevitCommands\CreateHoleTasks.cs" />
     <Compile Include="RevitCommands\Test.cs" />
+    <Compile Include="Utils\HoleTaskFamilyLoader.cs" />
     <Compile Include="Utils\SolidCreater.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
+    <None Include="Confing.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Confing.Designer.cs</LastGenOutput>
+    </None>
     <None Include="HoleCuterPlugin.cd" />
     <None Include="packages.config" />
     <AdditionalFiles Include="stylecop.json" />

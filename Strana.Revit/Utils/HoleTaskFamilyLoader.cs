@@ -4,7 +4,9 @@
 // </copyright>
 
 using System;
-using Autodesk.Revit.Creation;
+using System.IO;
+using System.Linq;
+using Autodesk.Revit.DB;
 
 namespace Strana.Revit.HoleTask.Utils
 {
@@ -13,14 +15,102 @@ namespace Strana.Revit.HoleTask.Utils
     /// </summary>
     public class HoleTaskFamilyLoader
     {
+        private readonly Document doc;
+        private FamilySymbol floorFamilySymbol;
+        private FamilySymbol wallFamilySymbol;
+
         /// <summary>
-        /// This class check are neaded to plugin families are loaded.
-        /// If families not load this class load  families in current project.
+        /// Initializes a new instance of the <see cref="HoleTaskFamilyLoader"/> class.
+        /// Load families into a Revit document.
         /// </summary>
-        /// <param name="doc">Current revit document.<seealso cref="Document"/></param>
-        public void LoadUnloadedHoleTaskFamilies(Document doc)
+        /// <param name="doc"><seealso cref="Document"/></param>
+        public HoleTaskFamilyLoader(Document doc)
         {
-            throw new NotSupportedException();
+            this.doc = doc;
+        }
+
+        /// <summary>
+        /// Get familySymbol for floor from repository or carrent document
+        /// </summary>
+        public FamilySymbol FloorFamilySymbol
+        {
+            get
+            {
+                if (this.floorFamilySymbol == null)
+                {
+                    var familySymbol = new FilteredElementCollector(this.doc)
+                                         .OfClass(typeof(FamilySymbol))
+                                         .WhereElementIsElementType()
+                                         .Cast<FamilySymbol>();
+                    foreach (var checkFamilySymbol in familySymbol)
+                    {
+                        if (checkFamilySymbol.Name != Path.GetFileNameWithoutExtension(Confing.Default.floorHoleTaskPath))
+                        {
+                            continue;
+                        }
+
+                        this.floorFamilySymbol = checkFamilySymbol;
+                        break;
+                    }
+
+                    if (this.floorFamilySymbol == null)
+                    {
+                        using (Transaction t = new Transaction(this.doc, "Load family for floor"))
+                        {
+                            t.Start();
+                            this.doc.LoadFamilySymbol(
+                                Confing.Default.floorHoleTaskPath,
+                                Path.GetFileNameWithoutExtension(Confing.Default.floorHoleTaskPath),
+                                out this.floorFamilySymbol);
+                            t.Commit();
+                        }
+                    }
+                }
+
+                return this.floorFamilySymbol;
+            }
+        }
+
+        /// <summary>
+        /// Get familySymbol for wall from repository or carrent document
+        /// </summary>
+        public FamilySymbol WallFamilySymbol
+        {
+            get
+            {
+                if (this.wallFamilySymbol == null)
+                {
+                    var familySymbol = new FilteredElementCollector(this.doc)
+                                         .OfClass(typeof(FamilySymbol))
+                                         .WhereElementIsElementType()
+                                         .Cast<FamilySymbol>();
+                    foreach (var checkFamilySymbol in familySymbol)
+                    {
+                        if (checkFamilySymbol.Name != Path.GetFileNameWithoutExtension(Confing.Default.wallHoleTaskPath))
+                        {
+                            continue;
+                        }
+
+                        this.wallFamilySymbol = checkFamilySymbol;
+                        break;
+                    }
+
+                    if (this.wallFamilySymbol == null)
+                    {
+                        using (Transaction t = new Transaction(this.doc, "Load family for wall"))
+                        {
+                            t.Start();
+                            this.doc.LoadFamilySymbol(
+                                Confing.Default.wallHoleTaskPath,
+                                Path.GetFileNameWithoutExtension(Confing.Default.wallHoleTaskPath),
+                                out this.wallFamilySymbol);
+                            t.Commit();
+                        }
+                    }
+                }
+
+                return this.wallFamilySymbol;
+            }
         }
     }
 }
