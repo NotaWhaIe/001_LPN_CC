@@ -30,26 +30,36 @@ namespace Strana.Revit.HoleTask.Extension.RevitElement
         /// <remarks>now return solid with holes.</remarks>
         public static Solid GetSolidWithoutHoles(this Element element, RevitLinkInstance revitLink)
         {
-            Transform transform = revitLink.GetTotalTransform();
-            Solid solidWithHoles = element.GetSolidWithHoles();
-            Face solidFacade = GetSolidMainFace(solidWithHoles);
-            CurveLoop outerConture = MainOuterContourFromFace(solidFacade); // внешний контур
-            List<CurveLoop> outerLoops = new ()
+            try
             {
-                outerConture,
-            };
+                Transform transform = revitLink.GetTotalTransform();
+                Solid solidWithHoles = element.GetSolidWithHoles();
+                Face solidFacade = GetSolidMainFace(solidWithHoles);
+                // if (element.Id.IntegerValue == 3887728) { } Элемент в тестовой модели, который не отрабатывает корректно, починить.
+                CurveLoop outerConture = MainOuterContourFromFace(solidFacade); // внешний контур
+                List<CurveLoop> outerLoops = new ()
+                {
+                    outerConture,
+                };
 
-            CurveLoop sweepPath = GetSweepPath(solidWithHoles); // траектория выдавливания
-            double pathAttachmentParam = sweepPath.First().GetEndParameter(0);
+                CurveLoop sweepPath = GetSweepPath(solidWithHoles); // траектория выдавливания
+                double pathAttachmentParam = sweepPath.First().GetEndParameter(0);
 
-            Solid solidWithoutHoles = GeometryCreationUtilities
-                .CreateSweptGeometry(
-                    sweepPath,
-                    0,
-                    pathAttachmentParam,
-                    outerLoops);
- 
-            return SolidUtils.CreateTransformed(solidWithoutHoles, transform);
+                Solid solidWithoutHoles = GeometryCreationUtilities
+                    .CreateSweptGeometry(
+                        sweepPath,
+                        0,
+                        pathAttachmentParam,
+                        outerLoops);
+
+                return SolidUtils.CreateTransformed(solidWithoutHoles, transform);
+            }
+            catch
+            {
+                Transform transform = revitLink.GetTotalTransform();
+                Solid solidWithHoles = element.GetSolidWithHoles();
+                return SolidUtils.CreateTransformed(solidWithHoles, transform);
+            }
         }
 
         private static Solid GetSolidWithHoles(this Element element)

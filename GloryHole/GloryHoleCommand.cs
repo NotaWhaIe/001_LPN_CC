@@ -703,7 +703,7 @@ namespace GloryHole
                                         }
                                     }
 
-                                    foreach (Duct duct in ductsList)
+                                    foreach (Duct duct      in ductsList)
                                     {
                                         Curve ductCurve = (duct.Location as LocationCurve).Curve;
                                         SolidCurveIntersectionOptions scio = new SolidCurveIntersectionOptions();

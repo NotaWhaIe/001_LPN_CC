@@ -61,17 +61,16 @@
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
-    <Reference Include="RevitAPI, Version=24.0.0.0, Culture=neutral, processorArchitecture=AMD64">
-      <HintPath>..\packages\Revit_All_Main_Versions_API_x64.2024.0.0\lib\net48\RevitAPI.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="RevitAPI">
+      <HintPath>..\..\Program Files\Autodesk\Revit 2021\RevitAPI.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="RevitAPIIFC">
-      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2021\RevitAPIIFC.dll</HintPath>
+      <HintPath>..\..\Program Files\Autodesk\Revit 2021\RevitAPIIFC.dll</HintPath>
+      <Private>False</Private>
     </Reference>
-    <Reference Include="RevitAPIUI, Version=24.0.0.0, Culture=neutral, processorArchitecture=AMD64">
-      <HintPath>..\packages\Revit_All_Main_Versions_API_x64.2024.0.0\lib\net48\RevitAPIUI.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="RevitAPIUI">
+      <HintPath>..\..\Program Files\Autodesk\Revit 2021\RevitAPIUI.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
@@ -112,7 +111,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RevitCommands\CreateHoleTasks.cs" />
     <Compile Include="RevitCommands\Test.cs" />
+    <Compile Include="Utils\HoleTaskCreator.cs" />
     <Compile Include="Utils\HoleTaskFamilyLoader.cs" />
+    <Compile Include="Utils\OrientaionType.cs" />
     <Compile Include="Utils\SolidCreater.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -125,6 +126,7 @@
     <None Include="packages.config" />
     <AdditionalFiles Include="stylecop.json" />
     <None Include="Resources\GloryHole.addin" />
+    <None Include="Resources\test.addin" />
     <None Include="Resources\HoleTask.addin" />
   </ItemGroup>
   <ItemGroup>
@@ -141,7 +143,6 @@
       <Name>GloryHole</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <Content Include="Resources\RevitRuneasyexample.txt" />
   </ItemGroup>

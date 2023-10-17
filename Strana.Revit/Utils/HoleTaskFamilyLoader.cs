@@ -30,7 +30,7 @@ namespace Strana.Revit.HoleTask.Utils
         }
 
         /// <summary>
-        /// Get familySymbol for floor from repository or carrent document
+        /// Get familySymbol for floor from repository or carrent document.
         /// </summary>
         public FamilySymbol FloorFamilySymbol
         {
@@ -62,6 +62,7 @@ namespace Strana.Revit.HoleTask.Utils
                                 Confing.Default.floorHoleTaskPath,
                                 Path.GetFileNameWithoutExtension(Confing.Default.floorHoleTaskPath),
                                 out this.floorFamilySymbol);
+                            this.floorFamilySymbol.Activate();
                             t.Commit();
                         }
                     }
@@ -72,7 +73,7 @@ namespace Strana.Revit.HoleTask.Utils
         }
 
         /// <summary>
-        /// Get familySymbol for wall from repository or carrent document
+        /// Get familySymbol for wall from repository or carrent document.
         /// </summary>
         public FamilySymbol WallFamilySymbol
         {
@@ -104,6 +105,7 @@ namespace Strana.Revit.HoleTask.Utils
                                 Confing.Default.wallHoleTaskPath,
                                 Path.GetFileNameWithoutExtension(Confing.Default.wallHoleTaskPath),
                                 out this.wallFamilySymbol);
+                            this.wallFamilySymbol.Activate();
                             t.Commit();
                         }
                     }

@@ -8,5 +8,8 @@
     <Setting Name="wallHoleTaskPath" Type="System.String" Scope="User">
       <Value Profile="(Default)">\\sb-sharegp\StranaDev_FamilyManager\430_Задания на отверстия\(Отв_Задание)_Стены_Прямоугольное.rfa</Value>
     </Setting>
+    <Setting Name="G" Type="System.Guid" Scope="User">
+      <Value Profile="(Default)">00000000-0000-0000-0000-000000000000</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
