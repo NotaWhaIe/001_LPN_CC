@@ -55,18 +55,14 @@ namespace Strana.Revit.HoleTask.Utils
 
                     if (this.floorFamilySymbol == null)
                     {
-                        using (Transaction t = new Transaction(this.doc, "Load family for floor"))
-                        {
-                            t.Start();
-                            this.doc.LoadFamilySymbol(
-                                Confing.Default.floorHoleTaskPath,
-                                Path.GetFileNameWithoutExtension(Confing.Default.floorHoleTaskPath),
-                                out this.floorFamilySymbol);
-                            this.floorFamilySymbol.Activate();
-                            t.Commit();
-                        }
+                        this.doc.LoadFamilySymbol(
+                            Confing.Default.floorHoleTaskPath,
+                            Path.GetFileNameWithoutExtension(Confing.Default.floorHoleTaskPath),
+                            out this.floorFamilySymbol);
                     }
                 }
+
+                this.floorFamilySymbol.Activate();
 
                 return this.floorFamilySymbol;
             }
@@ -98,18 +94,14 @@ namespace Strana.Revit.HoleTask.Utils
 
                     if (this.wallFamilySymbol == null)
                     {
-                        using (Transaction t = new Transaction(this.doc, "Load family for wall"))
-                        {
-                            t.Start();
-                            this.doc.LoadFamilySymbol(
-                                Confing.Default.wallHoleTaskPath,
-                                Path.GetFileNameWithoutExtension(Confing.Default.wallHoleTaskPath),
-                                out this.wallFamilySymbol);
-                            this.wallFamilySymbol.Activate();
-                            t.Commit();
-                        }
+                        this.doc.LoadFamilySymbol(
+                            Confing.Default.wallHoleTaskPath,
+                            Path.GetFileNameWithoutExtension(Confing.Default.wallHoleTaskPath),
+                            out this.wallFamilySymbol);
                     }
                 }
+
+                this.wallFamilySymbol.Activate();
 
                 return this.wallFamilySymbol;
             }

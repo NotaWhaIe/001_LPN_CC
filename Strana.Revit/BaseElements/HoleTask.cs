@@ -23,7 +23,7 @@ namespace Strana.Revit.BaseElements
         /// <summary>
         /// Create a Task Hole by his geometry.
         /// </summary>
-        public void CreateHoletask()
+        public void CreateHoleTask()
         {
             throw new System.NotSupportedException();
         }

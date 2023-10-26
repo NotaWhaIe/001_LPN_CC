@@ -12,6 +12,12 @@ using Autodesk.Revit.DB.Plumbing;
 using Autodesk.Revit.DB.IFC;
 using System.Diagnostics;
 using Autodesk.Revit.Creation;
+using System.Net;
+using Autodesk.Revit.DB.Electrical;
+using Autodesk.Revit.DB.Visual;
+using static System.Net.Mime.MediaTypeNames;
+using System.Data.Common;
+using System.Xml.Linq;
 //using Autodesk.DesignScript.Geometry;
 
 
@@ -23,30 +29,30 @@ namespace Strana.Revit.HoleTask.RevitCommands
         static AddInId addinId = new AddInId(new Guid("f64706dd-e8f6-4cbe-9cc6-a2910be5ad5a"));
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
-            UIDocument uiDoc = commandData.Application.ActiveUIDocument;
-            Autodesk.Revit.DB.Document doc = uiDoc.Document;
+            // Получить активный документ Revit
+            Document doc = commandData.Application.ActiveUIDocument.Document;
 
-            XYZ startPoint = new XYZ(0, 0, 0); // Начальная точка (координаты XYZ)
-            XYZ endPoint = new XYZ(0, 0, 10); // Конечная точка (координаты XYZ)
+            // Получить все экземпляры RevitLinkInstance в документе
+            FilteredElementCollector collector = new FilteredElementCollector(doc);
+            List<RevitLinkInstance> linkInstances = collector.OfClass(typeof(RevitLinkInstance)).ToElements().Cast<RevitLinkInstance>().ToList();
 
-            // Создаем новую ModelLine
-            using (Transaction transaction = new Transaction(doc, "Create Model Line"))
+            // Пройтись по всем экземплярам RevitLinkInstance
+            foreach (RevitLinkInstance linkInstance in linkInstances)
             {
-                transaction.Start();
+                Transform transform = linkInstance.GetTotalTransform();
+                XYZ xAxis = transform.BasisX;
 
-                // Создаем ModelCurve, указывая тип линии (в данном случае, прямую линию) и координаты точек
-                ModelCurve modelCurve = doc.Create.NewModelCurve(
-                    Line.CreateBound(
-                        startPoint, endPoint),
-                    SketchPlane.Create(
-                        doc, Plane.CreateByOriginAndBasis(
-                        startPoint, XYZ.BasisX, XYZ.BasisZ)));
+                double angle = Math.Atan2(xAxis.Y, xAxis.X);
 
-                transaction.Commit();
+                // Преобразовать угол из радиан в градусы
+                double angleInDegrees = angle * 180 / Math.PI;
+
+                // Теперь у вас есть угол поворота в градусах для данного экземпляра RevitLinkInstance
+                TaskDialog.Show("Rotation", "Угол поворота для RevitLinkInstance: " + angleInDegrees.ToString());
             }
 
-            TaskDialog.Show("Done!", "Result.Succeeded");
             return Result.Succeeded;
         }
+
     }
 }

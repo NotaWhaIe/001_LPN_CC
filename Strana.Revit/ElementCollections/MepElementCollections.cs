@@ -3,12 +3,14 @@
 // Licensed under the NC license. See LICENSE.md file in the project root for full license information.
 // </copyright>
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Electrical;
 using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.DB.Plumbing;
+using Strana.Revit.HoleTask.Utils;
 
 namespace Strana.Revit.HoleTask.ElementCollections
 {
@@ -16,54 +18,95 @@ namespace Strana.Revit.HoleTask.ElementCollections
     /// Class contains all mep elements in revit model.
     /// </summary>
     public static class MepElementCollections
-    {
-        /// <summary>
-        /// Gets all ducts to check intersecting.
-        /// </summary>
-        /// <param name="doc"><seealso cref="Document"/></param>
-        /// <returns>Collections of Revit duct elements.</returns>
-        public static IEnumerable<Element> AllDucts(Document doc)
+    {/// <summary>
+     /// Gets all cable trays to check intersecting + fastFilterBB.
+     /// </summary>
+     /// <param name="doc"><seealso cref="Document"/></param>
+     /// <param name="intersectedElement">wallFloor</param>
+     /// <param name="transform"></param>
+     /// <returns></returns>
+        public static IEnumerable<Element> AllMepElementsByBBox(Document doc, Element intersectedElement, Transform transform)
         {
-            return new FilteredElementCollector(doc)
-                        .OfCategory(BuiltInCategory.OST_DuctCurves)
-                        .OfClass(typeof(Duct))
-                        .WhereElementIsNotElementType();
-        }
+            BoundingBoxXYZ iEBB = intersectedElement.get_BoundingBox(null);
+            BoundingBoxXYZ transformedBoundingBox = intersectedElement.get_BoundingBox(null);
 
-        /// <summary>
-        /// Gets all pipes to check intersecting.
-        /// </summary>
-        /// <param name="doc"><seealso cref="Document"/></param>
-        /// <returns>Collections of Revit pipe elements.</returns>
-        public static IEnumerable<Element> AllPipes(Document doc)
-        {
-            return new FilteredElementCollector(doc)
-                        .OfCategory(BuiltInCategory.OST_PipeCurves)
-                        .OfClass(typeof(Pipe))
-                        .WhereElementIsNotElementType();
-        }
+            XYZ poinFirst = transform.OfPoint(iEBB.Min);
+            XYZ poinLast = transform.OfPoint(iEBB.Max);
+            XYZ transformedMin;
+            XYZ transformedMax;
 
-        /// <summary>
-        /// Gets all cable trays to check intersecting.
-        /// </summary>
-        /// <param name="doc"><seealso cref="Document"/></param>
-        /// <returns>Collections of Revit cable tray elements.</returns>
-        public static IEnumerable<Element> AllCableTrays(Document doc)
-        {
-            return new FilteredElementCollector(doc)
+
+
+
+            transformedBoundingBox.Min = transformedMin;
+            transformedBoundingBox.Max = transformedMax;
+            List<XYZ> allBoundingBoxPoints =
+            [
+                 transform.OfPoint(new XYZ(iEBB.Min.X, iEBB.Min.Y, iEBB.Max.Z)),
+                 transform.OfPoint(new XYZ(iEBB.Min.X, iEBB.Max.Y, iEBB.Max.Z)),
+                 transform.OfPoint(new XYZ(iEBB.Max.X, iEBB.Max.Y, iEBB.Min.Z)),
+                 transform.OfPoint(new XYZ(iEBB.Max.X, iEBB.Min.Y, iEBB.Min.Z)),
+            ];
+
+            transformedBoundingBox.ExpandToContain(allBoundingBoxPoints);
+
+            HoleTaskCreator.CreateSphereByPoint(doc, transformedBoundingBox.Min);
+            HoleTaskCreator.CreateSphereByPoint(doc, transformedBoundingBox.Max);
+            Outline outline = new(transformedBoundingBox.Min, transformedBoundingBox.Max);
+
+            BoundingBoxIntersectsFilter filter = new(outline);
+
+            var d = new FilteredElementCollector(doc)
+                          .OfCategory(BuiltInCategory.OST_DuctCurves)
+                          .OfClass(typeof(Duct))
+                          .WhereElementIsNotElementType()
+                          .WherePasses(filter);
+
+            var p = new FilteredElementCollector(doc)
+                         .OfCategory(BuiltInCategory.OST_PipeCurves)
+                         .OfClass(typeof(Pipe))
+                         .WhereElementIsNotElementType()
+                         .WherePasses(filter);
+
+            var c = new FilteredElementCollector(doc)
                         .OfCategory(BuiltInCategory.OST_CableTray)
                         .OfClass(typeof(CableTray))
-                        .WhereElementIsNotElementType();
+                        .WhereElementIsNotElementType()
+                        .WherePasses(filter);
+
+            return d.Concat(p).Concat(c);
         }
 
         /// <summary>
-        /// Gets all MEP elements to check intersecting (ducts, pipes, cable trays).
+        ///     Expand the given bounding box to include
+        ///     and contain the given point.
         /// </summary>
-        /// <param name="doc"><seealso cref="Document"/></param>
-        /// <returns>Collections of Revit MEP elements.</returns>
-        public static IEnumerable<Element> AllMepElements(Document doc)
+        public static void ExpandToContain(this BoundingBoxXYZ bb, XYZ p)
         {
-            return AllDucts(doc).Concat(AllPipes(doc)).Concat(AllCableTrays(doc));
+            bb.Min = new XYZ(Math.Min(bb.Min.X, p.X),
+                Math.Min(bb.Min.Y, p.Y),
+                Math.Min(bb.Min.Z, p.Z));
+
+            bb.Max = new XYZ(Math.Max(bb.Max.X, p.X),
+                Math.Max(bb.Max.Y, p.Y),
+                Math.Max(bb.Max.Z, p.Z));
+        }
+
+        /// <summary>
+        ///     Expand the given bounding box to include
+        ///     and contain the given points.
+        /// </summary>
+        public static void ExpandToContain(this BoundingBoxXYZ bb, IEnumerable<XYZ> pts)
+        {
+            bb.ExpandToContain(new XYZ(
+                pts.Min<XYZ, double>(p => p.X),
+                pts.Min<XYZ, double>(p => p.Y),
+                pts.Min<XYZ, double>(p => p.Z)));
+
+            bb.ExpandToContain(new XYZ(
+                pts.Max<XYZ, double>(p => p.X),
+                pts.Max<XYZ, double>(p => p.Y),
+                pts.Max<XYZ, double>(p => p.Z)));
         }
     }
 }

@@ -4,14 +4,13 @@
 // </copyright>
 
 using System.Collections.Generic;
-using System.Linq;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.IFC;
 
 namespace Strana.Revit.HoleTask.Extension.RevitElement
 {
     /// <summary>
-    /// This extension for geting element solids.
+    /// This extension for getting element solids.
     /// </summary>
     public static class SolidGetter
     {
@@ -24,7 +23,7 @@ namespace Strana.Revit.HoleTask.Extension.RevitElement
         /// <summary>
         /// Get from wall and floor solid without holes.
         /// </summary>
-        /// <param name="element">This is fooor or wall.</param>
+        /// <param name="element">This is floor or wall.</param>
         /// <param name="revitLink">Transform solid by the given revit link instance.</param>
         /// <returns><seealso cref="Solid"/></returns>
         /// <remarks>now return solid with holes.</remarks>
@@ -35,22 +34,14 @@ namespace Strana.Revit.HoleTask.Extension.RevitElement
                 Transform transform = revitLink.GetTotalTransform();
                 Solid solidWithHoles = element.GetSolidWithHoles();
                 Face solidFacade = GetSolidMainFace(solidWithHoles);
-                // if (element.Id.IntegerValue == 3887728) { } Элемент в тестовой модели, который не отрабатывает корректно, починить.
-                CurveLoop outerConture = MainOuterContourFromFace(solidFacade); // внешний контур
-                List<CurveLoop> outerLoops = new ()
-                {
-                    outerConture,
-                };
+
+                CurveLoop outerСontour = MainOuterContourFromFace(solidFacade); // внешний контур
+                List<CurveLoop> outerLoops = [outerСontour];
 
                 CurveLoop sweepPath = GetSweepPath(solidWithHoles); // траектория выдавливания
-                double pathAttachmentParam = sweepPath.First().GetEndParameter(0);
 
                 Solid solidWithoutHoles = GeometryCreationUtilities
-                    .CreateSweptGeometry(
-                        sweepPath,
-                        0,
-                        pathAttachmentParam,
-                        outerLoops);
+                    .CreateSweptGeometry(sweepPath, 0, 0, outerLoops);
 
                 return SolidUtils.CreateTransformed(solidWithoutHoles, transform);
             }
@@ -62,34 +53,72 @@ namespace Strana.Revit.HoleTask.Extension.RevitElement
             }
         }
 
+        /// <summary>
+        /// bool give information are need see collision by this element.
+        /// </summary>
+        /// <param name="element">floor or wall.</param>
+        /// <returns> are need create hole task by current element.</returns>
+        public static bool AreElementsHaveFaces(this Element element)
+        {
+            Solid solid = element.GetSolidWithHoles();
+            if (solid == null)
+            {
+                return false;
+            }
+
+            foreach (var face in solid.Faces)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
         private static Solid GetSolidWithHoles(this Element element)
         {
             GeometryElement geometryElement = element.get_Geometry(Opt);
-            Solid elementSolid = null;
+            Solid largestSolid = null;
+            double largestVolume = 0.0;
 
             foreach (GeometryObject geometry in geometryElement)
             {
-                elementSolid = geometry as Solid;
+                if (geometry is Solid solid && solid.Volume > 0 && solid.Volume > largestVolume)
+                {
+                    largestSolid = solid;
+                    largestVolume = solid.Volume;
+                }
             }
 
-            return elementSolid;
+            return largestSolid;
         }
 
         /// <summary>
-        /// return element facade face.
+        /// return element façade face.
         /// </summary>
         /// <param name="solid"><seealso cref="Solid"/></param>
-        /// <returns>facade face. <seealso cref="Face"/></returns>
+        /// <returns>façade face. <seealso cref="Face"/></returns>
         private static Face GetSolidMainFace(Solid solid)
         {
             Face faceMaxSquare = null;
             var faces = solid.Faces;
-            foreach (Face solidface in faces)
+            foreach (Face solidFace in faces)
             {
-                if (faceMaxSquare == null || faceMaxSquare.Area < solidface.Area)
+                if (faceMaxSquare == null || faceMaxSquare.Area < solidFace.Area)
                 {
-                    faceMaxSquare = solidface;
+                    faceMaxSquare = solidFace;
                 }
+            }
+
+            if (faceMaxSquare == null)
+            {
+                foreach (Face solidFace in faces)
+                {
+                    if (faceMaxSquare == null || faceMaxSquare.Area < solidFace.Area)
+                    {
+                        faceMaxSquare = solidFace;
+                    }
+                }
+
             }
 
             return faceMaxSquare;
@@ -99,8 +128,8 @@ namespace Strana.Revit.HoleTask.Extension.RevitElement
         {
             EdgeArrayArray allFaceEdges = faceWithHoles.EdgeLoops;
 
-            List<CurveLoop> curentUnitedCurveLoopList = new List<CurveLoop>();
-            CurveLoop curentUnitedCurveLoop = null;
+            List<CurveLoop> currentUnitedCurveLoopList = new ();
+            CurveLoop currentUnitedCurveLoop = null;
 
             foreach (EdgeArray agesOfOneFace in allFaceEdges)
             {
@@ -112,20 +141,19 @@ namespace Strana.Revit.HoleTask.Extension.RevitElement
                     unitedCurve.Add(curve);
                 }
 
-                List<CurveLoop> curveLoopList = new List<CurveLoop>();
+                List<CurveLoop> curveLoopList = new ();
                 CurveLoop curvesLoop = CurveLoop.Create(unitedCurve);
                 curveLoopList.Add(curvesLoop);
-                if (curentUnitedCurveLoop == null || ExporterIFCUtils
+                if (currentUnitedCurveLoop == null || ExporterIFCUtils
                     .ComputeAreaOfCurveLoops(curveLoopList) > ExporterIFCUtils
-                    .ComputeAreaOfCurveLoops(curentUnitedCurveLoopList))
+                    .ComputeAreaOfCurveLoops(currentUnitedCurveLoopList))
                 {
-                    curentUnitedCurveLoop = curvesLoop;
-                    curentUnitedCurveLoopList = new List<CurveLoop>();
-                    curentUnitedCurveLoopList.Add(curvesLoop);
+                    currentUnitedCurveLoop = curvesLoop;
+                    currentUnitedCurveLoopList = [curvesLoop];
                 }
             }
 
-            return curentUnitedCurveLoop;
+            return currentUnitedCurveLoop;
         }
 
         private static CurveLoop GetSweepPath(Solid solid)
@@ -140,10 +168,7 @@ namespace Strana.Revit.HoleTask.Extension.RevitElement
                 }
             }
 
-            List<Curve> curve = new ()
-            {
-                edgeMin.AsCurve(),
-            };
+            List<Curve> curve = [edgeMin?.AsCurve() ?? null];
             CurveLoop edgeMinCurvesLoop = CurveLoop.Create(curve);
             return edgeMinCurvesLoop;
         }
