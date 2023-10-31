@@ -122,7 +122,7 @@ namespace Strana.Revit.HoleTask.Utils
             IEnumerable<Level> docLvlList = this.GetDocumentLevels(this.doc);
 
             double holeTaskWidth = this.RoundUpToIncrement(mepHeight + clearance, roundHoleSizesUpIncrement);
-            double holeTaskThickness = this.RoundUpToIncrement(this.CalculatedWidth( mepWidth, intersectedElement, intersection) + clearance, roundHoleSizesUpIncrement);
+            double holeTaskThickness = this.RoundUpToIncrement(this.CalculatedWidth(mepWidth, intersectedElement, intersection) + clearance, roundHoleSizesUpIncrement);
             double holeTaskHeight = this.GetInterctedElementThickness(intersectedElement) + (60 / 304.8);
 
             Level lvl = GetClosestFloorLevel(docLvlList, linkDoc, intersectedElement);
@@ -298,10 +298,10 @@ namespace Strana.Revit.HoleTask.Utils
                 foreach (Connector mepConnector in curve.ConnectorManager.Connectors)
                 {
                     double rotationAngle = Math.Abs(Math.Asin(mepConnector.CoordinateSystem.BasisY.X) - (Math.PI / 2));
-
+                    //double rotationAngle = Math.Abs(Math.Asin(mepConnector.CoordinateSystem.BasisZ.Y) - (26 * Math.PI / 180));
                     if (rotationAngle != 0)
                     {
-                        ElementTransformUtils.RotateElement(this.doc, holeTask.Id, axis, (rotationAngle /*+ linkRotation*/));
+                        ElementTransformUtils.RotateElement(this.doc, holeTask.Id, axis, rotationAngle);
                     }
 
                     break;

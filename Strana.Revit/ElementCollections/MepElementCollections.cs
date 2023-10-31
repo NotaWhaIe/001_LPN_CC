@@ -54,8 +54,6 @@ namespace Strana.Revit.HoleTask.ElementCollections
 
             transformedBoundingBox.ExpandToContain(allBoundingBoxPoints);
 
-            HoleTaskCreator.CreateSphereByPoint(doc, transformedBoundingBox.Min);
-            HoleTaskCreator.CreateSphereByPoint(doc, transformedBoundingBox.Max);
             Outline outline = new(transformedBoundingBox.Min, transformedBoundingBox.Max);
 
             BoundingBoxIntersectsFilter filter = new(outline);
