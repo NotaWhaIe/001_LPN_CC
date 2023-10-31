@@ -124,7 +124,7 @@ namespace Strana.Revit.HoleTask.Utils
             IEnumerable<Level> docLvlList = this.GetDocumentLevels(this.doc);
 
             double holeTaskWidth = this.RoundUpToIncrement(mepHeight + clearance, roundHoleSizesUpIncrement);
-            double holeTaskThickness = this.RoundUpToIncrement(this.CalculatedWidth(orientation, mepWidth, intersectedElement, intersection) + clearance, roundHoleSizesUpIncrement);
+            double holeTaskThickness = this.RoundUpToIncrement(this.CalculatedWidth( mepWidth, intersectedElement, intersection) + clearance, roundHoleSizesUpIncrement);
             double holeTaskHeight = this.GetInterctedElementThickness(intersectedElement) + (60 / 304.8);
 
             Level lvl = GetClosestFloorLevel(docLvlList, linkDoc, intersectedElement);

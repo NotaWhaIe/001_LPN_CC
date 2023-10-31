@@ -32,20 +32,24 @@ namespace Strana.Revit.HoleTask.ElementCollections
 
             XYZ poinFirst = transform.OfPoint(iEBB.Min);
             XYZ poinLast = transform.OfPoint(iEBB.Max);
-            XYZ transformedMin;
-            XYZ transformedMax;
 
-
-
+            double pointFirstX = poinFirst.X < poinLast.X ? poinFirst.X : poinLast.X;
+            double pointFirstY = poinFirst.Y < poinLast.Y ? poinFirst.Y : poinLast.Y;
+            double pointFirstZ = poinFirst.Z < poinLast.Z ? poinFirst.Z : poinLast.Z;
+            double poinLastX = poinFirst.X > poinLast.X ? poinFirst.X : poinLast.X;
+            double poinLastY = poinFirst.Y > poinLast.Y ? poinFirst.Y : poinLast.Y;
+            double poinLastZ = poinFirst.Z > poinLast.Z ? poinFirst.Z : poinLast.Z;
+            XYZ transformedMin = new XYZ(pointFirstX, pointFirstY, pointFirstZ);
+            XYZ transformedMax = new XYZ(poinLastX, poinLastY, poinLastZ);
 
             transformedBoundingBox.Min = transformedMin;
             transformedBoundingBox.Max = transformedMax;
             List<XYZ> allBoundingBoxPoints =
             [
-                 transform.OfPoint(new XYZ(iEBB.Min.X, iEBB.Min.Y, iEBB.Max.Z)),
-                 transform.OfPoint(new XYZ(iEBB.Min.X, iEBB.Max.Y, iEBB.Max.Z)),
-                 transform.OfPoint(new XYZ(iEBB.Max.X, iEBB.Max.Y, iEBB.Min.Z)),
-                 transform.OfPoint(new XYZ(iEBB.Max.X, iEBB.Min.Y, iEBB.Min.Z)),
+                transform.OfPoint(new XYZ(iEBB.Min.X, iEBB.Min.Y, iEBB.Max.Z)),
+                transform.OfPoint(new XYZ(iEBB.Min.X, iEBB.Max.Y, iEBB.Max.Z)),
+                transform.OfPoint(new XYZ(iEBB.Max.X, iEBB.Max.Y, iEBB.Min.Z)),
+                transform.OfPoint(new XYZ(iEBB.Max.X, iEBB.Min.Y, iEBB.Min.Z)),
             ];
 
             transformedBoundingBox.ExpandToContain(allBoundingBoxPoints);
