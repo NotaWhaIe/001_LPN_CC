@@ -7,9 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.DB.Structure;
-using Autodesk.Revit.UI;
 
 namespace Strana.Revit.HoleTask.Utils
 {
@@ -303,7 +301,7 @@ namespace Strana.Revit.HoleTask.Utils
 
                     if (rotationAngle != 0)
                     {
-                        ElementTransformUtils.RotateElement(this.doc, holeTask.Id, axis, (rotationAngle));
+                        ElementTransformUtils.RotateElement(this.doc, holeTask.Id, axis, (rotationAngle /*+ linkRotation*/));
                     }
 
                     break;
