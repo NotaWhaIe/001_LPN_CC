@@ -800,10 +800,7 @@ namespace GloryHole
                                                     //}
 
                                                     Line rotationAxis = Line.CreateBound(originIntersectionCurve, originIntersectionCurve + 1 * XYZ.BasisZ);
-                                                    ElementTransformUtils.RotateElement(doc
-                                                        , intersectionPoint.Id
-                                                        , rotationAxis
-                                                        , ductRotationAngle);
+                                                    ElementTransformUtils.RotateElement(doc , intersectionPoint.Id , rotationAxis , ductRotationAngle);
                                                 }
                                             }
                                         }
