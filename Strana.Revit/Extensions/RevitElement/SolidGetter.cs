@@ -74,7 +74,7 @@ namespace Strana.Revit.HoleTask.Extension.RevitElement
             return false;
         }
 
-        private static Solid GetSolidWithHoles(this Element element)
+        public static Solid GetSolidWithHoles(this Element element)
         {
             GeometryElement geometryElement = element.get_Geometry(Opt);
             Solid largestSolid = null;

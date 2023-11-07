@@ -4,6 +4,7 @@
 // </copyright>
 
 using System.Collections.Generic;
+using System.Linq;
 using Autodesk.Revit.DB;
 using Strana.Revit.HoleTask.ElementCollections;
 using Strana.Revit.HoleTask.Extension.RevitElement;
@@ -18,6 +19,7 @@ namespace Strana.Revit.HoleTask.Extensions
             using (var t = new Transaction(linkInstance.Document, "Create all instances of hole task"))
             {
                 t.Start();
+                List<FamilyInstance> allHoleTaskByRevitLinkInstance = new ();
                 Document linkDoc = linkInstance.GetLinkDocument();
 
                 // Взять стены и перекрытия
@@ -25,9 +27,21 @@ namespace Strana.Revit.HoleTask.Extensions
 
                 foreach (Element intersectingElement in allIntersectingElements)
                 {
-                    intersectingElement.CreateHoleTasksByIntersectedElements(linkInstance);
+                    allHoleTaskByRevitLinkInstance = allHoleTaskByRevitLinkInstance
+                        .Concat(intersectingElement
+                        .CreateHoleTasksByIntersectedElements(linkInstance))
+                        .ToList();
                 }
 
+                List<FamilyInstance> joinedHoleTasks = new HoleTasksJoiner().JoinAllHoleTask(allHoleTaskByRevitLinkInstance);
+
+                // Тест создания солида с дельтой.
+                foreach (FamilyInstance f in allHoleTaskByRevitLinkInstance)
+                {
+                    Solid s = f.GetHoleTaskSolidWithDelta();
+                }
+
+                //new HoleTasksStatusDeterminator().DeterminateAllStatuses(joinedHoleTasks, allIntersectingElements);
                 t.Commit();
             }
         }

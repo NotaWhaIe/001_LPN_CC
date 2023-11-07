@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Structure;
+using Autodesk.Revit.UI;
 
 namespace Strana.Revit.HoleTask.Utils
 {
@@ -31,7 +32,7 @@ namespace Strana.Revit.HoleTask.Utils
         }
 
         /// <summary>
-        /// for test.
+        /// For test.
         /// </summary>
         /// <param name="doc"><seealso cref="Document"/></param>
         /// <param name="center"><seealso cref="XYZ"/></param>
@@ -90,22 +91,37 @@ namespace Strana.Revit.HoleTask.Utils
             double roundHoleSizesUpIncrement)
         {
             OrientaionType orientation = this.GetElementOrientationType(mepElement);
-
             FamilySymbol holeFamilySymbol;
             HoleTaskFamilyLoader familyLoader = new(this.doc);
-            if (orientation == OrientaionType.Vertical)
-            {
-                holeFamilySymbol = familyLoader.FloorFamilySymbol;
-            }
-            else
+            Wall wall = intersectedElement as Wall;
+            if (intersectedElement == wall && orientation == OrientaionType.Horizontal)
             {
                 holeFamilySymbol = familyLoader.WallFamilySymbol;
             }
+            else if (intersectedElement == wall && orientation == OrientaionType.Vertical)
+            {
+                holeFamilySymbol = familyLoader.WallFamilySymbol;
+            }
+            else if (intersectedElement != wall && orientation == OrientaionType.Vertical)
+            {
+                holeFamilySymbol = familyLoader.FloorFamilySymbol;
+            }
+            else//(intersectedElement != wall && orientation == OrientaionType.Horizontal
+            {
+                holeFamilySymbol = familyLoader.FloorFamilySymbol;
+            }
+            //if (orientation == OrientaionType.Vertical)
+            //{
+            //    holeFamilySymbol = familyLoader.FloorFamilySymbol;
+            //}
+            //else
+            //{
+            //    holeFamilySymbol = familyLoader.WallFamilySymbol;
+            //}
 
             double mepDiameter = mepElement.get_Parameter(BuiltInParameter.RBS_CURVE_DIAMETER_PARAM)?.AsDouble() ?? 0;
             double mepHeight;
             double mepWidth;
-
             if (mepDiameter > 0)
             {
                 mepHeight = mepDiameter;
@@ -210,13 +226,22 @@ namespace Strana.Revit.HoleTask.Utils
             XYZ startPoint = mepElementCurve.Curve.GetEndPoint(0);
             XYZ endPoint = mepElementCurve.Curve.GetEndPoint(1);
             double tolerance = 0.1; // Add zeros to reduce tolerance
-
-            if (Math.Abs(startPoint.Z - endPoint.Z) <= tolerance)
+            if (Math.Abs(startPoint.X - endPoint.X) <= tolerance)
             {
-                return OrientaionType.Horizontal;
+                return OrientaionType.Vertical;
             }
 
-            return OrientaionType.Vertical;
+            return OrientaionType.Horizontal;
+            //LocationCurve mepElementCurve = mepElement.Location as LocationCurve;
+            //XYZ startPoint = mepElementCurve.Curve.GetEndPoint(0);
+            //XYZ endPoint = mepElementCurve.Curve.GetEndPoint(1);
+            //double tolerance = 0.1; // Add zeros to reduce tolerance
+            //if (Math.Abs(startPoint.Z - endPoint.Z) <= tolerance)
+            //{
+            //    return OrientaionType.Horizontal;
+            //}
+
+            //return OrientaionType.Vertical;
         }
 
         private XYZ GetIntersectionCurveCenter(SolidCurveIntersection intersection)
@@ -304,51 +329,49 @@ namespace Strana.Revit.HoleTask.Utils
 
         private void RotateHoleTask(Element mepElement, OrientaionType orientaionType, FamilyInstance holeTask, SolidCurveIntersection intersection, Element intersectedElement, Level lvl, RevitLinkInstance linkInstance)
         {
-            MEPCurve curve = mepElement as MEPCurve;
-            Transform transform = linkInstance.GetTotalTransform();
-            XYZ xAxis = transform.BasisX;
-            double linkRotation = Math.Atan2(xAxis.Y, xAxis.X);
-
-            if (orientaionType == OrientaionType.Vertical) // floor
-            {
-                double rotationAngle = GetAngleFromMEPCurve(curve);
-
-                XYZ point1 = intersection.GetCurveSegment(0).GetEndPoint(0);
-                XYZ point2 = intersection.GetCurveSegment(0).GetEndPoint(1);
-                Line axis = Line.CreateBound(point1, point2);
-                ElementTransformUtils.RotateElement(this.doc, holeTask.Id, axis, rotationAngle);
-            }
-            //if (orientaionType == OrientaionType.Vertical) // flor
-            //{
-            //    XYZ point1 = intersection.GetCurveSegment(0).GetEndPoint(0);
-            //    XYZ point2 = intersection.GetCurveSegment(0).GetEndPoint(1);
-            //    Line axis = Line.CreateBound(point1, point2);
-
-            //    foreach (Connector mepConnector in curve.ConnectorManager.Connectors)
-            //    {
-            //        double rotationAngle = Math.Abs(Math.Asin(mepConnector.CoordinateSystem.BasisY.X) - (Math.PI / 2));
-            //        //double rotationAngle = Math.Abs(Math.Asin(mepConnector.CoordinateSystem.BasisZ.Y) - (26 * Math.PI / 180));
-            //        if (rotationAngle != 0)
-            //        {
-            //            ElementTransformUtils.RotateElement(this.doc, holeTask.Id, axis, rotationAngle);
-            //        }
-
-            //        break;
-            //    }
-            //}
-            else // walls
             {
                 Wall wall = intersectedElement as Wall;
-                if (wall != null)
+                MEPCurve curve = mepElement as MEPCurve;
+                Transform transform = linkInstance.GetTotalTransform();
+                XYZ xAxis = transform.BasisX;
+                double linkRotation = Math.Atan2(xAxis.Y, xAxis.X);
+                if (orientaionType == OrientaionType.Vertical && intersectedElement != wall)// floor 
+                {
+                    double rotationAngle = GetAngleFromMEPCurve(curve);
+                    XYZ point1 = intersection.GetCurveSegment(0).GetEndPoint(0);
+                    XYZ point2 = intersection.GetCurveSegment(0).GetEndPoint(1);
+                    Line axis = Line.CreateBound(point1, point2);
+                    //XYZ pointCenter = (point1 + point2) / 2;
+                    //Line axis = Line.CreateBound(pointCenter, pointCenter + XYZ.BasisZ);
+                    ElementTransformUtils.RotateElement(this.doc, holeTask.Id, axis, rotationAngle);
+                }
+                else if (orientaionType == OrientaionType.Horizontal && intersectedElement != wall)
+                {
+                    XYZ point1 = intersection.GetCurveSegment(0).GetEndPoint(0);
+                    XYZ point2 = intersection.GetCurveSegment(0).GetEndPoint(1);
+                    XYZ pointCenter = (point1 + point2) / 2;
+                    Line axis = Line.CreateBound(pointCenter, pointCenter + XYZ.BasisZ);
+                    foreach (Connector mepConnector in curve.ConnectorManager.Connectors)
+                    {
+                        double rotationAngle = Math.Abs(Math.Asin(mepConnector.CoordinateSystem.BasisY.X) - Math.PI);
+                        if (rotationAngle != 0)
+                        {
+                            ElementTransformUtils.RotateElement(this.doc, holeTask.Id, axis, (rotationAngle + linkRotation));
+                        }
+
+                        break;
+                    }
+                }
+                else // intersectedElement == wall
                 {
                     XYZ wallOrientation = wall.Orientation;
-                    XYZ intersectionCurveStartPoint = intersection.GetCurveSegment(0).GetEndPoint(0);
-                    XYZ intersectionCurveEndPoint = intersection.GetCurveSegment(0).GetEndPoint(1);
-                    XYZ originIntersectionCurve = (intersectionCurveStartPoint + intersectionCurveEndPoint) / 2;
-                    originIntersectionCurve = new XYZ(originIntersectionCurve.X, originIntersectionCurve.Y, originIntersectionCurve.Z - lvl.Elevation);
-                    Line rotationLine = Line.CreateBound(originIntersectionCurve, originIntersectionCurve + XYZ.BasisZ);
+                    XYZ point1 = intersection.GetCurveSegment(0).GetEndPoint(0);
+                    XYZ point2 = intersection.GetCurveSegment(0).GetEndPoint(1);
+                    XYZ pointCenter = (point1 + point2) / 2;
+                    pointCenter = new XYZ(pointCenter.X, pointCenter.Y, pointCenter.Z - lvl.Elevation);
+                    Line axis = Line.CreateBound(pointCenter, pointCenter + XYZ.BasisZ);
 
-                    double rotationAngle = wallOrientation.AngleTo(holeTask.FacingOrientation /** 180 / Math.PI*/);
+                    double rotationAngle = wallOrientation.AngleTo(holeTask.FacingOrientation);
 
                     if (wallOrientation.AngleOnPlaneTo(holeTask.FacingOrientation, XYZ.BasisZ) < Math.PI)
                     {
@@ -357,28 +380,26 @@ namespace Strana.Revit.HoleTask.Utils
 
                     if (rotationAngle != 0)
                     {
-                        ElementTransformUtils.RotateElement(this.doc, holeTask.Id, rotationLine, (rotationAngle + linkRotation) - (Math.PI / 2));
+                        ElementTransformUtils.RotateElement(this.doc, holeTask.Id, axis, (rotationAngle + linkRotation) - (Math.PI / 2));
                     }
-                }
-                else //Наклонное перекрытие
-                {
-                    XYZ point1 = intersection.GetCurveSegment(0).GetEndPoint(0);
-                    XYZ point2 = intersection.GetCurveSegment(0).GetEndPoint(1);
-                    XYZ pointCenter = (point1 + point2) / 2;
+                    //}
+                    //else //Наклонное перекрытие
+                    //{
+                    //    XYZ point1 = intersection.GetCurveSegment(0).GetEndPoint(0);
+                    //    XYZ point2 = intersection.GetCurveSegment(0).GetEndPoint(1);
+                    //    XYZ pointCenter = (point1 + point2) / 2;
+                    //    Line axis = Line.CreateBound(pointCenter, pointCenter + XYZ.BasisZ);
+                    //    foreach (Connector mepConnector in curve.ConnectorManager.Connectors)
+                    //    {
+                    //        double rotationAngle = Math.Abs(Math.Asin(mepConnector.CoordinateSystem.BasisY.X) - Math.PI);
+                    //        if (rotationAngle != 0)
+                    //        {
+                    //            ElementTransformUtils.RotateElement(this.doc, holeTask.Id, axis, (rotationAngle + linkRotation));
+                    //        }
 
-                    Line axis = Line.CreateBound(pointCenter, pointCenter + new XYZ(0.0, 0.0, 1));
-
-                    foreach (Connector mepConnector in curve.ConnectorManager.Connectors)
-                    {
-                        double rotationAngle = Math.Abs(Math.Asin(mepConnector.CoordinateSystem.BasisY.X) - Math.PI);
-
-                        if (rotationAngle != 0)
-                        {
-                            ElementTransformUtils.RotateElement(this.doc, holeTask.Id, axis, (rotationAngle + linkRotation));
-                        }
-
-                        break;
-                    }
+                    //        break;
+                    //    }
+                    //}
                 }
             }
         }

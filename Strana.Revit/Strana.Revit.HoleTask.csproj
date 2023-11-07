@@ -88,14 +88,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BaseElements\CurrentProject.cs" />
-    <Compile Include="BaseElements\HoleTaskStatus.cs" />
-    <Compile Include="BaseElements\IntersectingElement.cs" />
-    <Compile Include="BaseElements\LinkProject.cs" />
-    <Compile Include="BaseElements\MepElement.cs" />
-    <Compile Include="BaseElements\HoleTask.cs" />
-    <Compile Include="BaseElements\HoleTaskInnerSolid.cs" />
-    <Compile Include="BaseElements\MepElementGeometryType.cs" />
     <Compile Include="Confing.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
@@ -103,6 +95,7 @@
     </Compile>
     <Compile Include="ElementCollections\LinkInstanseCollections.cs" />
     <Compile Include="ElementCollections\MepElementCollections.cs" />
+    <Compile Include="Utils\HoleTasksStatusDeterminator.cs" />
     <Compile Include="Extensions\RevitElement\SolidGetter.cs" />
     <Compile Include="Extensions\RevitDocumentExstensions.cs" />
     <Compile Include="Extensions\RevitElementExstensions.cs" />
@@ -115,6 +108,8 @@
     <Compile Include="RevitCommands\Test.cs" />
     <Compile Include="Utils\HoleTaskCreator.cs" />
     <Compile Include="Utils\HoleTaskFamilyLoader.cs" />
+    <Compile Include="Utils\HoleTasksJoiner.cs" />
+    <Compile Include="Extensions\HoleTaskSolidGetter.cs" />
     <Compile Include="Utils\OrientaionType.cs" />
   </ItemGroup>
   <ItemGroup>

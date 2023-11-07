@@ -28,6 +28,7 @@ using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace GloryHole
@@ -37,6 +38,9 @@ namespace GloryHole
     {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
             // Получение текущего документа
             Document doc = commandData.Application.ActiveUIDocument.Document;
             //Получение доступа к Selection
@@ -1082,16 +1086,19 @@ namespace GloryHole
                 {
                     using (Transaction t = new Transaction(doc))
                     {
-                        t.Start("Объединение пересекающихся отверстий в стене");
+                        t.Start("Объединение пересекающихся отверстий");
 
                         Options opt = new Options();
                         opt.ComputeReferences = true;
                         opt.DetailLevel = ViewDetailLevel.Fine;
-
+                        
                         while (intersectionWallRectangularCombineList.Count != 0)
                         {
-                            List<FamilyInstance> intersectionWallRectangularSolidIntersectCombineList = new List<FamilyInstance>();
-                            intersectionWallRectangularSolidIntersectCombineList.Add(intersectionWallRectangularCombineList[0]);
+                            List<FamilyInstance> intersectionWallRectangularSolidIntersectCombineList = new List<FamilyInstance>
+                            {
+                                intersectionWallRectangularCombineList[0]
+                            };
+
                             intersectionWallRectangularCombineList.RemoveAt(0);
 
                             List<FamilyInstance> tmpIntersectionWallRectangularSolidIntersectCombineList = intersectionWallRectangularCombineList.ToList();
@@ -1598,6 +1605,11 @@ namespace GloryHole
                 }
                 tg.Assimilate();
             }
+
+            stopwatch.Stop();
+            TimeSpan elapsedTime = stopwatch.Elapsed;
+            TaskDialog.Show("Время работы", elapsedTime.TotalSeconds.ToString() + " сек.");
+
             return Result.Succeeded;
         }
 
