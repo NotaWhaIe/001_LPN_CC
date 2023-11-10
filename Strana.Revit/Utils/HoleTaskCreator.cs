@@ -254,6 +254,8 @@ namespace Strana.Revit.HoleTask.Utils
                 holeTaskHeight = holeTaskWidth;
                 return holeTaskHeight;
             }
+            //мб тут надо будет добавить определения для еще одного кейса, как и для всех ориентаций
+            //intersectedElement != wall && orientation == OrientaionType.Horizontal
         }
 
         private double CalculatedWidth(double mepWidth, Element intersectedElement, SolidCurveIntersection intersection)
