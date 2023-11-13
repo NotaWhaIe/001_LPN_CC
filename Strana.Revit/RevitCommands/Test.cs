@@ -72,17 +72,6 @@ namespace Strana.Revit.HoleTask.RevitCommands
                 TaskDialog.Show(":(", "Solid == null");
             }
 
-            // Test Создать солид в модели используя DirectShape на месте имеющегося солид
-            using (Transaction t = new(doc, "create Solid"))
-            {
-                t.Start();
-
-                DirectShape directShape = DirectShape.CreateElement(doc, new ElementId(BuiltInCategory.OST_Furniture));
-                directShape.SetShape(new GeometryObject[] { largestSolid });
-
-                t.Commit();
-            }
-
             CurveLoop GetCurveLoopFromSolid(Solid largestSolid)
             {
                 FaceArray faces = largestSolid.Faces;
@@ -105,8 +94,8 @@ namespace Strana.Revit.HoleTask.RevitCommands
 
             double offsetDistance = 50.0 / 304.8;
 
-            // Получить контур сдвига
-            List<double> listOffset(CurveLoop curveLoopSolid, double offsetDistance)
+            // Get sweep's profile
+            List<double> DoubleListOffset(CurveLoop curveLoopSolid, double offsetDistance)
             {
                 List<double> list = new List<double>();
                 foreach (Curve curve in curveLoopSolid)
@@ -117,7 +106,30 @@ namespace Strana.Revit.HoleTask.RevitCommands
                 return list;
             }
 
-            // Получить траекторию сдвига
+            List<double> doubleOffsetСontour = DoubleListOffset(curveLoopSolid, offsetDistance);
+            CurveLoop curveLoopOffset = CurveLoop.CreateViaOffset(curveLoopSolid, DoubleListOffset(curveLoopSolid, offsetDistance), XYZ.BasisZ);
+            List<CurveLoop> curveLoopOffsetСontour = [curveLoopOffset];
+
+            // Get sweep's path
+            CurveLoop GetSweepPathOfSolid(Solid largestSolid)
+            {
+                EdgeArray sweeps = largestSolid.Edges;
+                foreach (Edge edge in sweeps)
+                {
+                    Curve curve = edge.AsCurve();
+                    XYZ point0 = curve.GetEndPoint(0);
+                    XYZ point1 = curve.GetEndPoint(1);
+                    double tolerance = 0.1; // Tolerance=0.1 == 1 degree, tolerance=0.2 == 3 degree, tolerance=0.3 == 4 degree.
+                    if ((point0.Z - point1.Z) > tolerance)
+                    {
+                        curve = AddOffsetToSweepPath(curve, offsetDistance);
+                        CurveLoop curveLoop = new CurveLoop();
+                        curveLoop.Append(curve);
+                        return curveLoop;
+                    }
+                }
+                return null;
+            }
             Curve AddOffsetToSweepPath(Curve sweepPath, double offsetDistance)
             {
                 if (sweepPath is Line line)
@@ -126,7 +138,7 @@ namespace Strana.Revit.HoleTask.RevitCommands
                     double newLength = currentLength + 2 * offsetDistance;
 
                     XYZ direction = line.Direction.Normalize();
-                    XYZ newEndPoint = line.GetEndPoint(0) + direction * newLength;
+                    XYZ newEndPoint = line.GetEndPoint(0) + newLength * direction;
 
                     Line newLine = Line.CreateBound(line.GetEndPoint(0), newEndPoint);
                     Curve curve = newLine as Curve;
@@ -134,42 +146,29 @@ namespace Strana.Revit.HoleTask.RevitCommands
                 }
                 return null;
             }
-            Curve GetSweepPathOfSolid(Solid largestSolid)
+            CurveLoop sweepPath = GetSweepPathOfSolid(largestSolid);
+
+            // Create geomentry by sweep
+            Solid solidWithDelta = GeometryCreationUtilities.CreateSweptGeometry(sweepPath, 0, 0, curveLoopOffsetСontour);
+
+            // Move solid on the Z axis to the delta
+            XYZ translationVector = new XYZ(0, 0, offsetDistance);
+            Transform translationTransform = Transform.CreateTranslation(translationVector);
+            Solid movedSolid = SolidUtils.CreateTransformed(solidWithDelta, translationTransform);
+
+            // Create solid in the model by DirectShape
+            using (Transaction tе = new(doc, "create solidWithDelta"))
             {
-                EdgeArray sweeps = largestSolid.Edges;
-                foreach (Edge edge in sweeps)
-                {
+                tе.Start();
 
-                    Curve curve = edge.AsCurve();
-                    XYZ point0 = curve.GetEndPoint(0);
-                    XYZ point1 = curve.GetEndPoint(1);
-                    double tolerance = 0.1; // Tolerance=0.1 == 1 degree, tolerance=0.2 == 3 degree, tolerance=0.3 == 4 degree.
-                    if ((point0.Z - point1.Z) > tolerance)
-                    {
-                        curve = AddOffsetToSweepPath(curve, offsetDistance);
-                        return curve;
-                    }
-                }
-                return null;
+                DirectShape directShape = DirectShape.CreateElement(doc, new ElementId(BuiltInCategory.OST_Furniture));
+                directShape.SetShape(new GeometryObject[] { movedSolid });
+
+                tе.Commit();
             }
-            Curve sweepPath = GetSweepPathOfSolid(largestSolid);
 
-            //Curve/*Loop */sweepPath = GetSweepPathOfSolid(Solid largestSolid);
-
-            // Получить сдвиг
-
-            //Solid solidWithoutHoles = GeometryCreationUtilities
-            //.CreateSweptGeometry(sweepPath, 0, 0, outerLoops);
-
-            // Отрисовать в моделе солид
-
-
-
-            //CurveLoop curveLoopOffset = CurveLoop.CreateViaOffset(curveLoopSolid, listOffset(curveLoopSolid), XYZ.BasisZ);
-
-            TaskDialog.Show(":)", (sweepPath.Length * 304.8).ToString());
+            TaskDialog.Show(":)", ":)");
             return Result.Succeeded;
         }
     }
 }
-

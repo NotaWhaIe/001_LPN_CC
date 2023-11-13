@@ -32,7 +32,7 @@ namespace Strana.Revit.HoleTask.Utils
         }
 
         /// <summary>
-        /// For test.
+        /// Create DirectShape sphere For test.
         /// </summary>
         /// <param name="doc"><seealso cref="Document"/></param>
         /// <param name="center"><seealso cref="XYZ"/></param>
