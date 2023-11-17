@@ -140,8 +140,8 @@ namespace Strana.Revit.HoleTask.Utils
             this.intersectionFloorRectangularCombineList.Add(holeTask);
 
             holeTask.LookupParameter("Глубина").Set(holeTaskThickness);
-            holeTask.LookupParameter("Ширина").Set(this.ExchangeParameters(orientation, holeTaskWidth, holeTaskHeight));
-            holeTask.LookupParameter("Высота").Set(this.ExchangeParameters(orientation, holeTaskHeight, holeTaskWidth));
+            holeTask.LookupParameter("Ширина").Set(this.ExchangeParameters(orientation, holeTaskWidth, holeTaskHeight));// Width
+            holeTask.LookupParameter("Высота").Set(this.ExchangeParameters(orientation, holeTaskHeight, holeTaskWidth));// Height
 
             this.RotateHoleTask(mepElement, orientation, holeTask, intersection, intersectedElement, lvl, linkInstance);
             return holeTask;
@@ -298,10 +298,8 @@ namespace Strana.Revit.HoleTask.Utils
                 {
                     rotationAngle = -c.CoordinateSystem.BasisY.AngleTo(XYZ.BasisY) + Math.PI / 2;
                 }
-
                 return rotationAngle;
             }
-
             return 0;
         }
 
@@ -339,7 +337,6 @@ namespace Strana.Revit.HoleTask.Utils
                     {
                         rotationAngle *= -1;
                     }
-
                     if (rotationAngle != 0)
                     {
                         ElementTransformUtils.RotateElement(this.doc, holeTask.Id, axis, (rotationAngle + linkRotation) - (Math.PI / 2));

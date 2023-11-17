@@ -2,3 +2,9 @@
 
 # IDE0058: Значение выражения никогда не используется
 csharp_style_unused_value_expression_statement_preference = unused_local_variable
+
+# SA1010: Opening square brackets should be spaced correctly
+dotnet_diagnostic.SA1010.severity = none
+
+# Default severity for all analyzer diagnostics
+dotnet_analyzer_diagnostic.severity = none

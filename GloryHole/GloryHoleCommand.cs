@@ -164,7 +164,8 @@ namespace GloryHole
 
             using (TransactionGroup tg = new TransactionGroup(doc))
             {
-                tg.Start("Задание на отверстия");
+                tg.Start("Задан" +
+                    "ие на отверстия");
                 using (Transaction t = new Transaction(doc))
                 {
                     t.Start("Создание болванок");

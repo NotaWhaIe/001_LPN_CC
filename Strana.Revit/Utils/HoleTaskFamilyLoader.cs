@@ -23,7 +23,7 @@ namespace Strana.Revit.HoleTask.Utils
         /// Initializes a new instance of the <see cref="HoleTaskFamilyLoader"/> class.
         /// Load families into a Revit document.
         /// </summary>
-        /// <param name="doc"><seealso cref="Document"/></param>
+        /// <param name="doc"><seealso cref="Document"/></param> 
         public HoleTaskFamilyLoader(Document doc)
         {
             this.doc = doc;

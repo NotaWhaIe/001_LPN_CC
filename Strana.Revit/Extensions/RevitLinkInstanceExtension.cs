@@ -32,10 +32,10 @@ namespace Strana.Revit.HoleTask.Extensions
                         .ToList();
                 }
 
-                _ = new HoleTasksJoiner().JoinAllHoleTask(allHoleTaskByRevitLinkInstance);
+                List<FamilyInstance> joinHoleTaskList= new HoleTasksJoiner().JoinAllHoleTask(allHoleTaskByRevitLinkInstance);
 
                 // Тест создания солида с дельтой.
-                foreach (FamilyInstance f in allHoleTaskByRevitLinkInstance)
+                foreach (FamilyInstance f in joinHoleTaskList)
                 {
                     Solid s = f.GetHoleTaskSolidWithDelta(20.0/304.8);
                 }
