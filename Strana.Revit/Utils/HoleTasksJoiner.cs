@@ -32,7 +32,6 @@ namespace Strana.Revit.HoleTask.Utils
         /// <param name="allFamilyInstances"></param>
         /// <returns></returns>
         /// <remark>Intersected volume don't calculeted corrected, that whay I used try-catch</remark>
-
         internal List<FamilyInstance> JoinAllHoleTask(List<FamilyInstance> allFamilyInstances)
         {
             Document doc = allFamilyInstances.First().Document;
@@ -74,8 +73,6 @@ namespace Strana.Revit.HoleTask.Utils
                     FamilyInstance firstIntersectionPoint = intersectionWallRectangularSolidIntersectCombineList[i];
                     Solid firstIntersectionPointSolid = firstIntersectionPoint.GetHoleTaskSolidWithDelta(0 / 304.8);
 
-                    // Отличие от CITRUS см. стр. 1111
-
                     for (int j = 0; j < tmpIntersectionWallRectangularSolidIntersectCombineList.Count; j++)
                     {
                         FamilyInstance secondIntersectionPoint = tmpIntersectionWallRectangularSolidIntersectCombineList[j];
@@ -91,7 +88,7 @@ namespace Strana.Revit.HoleTask.Utils
                         }
                         catch (Exception)
                         {
-                            // do nothing
+                            /// Do nothing.
                         }
 
                         if (unionvolume > 0)
@@ -138,7 +135,7 @@ namespace Strana.Revit.HoleTask.Utils
                         }
                     }
 
-                    // Найти центр спроецировать точки на одну отметку и померить расстояние
+                    /// Find the center and calculete sizes.
                     double maxHorizontalDistance = 0;
                     double maxVerticalDistance = 0;
                     XYZ pointP1 = null;
@@ -166,7 +163,6 @@ namespace Strana.Revit.HoleTask.Utils
 
                     XYZ midPointLeftRight = (pointP1 + pointP2) / 2;
                     XYZ midPointUpDown = (pointP3 + pointP4) / 2;
-
                     XYZ centroidIntersectionPoint = new(
                         midPointLeftRight.X,
                         midPointLeftRight.Y,
@@ -185,28 +181,28 @@ namespace Strana.Revit.HoleTask.Utils
                     foreach (XYZ p in pointsList)
                     {
                         XYZ vectorToPoint = (p - centroidIntersectionPoint).Normalize();
-                        // Нижний левый угол
+                        /// lower left corner
                         if (pointFacingOrientation.Negate().AngleTo(vectorToPoint) <= Math.PI / 2
                             && pointHandOrientation.Negate().AngleTo(vectorToPoint) <= Math.PI / 2)
                         {
                             combineDownLeftPointList.Add(p);
                         }
 
-                        // Нижний правый угол
+                        /// lower right corner
                         if (pointFacingOrientation.Negate().AngleTo(vectorToPoint) <= Math.PI / 2
                             && pointHandOrientation.AngleTo(vectorToPoint) <= Math.PI / 2)
                         {
                             combineDownRightPointList.Add(p);
                         }
 
-                        // Верхний левый угол
+                        /// upper left corner
                         if (pointFacingOrientation.AngleTo(vectorToPoint) <= Math.PI / 2
                             && pointHandOrientation.Negate().AngleTo(vectorToPoint) <= Math.PI / 2)
                         {
                             combineUpLeftPointList.Add(p);
                         }
 
-                        // Верхний правый угол
+                        /// upper right corner
                         if (pointFacingOrientation.AngleTo(vectorToPoint) <= Math.PI / 2
                             && pointHandOrientation.AngleTo(vectorToPoint) <= Math.PI / 2)
                         {
@@ -214,18 +210,18 @@ namespace Strana.Revit.HoleTask.Utils
                         }
                     }
 
-                    /// for test
-                    HoleTaskCreator.CreateSphereByPoint(doc, centroidIntersectionPoint);
-                    foreach (var item in pointsList)
-                    {
-                        HoleTaskCreator.CreateSphereByPoint(doc, item);
-                    }
+                    //// For test.
+                    //HoleTaskCreator.CreateSphereByPoint(doc, centroidIntersectionPoint);
+                    //foreach (var item in pointsList)
+                    //    {
+                    //        HoleTaskCreator.CreateSphereByPoint(doc, item);
+                    //    }
 
                     List<XYZ> maxRightPointList = [.. combineDownRightPointList, .. combineUpRightPointList];
                     double maxRightDistance = -1000000;
 
-                    // Зануляю координату Z в коллекции
-                    List<XYZ> pointsListZ0 = new List<XYZ>(pointsList);
+                    /// .Z = 0.0 to calculate the distance on the XY plane
+                    List<XYZ> pointsListZ0 = new List<XYZ>(maxRightPointList);
                     for (int i = 0; i < pointsListZ0.Count; i++)
                     {
                         pointsListZ0[i] = new XYZ(pointsListZ0[i].X, pointsListZ0[i].Y, 0.0);
@@ -242,7 +238,6 @@ namespace Strana.Revit.HoleTask.Utils
                     }
 
                     double intersectionPointWidthCalculete = maxRightDistance * 2;
-
                     double minZ = 10000000000;
                     XYZ minZPoint = null;
                     double maxZ = -10000000000;
@@ -262,9 +257,7 @@ namespace Strana.Revit.HoleTask.Utils
                     }
 
                     double intersectionPointHeight = maxZPoint.Z - minZPoint.Z;
-
                     XYZ newCenterPoint = new XYZ(centroidIntersectionPoint.X, centroidIntersectionPoint.Y, centroidIntersectionPoint.Z - (doc.GetElement(intersectionWallRectangularSolidIntersectCombineList.First().LevelId) as Level).Elevation);
-
                     FamilyInstance intersectionPoint = doc.Create.NewFamilyInstance(
                         newCenterPoint,
                         holeFamilySymbol,
@@ -332,9 +325,9 @@ namespace Strana.Revit.HoleTask.Utils
                                BooleanOperationsType.Intersect).Volume;
 
                         }
-                        catch (Exception ex)
+                        catch (Exception)
                         {
-                            // do nothing
+                            /// Do nothing.
                         }
 
                         if (unionvolume > 0)
@@ -358,31 +351,23 @@ namespace Strana.Revit.HoleTask.Utils
                         XYZ originPoint = (holeTask.Location as LocationPoint).Point;
 
                         XYZ downLeftPoint = originPoint +
-                            (holeTask.LookupParameter(this.ExchangeParameters(holeTaskName, holeTaskWidth, holeTaskHeight)).AsDouble() /
-                            2 * holeTask.HandOrientation.Negate()) +
-                            (holeTask.LookupParameter(this.ExchangeParameters(holeTaskName, holeTaskHeight, holeTaskWidth)).AsDouble() /
-                            2 * holeTask.FacingOrientation.Negate());
+                            (holeTask.LookupParameter(holeTaskWidth).AsDouble() / 2 * holeTask.HandOrientation.Negate()) +
+                            (holeTask.LookupParameter(holeTaskHeight).AsDouble() / 2 * holeTask.FacingOrientation.Negate());
                         pointsList.Add(downLeftPoint);
 
                         XYZ downRightPoint = originPoint +
-                            (holeTask.LookupParameter(this.ExchangeParameters(holeTaskName, holeTaskWidth, holeTaskHeight)).AsDouble() /
-                            2 * holeTask.HandOrientation) +
-                            (holeTask.LookupParameter(this.ExchangeParameters(holeTaskName, holeTaskHeight, holeTaskWidth)).AsDouble() /
-                            2 * holeTask.FacingOrientation.Negate());
+                            (holeTask.LookupParameter(holeTaskWidth).AsDouble() / 2 * holeTask.HandOrientation) +
+                            (holeTask.LookupParameter(holeTaskHeight).AsDouble() / 2 * holeTask.FacingOrientation.Negate());
                         pointsList.Add(downRightPoint);
 
                         XYZ upLeftPoint = originPoint +
-                            (holeTask.LookupParameter(this.ExchangeParameters(holeTaskName, holeTaskWidth, holeTaskHeight)).AsDouble() /
-                            2 * holeTask.HandOrientation.Negate()) +
-                            (holeTask.LookupParameter(this.ExchangeParameters(holeTaskName, holeTaskHeight, holeTaskWidth)).AsDouble() /
-                            2 * holeTask.FacingOrientation);
+                            (holeTask.LookupParameter(holeTaskWidth).AsDouble() / 2 * holeTask.HandOrientation.Negate()) +
+                            (holeTask.LookupParameter(holeTaskHeight).AsDouble() / 2 * holeTask.FacingOrientation);
                         pointsList.Add(upLeftPoint);
 
                         XYZ upRightPoint = originPoint +
-                            (holeTask.LookupParameter(this.ExchangeParameters(holeTaskName, holeTaskWidth, holeTaskHeight)).AsDouble() /
-                            2 * holeTask.HandOrientation) +
-                            (holeTask.LookupParameter(this.ExchangeParameters(holeTaskName, holeTaskHeight, holeTaskWidth)).AsDouble() /
-                            2 * holeTask.FacingOrientation);
+                            (holeTask.LookupParameter(holeTaskWidth).AsDouble() / 2 * holeTask.HandOrientation) +
+                            (holeTask.LookupParameter(holeTaskHeight).AsDouble() / 2 * holeTask.FacingOrientation);
                         pointsList.Add(upRightPoint);
 
                         if (holeTask.LookupParameter(holeTaskThickness).AsDouble() > intersectionPointThickness)
@@ -414,28 +399,28 @@ namespace Strana.Revit.HoleTask.Utils
                     foreach (XYZ p in pointsList)
                     {
                         XYZ vectorToPoint = (p - centroidIntersectionPoint).Normalize();
-                        // Нижний левый угол
+                        /// lower left corner
                         if (pointFacingOrientation.Negate().AngleTo(vectorToPoint) <= Math.PI / 2
                             && pointHandOrientation.Negate().AngleTo(vectorToPoint) <= Math.PI / 2)
                         {
                             combineDownLeftPointList.Add(p);
                         }
 
-                        // Нижний правый угол
+                        /// lower right corner
                         if (pointFacingOrientation.Negate().AngleTo(vectorToPoint) <= Math.PI / 2
                             && pointHandOrientation.AngleTo(vectorToPoint) <= Math.PI / 2)
                         {
                             combineDownRightPointList.Add(p);
                         }
 
-                        // Верхний левый угол
+                        /// upper left corner
                         if (pointFacingOrientation.AngleTo(vectorToPoint) <= Math.PI / 2
                             && pointHandOrientation.Negate().AngleTo(vectorToPoint) <= Math.PI / 2)
                         {
                             combineUpLeftPointList.Add(p);
                         }
 
-                        // Верхний правый угол
+                        /// upper right corner
                         if (pointFacingOrientation.AngleTo(vectorToPoint) <= Math.PI / 2
                             && pointHandOrientation.AngleTo(vectorToPoint) <= Math.PI / 2)
                         {
@@ -506,15 +491,6 @@ namespace Strana.Revit.HoleTask.Utils
                     intersectionPoint.LookupParameter(holeTaskHeight).Set(intersectionPointHeight);
                     intersectionPoint.LookupParameter(holeTaskThickness).Set(intersectionPointThickness);
 
-                    //string holeTaskWidth = "Ширина";
-                    //string holeTaskHeight = "Глубина";
-                    //string holeTaskThickness = "Высота";
-
-                    //Конвертировать футы в мм
-                    double Width = intersectionPointWidth * 304.8;         //Ширина
-                    double Height = intersectionPointHeight * 304.8;       //Высота
-                    double Thickness = intersectionPointThickness * 304.8; //Глубина
-
                     //intersectionPoint.get_Parameter(heightOfBaseLevelGuid)
                     //    .Set(pointLevelElevation);
                     //intersectionPoint.get_Parameter(levelOffsetGuid)
@@ -538,33 +514,17 @@ namespace Strana.Revit.HoleTask.Utils
                     {
                         doc.Delete(forDel.Id);
                         intersectionFloorRectangularCombineList.Remove(forDel);
-                        //return intersectionFloorRectangularCombineList;
                     }
                 }
                 else
                 {
                     intersectionFloorRectangularCombineList.Remove(intersectionFloorRectangularSolidIntersectCombineList[0]);
-                    //return intersectionFloorRectangularCombineList;
                 }
-                //return intersectionFloorRectangularCombineList;
             }
             allFamilyInstances = intersectionWallRectangularCombineList
                  .Concat(intersectionFloorRectangularCombineList)
                  .ToList();
             return allFamilyInstances;
-        }
-
-        private string ExchangeParameters(string holeTaskName, string holeTaskHeight, string holeTaskWidth)
-        {
-            if (holeTaskName == "(Отв_Задание)_Стены_Прямоугольное")
-            {
-                holeTaskHeight = holeTaskWidth;
-                return holeTaskHeight;
-            }
-            else
-            {
-                return holeTaskHeight;
-            }
         }
     }
 }
