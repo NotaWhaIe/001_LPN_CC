@@ -30,6 +30,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Windows.Media.Media3D;
+using System.Windows;
 
 namespace GloryHole
 {
@@ -44,7 +46,7 @@ namespace GloryHole
             // Получение текущего документа
             Document doc = commandData.Application.ActiveUIDocument.Document;
             //Получение доступа к Selection
-            Selection sel = commandData.Application.ActiveUIDocument.Selection; 
+            Selection sel = commandData.Application.ActiveUIDocument.Selection;
             //Общие параметры размеров
             Guid intersectionPointWidthGuid = new Guid("8f2e4f93-9472-4941-a65d-0ac468fd6a5d");
             Guid intersectionPointHeightGuid = new Guid("da753fe3-ecfa-465b-9a2c-02f55d0c2ff1");
@@ -87,7 +89,7 @@ namespace GloryHole
             }
 
             FamilySymbol intersectionWallRectangularFamilySymbol = gloryHoleWPF.IntersectionWallRectangularFamilySymbol;
-            if(intersectionWallRectangularFamilySymbol == null)
+            if (intersectionWallRectangularFamilySymbol == null)
             {
                 TaskDialog.Show("Ravit", "Не найден тип для прямоугольного отверстия в стене! Загрузите семейство \"Пересечение_Стена_Прямоугольное\"!");
                 return Result.Cancelled;
@@ -194,7 +196,7 @@ namespace GloryHole
                             .OfCategory(BuiltInCategory.OST_Floors)
                             .OfClass(typeof(Floor))
                             .WhereElementIsNotElementType()
-                            .Cast<Floor>()                           
+                            .Cast<Floor>()
                             .ToList();
 
                         //Обработка стен
@@ -519,9 +521,9 @@ namespace GloryHole
                                                 {
                                                     Line rotationLine = Line.CreateBound(originIntersectionCurve, originIntersectionCurve + 1 * XYZ.BasisZ);
                                                     double rotationAngle = 0;
-                                                    if(Math.Round(wallOrientation.AngleOnPlaneTo(intersectionPoint.FacingOrientation, XYZ.BasisZ),6) * (180 / Math.PI) < 180)
+                                                    if (Math.Round(wallOrientation.AngleOnPlaneTo(intersectionPoint.FacingOrientation, XYZ.BasisZ), 6) * (180 / Math.PI) < 180)
                                                     {
-                                                        rotationAngle = - wallOrientation.AngleTo(intersectionPoint.FacingOrientation);
+                                                        rotationAngle = -wallOrientation.AngleTo(intersectionPoint.FacingOrientation);
                                                     }
                                                     else
                                                     {
@@ -708,7 +710,7 @@ namespace GloryHole
                                         }
                                     }
 
-                                    foreach (Duct duct      in ductsList)
+                                    foreach (Duct duct in ductsList)
                                     {
                                         Curve ductCurve = (duct.Location as LocationCurve).Curve;
                                         SolidCurveIntersectionOptions scio = new SolidCurveIntersectionOptions();
@@ -805,7 +807,7 @@ namespace GloryHole
                                                     //}
 
                                                     Line rotationAxis = Line.CreateBound(originIntersectionCurve, originIntersectionCurve + 1 * XYZ.BasisZ);
-                                                    ElementTransformUtils.RotateElement(doc , intersectionPoint.Id , rotationAxis , ductRotationAngle);
+                                                    ElementTransformUtils.RotateElement(doc, intersectionPoint.Id, rotationAxis, ductRotationAngle);
                                                 }
                                             }
                                         }
@@ -1092,7 +1094,7 @@ namespace GloryHole
                         Options opt = new Options();
                         opt.ComputeReferences = true;
                         opt.DetailLevel = ViewDetailLevel.Fine;
-                        
+
                         while (intersectionWallRectangularCombineList.Count != 0)
                         {
                             List<FamilyInstance> intersectionWallRectangularSolidIntersectCombineList = new List<FamilyInstance>
@@ -1165,28 +1167,30 @@ namespace GloryHole
                             {
                                 List<XYZ> pointsList = new List<XYZ>();
                                 double intersectionPointThickness = 0;
-
+                                // Копия студии
                                 foreach (FamilyInstance intPount in intersectionWallRectangularSolidIntersectCombineList)
                                 {
+                                    double width = intPount.get_Parameter(intersectionPointWidthGuid).AsDouble();
+                                    double height = intPount.get_Parameter(intersectionPointHeightGuid).AsDouble();
+                                    double thickness = intPount.get_Parameter(intersectionPointThicknessGuid).AsDouble();
+
                                     XYZ originPoint = (intPount.Location as LocationPoint).Point;
 
-                                    XYZ downLeftPoint = originPoint + (intPount.get_Parameter(intersectionPointWidthGuid).AsDouble() / 2) * intPount.HandOrientation;
+                                    XYZ downLeftPoint = originPoint + (width / 2) * intPount.HandOrientation;
                                     pointsList.Add(downLeftPoint);
 
-                                    XYZ downRightPoint = originPoint + (intPount.get_Parameter(intersectionPointWidthGuid).AsDouble() / 2) * intPount.HandOrientation.Negate();
+                                    XYZ downRightPoint = originPoint + (width / 2) * intPount.HandOrientation.Negate();
                                     pointsList.Add(downRightPoint);
 
-                                    XYZ upLeftPoint = originPoint + ((intPount.get_Parameter(intersectionPointWidthGuid).AsDouble() / 2) * intPount.HandOrientation)
-                                        + intPount.get_Parameter(intersectionPointHeightGuid).AsDouble() * XYZ.BasisZ;
+                                    XYZ upLeftPoint = originPoint + ((width / 2) * intPount.HandOrientation) + height * XYZ.BasisZ;
                                     pointsList.Add(upLeftPoint);
 
-                                    XYZ upRightPoint = originPoint + ((intPount.get_Parameter(intersectionPointWidthGuid).AsDouble() / 2) * intPount.HandOrientation.Negate())
-                                        + intPount.get_Parameter(intersectionPointHeightGuid).AsDouble() * XYZ.BasisZ;
+                                    XYZ upRightPoint = originPoint + ((width / 2) * intPount.HandOrientation.Negate()) + height * XYZ.BasisZ;
                                     pointsList.Add(upRightPoint);
 
-                                    if (intPount.get_Parameter(intersectionPointThicknessGuid).AsDouble() > intersectionPointThickness)
+                                    if (thickness > intersectionPointThickness)
                                     {
-                                        intersectionPointThickness = intPount.get_Parameter(intersectionPointThicknessGuid).AsDouble();
+                                        intersectionPointThickness = thickness;
                                     }
                                 }
 
@@ -1199,9 +1203,9 @@ namespace GloryHole
                                 XYZ pointP4 = null;
                                 foreach (XYZ p1 in pointsList)
                                 {
-                                    foreach(XYZ p2 in pointsList)
+                                    foreach (XYZ p2 in pointsList)
                                     {
-                                        if(new XYZ(p1.X,p1.Y,0).DistanceTo(new XYZ(p2.X, p2.Y, 0)) > maxHorizontalDistance)
+                                        if (new XYZ(p1.X, p1.Y, 0).DistanceTo(new XYZ(p2.X, p2.Y, 0)) > maxHorizontalDistance)
                                         {
                                             maxHorizontalDistance = new XYZ(p1.X, p1.Y, 0).DistanceTo(new XYZ(p2.X, p2.Y, 0));
                                             pointP1 = p1;
@@ -1427,34 +1431,36 @@ namespace GloryHole
 
                                 foreach (FamilyInstance intPount in intersectionFloorRectangularSolidIntersectCombineList)
                                 {
+
+                                    double width = intPount.get_Parameter(intersectionPointWidthGuid).AsDouble();
+                                    double height = intPount.get_Parameter(intersectionPointHeightGuid).AsDouble();
+                                    double thickness = intPount.get_Parameter(intersectionPointThicknessGuid).AsDouble();
+
+
                                     XYZ originPoint = (intPount.Location as LocationPoint).Point;
 
-                                    XYZ downLeftPoint = originPoint + (intPount.get_Parameter(intersectionPointWidthGuid).AsDouble() / 2) * intPount.HandOrientation.Negate()
-                                        + (intPount.get_Parameter(intersectionPointHeightGuid).AsDouble() / 2) * intPount.FacingOrientation.Negate();
+                                    XYZ downLeftPoint = originPoint + (width / 2) * intPount.HandOrientation.Negate() + (height / 2) * intPount.FacingOrientation.Negate();
                                     pointsList.Add(downLeftPoint);
 
-                                    XYZ downRightPoint = originPoint + (intPount.get_Parameter(intersectionPointWidthGuid).AsDouble() / 2) * intPount.HandOrientation
-                                        + (intPount.get_Parameter(intersectionPointHeightGuid).AsDouble() / 2) * intPount.FacingOrientation.Negate();
+                                    XYZ downRightPoint = originPoint + (width / 2) * intPount.HandOrientation + (height / 2) * intPount.FacingOrientation.Negate();
                                     pointsList.Add(downRightPoint);
 
-                                    XYZ upLeftPoint = originPoint + (intPount.get_Parameter(intersectionPointWidthGuid).AsDouble() / 2) * intPount.HandOrientation.Negate()
-                                        + (intPount.get_Parameter(intersectionPointHeightGuid).AsDouble() / 2) * intPount.FacingOrientation;
+                                    XYZ upLeftPoint = originPoint + (width / 2) * intPount.HandOrientation.Negate() + (height / 2) * intPount.FacingOrientation;
                                     pointsList.Add(upLeftPoint);
 
-                                    XYZ upRightPoint = originPoint + (intPount.get_Parameter(intersectionPointWidthGuid).AsDouble() / 2) * intPount.HandOrientation
-                                        + (intPount.get_Parameter(intersectionPointHeightGuid).AsDouble() / 2) * intPount.FacingOrientation;
+                                    XYZ upRightPoint = originPoint + (width / 2) * intPount.HandOrientation + (height / 2) * intPount.FacingOrientation;
                                     pointsList.Add(upRightPoint);
 
-                                    if (intPount.get_Parameter(intersectionPointThicknessGuid).AsDouble() > intersectionPointThickness)
+                                    if (thickness > intersectionPointThickness)
                                     {
-                                        intersectionPointThickness = intPount.get_Parameter(intersectionPointThicknessGuid).AsDouble();
+                                        intersectionPointThickness = thickness;
                                     }
                                 }
-                                double maxX  = pointsList.Max(p => p.X);
+                                double maxX = pointsList.Max(p => p.X);
                                 double minX = pointsList.Min(p => p.X);
                                 double maxY = pointsList.Max(p => p.Y);
                                 double minY = pointsList.Min(p => p.Y);
-                                XYZ centroidIntersectionPoint = new XYZ((maxX + minX)/2,(maxY + minY) /2, pointsList.First().Z);
+                                XYZ centroidIntersectionPoint = new XYZ((maxX + minX) / 2, (maxY + minY) / 2, pointsList.First().Z);
 
                                 List<XYZ> combineDownLeftPointList = new List<XYZ>();
                                 List<XYZ> combineDownRightPointList = new List<XYZ>();

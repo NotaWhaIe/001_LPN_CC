@@ -118,7 +118,6 @@ namespace Strana.Revit.HoleTask.Extension.RevitElement
                         faceMaxSquare = solidFace;
                     }
                 }
-
             }
 
             return faceMaxSquare;

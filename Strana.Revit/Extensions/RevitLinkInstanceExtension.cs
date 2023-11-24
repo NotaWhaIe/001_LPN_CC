@@ -31,15 +31,9 @@ namespace Strana.Revit.HoleTask.Extensions
                         .CreateHoleTasksByIntersectedElements(linkInstance))
                         .ToList();
                 }
+                // Тест создания солида с дельтой.
 
                 List<FamilyInstance> joinHoleTaskList= new HoleTasksJoiner().JoinAllHoleTask(allHoleTaskByRevitLinkInstance);
-
-                // Тест создания солида с дельтой.
-                foreach (FamilyInstance f in joinHoleTaskList)
-                {
-                    Solid s = f.GetHoleTaskSolidWithDelta(20.0/304.8);
-                }
-
                 t.Commit();
             }
         }

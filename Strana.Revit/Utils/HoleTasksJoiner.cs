@@ -9,6 +9,7 @@ using System.Linq;
 using System.Xml.Linq;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Structure;
+using Strana.Revit.HoleTask.Extensions;
 
 namespace Strana.Revit.HoleTask.Utils
 {
@@ -30,92 +31,68 @@ namespace Strana.Revit.HoleTask.Utils
         /// </summary>
         /// <param name="allFamilyInstances"></param>
         /// <returns></returns>
+        /// <remark>Intersected volume don't calculeted corrected, that whay I used try-catch</remark>
+
         internal List<FamilyInstance> JoinAllHoleTask(List<FamilyInstance> allFamilyInstances)
         {
             Document doc = allFamilyInstances.First().Document;
-            Options opt = new();
             HoleTaskFamilyLoader familyLoader = new(doc);
             FamilySymbol holeFamilySymbol;
-            opt.ComputeReferences = true;
-            opt.DetailLevel = ViewDetailLevel.Fine;
-            string holeTaskWidth = "Ширина";
-            string holeTaskHeight = "Глубина";
-            string holeTaskThickness = "Высота";
             List<FamilyInstance> intersectionWallRectangularCombineList = allFamilyInstances
-                .Where(fi => fi.Name.ToString() == "(Отв_Задание)_Стены_Прямоугольное)")
+                .Where(fi => fi.Name.ToString() == "(Отв_Задание)_Стены_Прямоугольное")
                 .ToList();
             List<FamilyInstance> intersectionFloorRectangularCombineList = allFamilyInstances
                  .Where(fi => fi.Name.ToString() == "(Отв_Задание)_Перекрытия_Прямоугольное")
                  .ToList();
 
+            Options opt = new();
+            opt.ComputeReferences = true;
+            opt.DetailLevel = ViewDetailLevel.Fine;
+
             while (intersectionWallRectangularCombineList.Count != 0)
             {
+                string holeTaskWidth = "Глубина";
+                string holeTaskHeight = "Высота";
+                string holeTaskThickness = "Ширина";
+
+                double width = 0; // (Ширина)
+                double height = 0;// (Высота)
+                double thickness = 0; // (Толщина)
+
                 holeFamilySymbol = familyLoader.WallFamilySymbol;
                 string holeTaskName = intersectionWallRectangularCombineList.First()?.Name.ToString();
+
                 List<FamilyInstance> intersectionWallRectangularSolidIntersectCombineList = new()
                 {
                    intersectionWallRectangularCombineList[0],
                 };
                 intersectionWallRectangularCombineList.RemoveAt(0);
 
-                List<FamilyInstance> tmpIntersectionWallRectangularSolidIntersectCombineList =
-                    [.. intersectionWallRectangularCombineList];
+                List<FamilyInstance> tmpIntersectionWallRectangularSolidIntersectCombineList = [.. intersectionWallRectangularCombineList];
                 for (int i = 0; i < intersectionWallRectangularSolidIntersectCombineList.Count; i++)
                 {
-                    FamilyInstance firstIntersectionPoint =
-                        intersectionWallRectangularSolidIntersectCombineList[i];
-                    Solid firstIntersectionPointSolid = null;
-                    GeometryElement firstIntersectionPointGeomElem =
-                        firstIntersectionPoint.get_Geometry(opt);
-                    foreach (GeometryObject geomObj in firstIntersectionPointGeomElem)
-                    {
-                        GeometryInstance instance = geomObj as GeometryInstance;
-                        if (instance != null)
-                        {
-                            GeometryElement instanceGeometryElement =
-                                instance.GetInstanceGeometry();
-                            foreach (GeometryObject o in instanceGeometryElement)
-                            {
-                                Solid solid = o as Solid;
-                                if (solid != null && solid.Volume != 0)
-                                {
-                                    firstIntersectionPointSolid = solid;
-                                    break;
-                                }
-                            }
-                        }
-                    }
+                    FamilyInstance firstIntersectionPoint = intersectionWallRectangularSolidIntersectCombineList[i];
+                    Solid firstIntersectionPointSolid = firstIntersectionPoint.GetHoleTaskSolidWithDelta(0 / 304.8);
+
+                    // Отличие от CITRUS см. стр. 1111
 
                     for (int j = 0; j < tmpIntersectionWallRectangularSolidIntersectCombineList.Count; j++)
                     {
-                        FamilyInstance secondIntersectionPoint =
-                            tmpIntersectionWallRectangularSolidIntersectCombineList[j];
-                        Solid secondIntersectionPointSolid = null;
-                        GeometryElement secondIntersectionPointGeomElem =
-                            secondIntersectionPoint.get_Geometry(opt);
-                        foreach (GeometryObject geomObj in secondIntersectionPointGeomElem)
-                        {
-                            GeometryInstance instance = geomObj as GeometryInstance;
-                            if (instance != null)
-                            {
-                                GeometryElement instanceGeometryElement =
-                                    instance.GetInstanceGeometry();
-                                foreach (GeometryObject o in instanceGeometryElement)
-                                {
-                                    Solid solid = o as Solid;
-                                    if (solid != null && solid.Volume != 0)
-                                    {
-                                        secondIntersectionPointSolid = solid;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
+                        FamilyInstance secondIntersectionPoint = tmpIntersectionWallRectangularSolidIntersectCombineList[j];
+                        Solid secondIntersectionPointSolid = secondIntersectionPoint.GetHoleTaskSolidWithDelta(0.0 / 304.8);
+                        double unionvolume = 0;
 
-                        double unionvolume = BooleanOperationsUtils.ExecuteBooleanOperation(
-                            firstIntersectionPointSolid,
-                            secondIntersectionPointSolid,
-                            BooleanOperationsType.Intersect).Volume;
+                        try
+                        {
+                            unionvolume = BooleanOperationsUtils.ExecuteBooleanOperation(
+                                firstIntersectionPointSolid,
+                                secondIntersectionPointSolid,
+                                BooleanOperationsType.Intersect).Volume;
+                        }
+                        catch (Exception)
+                        {
+                            // do nothing
+                        }
 
                         if (unionvolume > 0)
                         {
@@ -135,35 +112,29 @@ namespace Strana.Revit.HoleTask.Utils
                     double intersectionPointThickness = 0;
                     foreach (FamilyInstance holeTask in intersectionWallRectangularSolidIntersectCombineList)
                     {
-                        //holeTask.Name
-
+                        width = holeTask.LookupParameter(holeTaskWidth).AsDouble();
+                        height = holeTask.LookupParameter(holeTaskHeight).AsDouble();
+                        thickness = holeTask.LookupParameter(holeTaskThickness).AsDouble();
                         XYZ originPoint = (holeTask.Location as LocationPoint).Point;
-                        XYZ downLeftPoint = originPoint +
-                            (holeTask.LookupParameter(this.ExchangeParameters(holeTaskName, holeTaskWidth, holeTaskHeight))
-                                .AsDouble() / 2) * holeTask.HandOrientation;
+
+                        XYZ holeTaskholeTask = holeTask.HandOrientation;
+                        XYZ holeTaskholeTaskTest = new XYZ(holeTaskholeTask.Y, holeTaskholeTask.X, holeTaskholeTask.Z);
+
+                        XYZ downLeftPoint = originPoint + (width / 2) * holeTaskholeTaskTest - (height / 2 * XYZ.BasisZ);
                         pointsList.Add(downLeftPoint);
 
-                        XYZ downRightPoint = originPoint +
-                            (holeTask.LookupParameter(this.ExchangeParameters(holeTaskName, holeTaskWidth, holeTaskHeight))
-                                .AsDouble() / 2 * holeTask.HandOrientation.Negate());
+                        XYZ downRightPoint = originPoint + width / 2 * holeTaskholeTaskTest.Negate() - (height / 2 * XYZ.BasisZ);
                         pointsList.Add(downRightPoint);
 
-                        XYZ upLeftPoint = originPoint +
-                            (holeTask.LookupParameter(this.ExchangeParameters(holeTaskName, holeTaskWidth, holeTaskHeight))
-                                .AsDouble() / 2 * holeTask.HandOrientation) +
-                            (holeTask.LookupParameter(this.ExchangeParameters(holeTaskName, holeTaskHeight, holeTaskWidth))
-                                .AsDouble() * XYZ.BasisZ);
+                        XYZ upLeftPoint = originPoint + (width / 2 * holeTaskholeTaskTest) + (height / 2 * XYZ.BasisZ);
                         pointsList.Add(upLeftPoint);
 
-                        XYZ upRightPoint = originPoint +
-                            ((holeTask.LookupParameter(this.ExchangeParameters(holeTaskName, holeTaskWidth, holeTaskHeight)).AsDouble() / 2) * holeTask.HandOrientation.Negate()) +
-                            holeTask.LookupParameter(this.ExchangeParameters(holeTaskName, holeTaskHeight, holeTaskWidth)).AsDouble() * XYZ.BasisZ; pointsList.Add(upRightPoint);
+                        XYZ upRightPoint = originPoint + ((width / 2) * holeTaskholeTaskTest.Negate()) + height / 2 * XYZ.BasisZ;
+                        pointsList.Add(upRightPoint);
 
-                        if (holeTask.LookupParameter(holeTaskThickness)
-                            .AsDouble() > intersectionPointThickness)
+                        if (thickness > intersectionPointThickness)
                         {
-                            intersectionPointThickness = holeTask.LookupParameter(holeTaskThickness)
-                                .AsDouble();
+                            intersectionPointThickness = thickness;
                         }
                     }
 
@@ -195,6 +166,7 @@ namespace Strana.Revit.HoleTask.Utils
 
                     XYZ midPointLeftRight = (pointP1 + pointP2) / 2;
                     XYZ midPointUpDown = (pointP3 + pointP4) / 2;
+
                     XYZ centroidIntersectionPoint = new(
                         midPointLeftRight.X,
                         midPointLeftRight.Y,
@@ -242,35 +214,39 @@ namespace Strana.Revit.HoleTask.Utils
                         }
                     }
 
+                    /// for test
+                    HoleTaskCreator.CreateSphereByPoint(doc, centroidIntersectionPoint);
+                    foreach (var item in pointsList)
+                    {
+                        HoleTaskCreator.CreateSphereByPoint(doc, item);
+                    }
+
                     List<XYZ> maxRightPointList = [.. combineDownRightPointList, .. combineUpRightPointList];
                     double maxRightDistance = -1000000;
-                    foreach (XYZ p in pointsList)
+
+                    // Зануляю координату Z в коллекции
+                    List<XYZ> pointsListZ0 = new List<XYZ>(pointsList);
+                    for (int i = 0; i < pointsListZ0.Count; i++)
                     {
-                        XYZ x = Line.CreateBound(centroidIntersectionPoint, centroidIntersectionPoint +
-                            (1000000 * pointHandOrientation)).Project(p).XYZPoint;
-                        if (x.DistanceTo(centroidIntersectionPoint) > maxRightDistance)
+                        pointsListZ0[i] = new XYZ(pointsListZ0[i].X, pointsListZ0[i].Y, 0.0);
+                    }
+
+                    XYZ centroidIntersectionPointZ0 = new XYZ(centroidIntersectionPoint.X, centroidIntersectionPoint.Y, 0.0);
+
+                    foreach (XYZ p in pointsListZ0)
+                    {
+                        if (p.DistanceTo(centroidIntersectionPointZ0) > maxRightDistance)
                         {
-                            maxRightDistance = x.DistanceTo(centroidIntersectionPoint);
+                            maxRightDistance = p.DistanceTo(centroidIntersectionPointZ0);
                         }
                     }
 
-                    List<XYZ> maxLeftPointList = [.. combineDownLeftPointList, .. combineUpLeftPointList];
-                    double maxLeftDistance = -1000000;
-                    foreach (XYZ p in pointsList)
-                    {
-                        XYZ x = Line.CreateBound(centroidIntersectionPoint, centroidIntersectionPoint +
-                            (1000000 * pointHandOrientation.Negate())).Project(p).XYZPoint;
-                        if (x.DistanceTo(centroidIntersectionPoint) > maxLeftDistance)
-                        {
-                            maxLeftDistance = x.DistanceTo(centroidIntersectionPoint);
-                        }
-                    }
+                    double intersectionPointWidthCalculete = maxRightDistance * 2;
 
                     double minZ = 10000000000;
                     XYZ minZPoint = null;
                     double maxZ = -10000000000;
                     XYZ maxZPoint = null;
-
                     foreach (XYZ p in pointsList)
                     {
                         if (p.Z < minZ)
@@ -286,13 +262,9 @@ namespace Strana.Revit.HoleTask.Utils
                     }
 
                     double intersectionPointHeight = maxZPoint.Z - minZPoint.Z;
-                    double intersectionPointWidth = maxLeftDistance + maxRightDistance;
-                    XYZ newCenterPoint = new XYZ(
-                            centroidIntersectionPoint.X,
-                            centroidIntersectionPoint.Y,
-                            (centroidIntersectionPoint.Z - (intersectionPointHeight / 2)) -
-                            (doc.GetElement(intersectionWallRectangularSolidIntersectCombineList
-                                .First().LevelId) as Level).Elevation);
+
+                    XYZ newCenterPoint = new XYZ(centroidIntersectionPoint.X, centroidIntersectionPoint.Y, centroidIntersectionPoint.Z - (doc.GetElement(intersectionWallRectangularSolidIntersectCombineList.First().LevelId) as Level).Elevation);
+
                     FamilyInstance intersectionPoint = doc.Create.NewFamilyInstance(
                         newCenterPoint,
                         holeFamilySymbol,
@@ -310,31 +282,29 @@ namespace Strana.Revit.HoleTask.Utils
                                 .FacingOrientation.AngleTo(intersectionPoint.FacingOrientation));
                     }
 
-                    intersectionPoint.LookupParameter(this.ExchangeParameters(holeTaskName, holeTaskWidth, holeTaskHeight)).Set(intersectionPointWidth);
-                    intersectionPoint.LookupParameter(this.ExchangeParameters(holeTaskName, holeTaskHeight, holeTaskWidth)).Set(intersectionPointHeight);
+                    intersectionPoint.LookupParameter(holeTaskHeight).Set(intersectionPointHeight);
+                    intersectionPoint.LookupParameter(holeTaskWidth).Set(intersectionPointWidthCalculete);
                     intersectionPoint.LookupParameter(holeTaskThickness).Set(intersectionPointThickness);
                     intersectionPoint.get_Parameter(BuiltInParameter.INSTANCE_ELEVATION_PARAM).Set(newCenterPoint.Z);
-                    //intersectionPoint.get_Parameter(heightOfBaseLevelGuid).Set((doc.GetElement(intersectionPoint.LevelId)
-                    //as Level).Elevation);
-                    //intersectionPoint.get_Parameter(levelOffsetGuid).Set(newCenterPoint.Z);
 
                     foreach (FamilyInstance forDel in intersectionWallRectangularSolidIntersectCombineList)
                     {
                         doc.Delete(forDel.Id);
                         intersectionWallRectangularCombineList.Remove(forDel);
-                        //return intersectionWallRectangularCombineList;
                     }
                 }
                 else
                 {
                     intersectionWallRectangularCombineList.Remove(intersectionWallRectangularSolidIntersectCombineList[0]);
-                    //return intersectionWallRectangularCombineList;
                 }
-                //return intersectionWallRectangularCombineList;
             }
 
             while (intersectionFloorRectangularCombineList.Count != 0)
             {
+                string holeTaskWidth = "Ширина";
+                string holeTaskHeight = "Глубина";
+                string holeTaskThickness = "Высота";
+
                 holeFamilySymbol = familyLoader.FloorFamilySymbol;
                 string holeTaskName = intersectionFloorRectangularCombineList.First()?.Name.ToString();
                 List<FamilyInstance> intersectionFloorRectangularSolidIntersectCombineList =
@@ -345,54 +315,27 @@ namespace Strana.Revit.HoleTask.Utils
                 for (int i = 0; i < intersectionFloorRectangularSolidIntersectCombineList.Count; i++)
                 {
                     FamilyInstance firstIntersectionPoint = intersectionFloorRectangularSolidIntersectCombineList[i];
-                    Solid firstIntersectionPointSolid = null;
-                    GeometryElement firstIntersectionPointGeomElem = firstIntersectionPoint.get_Geometry(opt);
-                    foreach (GeometryObject geomObj in firstIntersectionPointGeomElem)
-                    {
-                        GeometryInstance instance = geomObj as GeometryInstance;
-                        if (instance != null)
-                        {
-                            GeometryElement instanceGeometryElement = instance.GetInstanceGeometry();
-                            foreach (GeometryObject o in instanceGeometryElement)
-                            {
-                                Solid solid = o as Solid;
-                                if (solid != null && solid.Volume != 0)
-                                {
-                                    firstIntersectionPointSolid = solid;
-                                    break;
-                                }
-                            }
-                        }
-                    }
+                    Solid firstIntersectionPointSolid = firstIntersectionPoint.GetHoleTaskSolidWithDelta(20.0 / 304.8);
 
                     for (int j = 0; j < tmpIntersectionFloorRectangularSolidIntersectCombineList.Count; j++)
                     {
                         FamilyInstance secondIntersectionPoint =
                             tmpIntersectionFloorRectangularSolidIntersectCombineList[j];
-                        Solid secondIntersectionPointSolid = null;
-                        GeometryElement secondIntersectionPointGeomElem = secondIntersectionPoint.get_Geometry(opt);
-                        foreach (GeometryObject geomObj in secondIntersectionPointGeomElem)
-                        {
-                            GeometryInstance instance = geomObj as GeometryInstance;
-                            if (instance != null)
-                            {
-                                GeometryElement instanceGeometryElement = instance.GetInstanceGeometry();
-                                foreach (GeometryObject o in instanceGeometryElement)
-                                {
-                                    Solid solid = o as Solid;
-                                    if (solid != null && solid.Volume != 0)
-                                    {
-                                        secondIntersectionPointSolid = solid;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
+                        Solid secondIntersectionPointSolid = secondIntersectionPoint.GetHoleTaskSolidWithDelta(20.0 / 304.8);
+                        double unionvolume = 0;
 
-                        double unionvolume = BooleanOperationsUtils.ExecuteBooleanOperation(
-                            firstIntersectionPointSolid,
-                            secondIntersectionPointSolid,
-                            BooleanOperationsType.Intersect).Volume;
+                        try
+                        {
+                            unionvolume = BooleanOperationsUtils.ExecuteBooleanOperation(
+                               firstIntersectionPointSolid,
+                               secondIntersectionPointSolid,
+                               BooleanOperationsType.Intersect).Volume;
+
+                        }
+                        catch (Exception ex)
+                        {
+                            // do nothing
+                        }
 
                         if (unionvolume > 0)
                         {
@@ -559,12 +502,19 @@ namespace Strana.Revit.HoleTask.Utils
                         holeFamilySymbol,
                         pointLevel,
                         StructuralType.NonStructural);
-                    intersectionPoint.LookupParameter(this.ExchangeParameters(holeTaskName, holeTaskWidth, holeTaskHeight))
-                        .Set(intersectionPointWidth);
-                    intersectionPoint.LookupParameter(this.ExchangeParameters(holeTaskName, holeTaskWidth, holeTaskHeight))
-                        .Set(intersectionPointHeight);
-                    intersectionPoint.LookupParameter(holeTaskThickness)
-                        .Set(intersectionPointThickness);
+                    intersectionPoint.LookupParameter(holeTaskWidth).Set(intersectionPointWidth);
+                    intersectionPoint.LookupParameter(holeTaskHeight).Set(intersectionPointHeight);
+                    intersectionPoint.LookupParameter(holeTaskThickness).Set(intersectionPointThickness);
+
+                    //string holeTaskWidth = "Ширина";
+                    //string holeTaskHeight = "Глубина";
+                    //string holeTaskThickness = "Высота";
+
+                    //Конвертировать футы в мм
+                    double Width = intersectionPointWidth * 304.8;         //Ширина
+                    double Height = intersectionPointHeight * 304.8;       //Высота
+                    double Thickness = intersectionPointThickness * 304.8; //Глубина
+
                     //intersectionPoint.get_Parameter(heightOfBaseLevelGuid)
                     //    .Set(pointLevelElevation);
                     //intersectionPoint.get_Parameter(levelOffsetGuid)
@@ -572,7 +522,7 @@ namespace Strana.Revit.HoleTask.Utils
                     //         .AsDouble() - (50 / 304.8));
 
                     double rotationAngle = pointFacingOrientation
-                        .AngleTo(intersectionPoint.FacingOrientation) + Math.PI/2;
+                        .AngleTo(intersectionPoint.FacingOrientation);
                     if (rotationAngle != 0)
                     {
                         Line rotationAxis = Line.CreateBound(
@@ -606,7 +556,7 @@ namespace Strana.Revit.HoleTask.Utils
 
         private string ExchangeParameters(string holeTaskName, string holeTaskHeight, string holeTaskWidth)
         {
-            if (holeTaskName == "(Отв_Задание)_Стены_Прямоугольное)")
+            if (holeTaskName == "(Отв_Задание)_Стены_Прямоугольное")
             {
                 holeTaskHeight = holeTaskWidth;
                 return holeTaskHeight;

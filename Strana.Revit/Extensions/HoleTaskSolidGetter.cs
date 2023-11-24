@@ -41,9 +41,11 @@ namespace Strana.Revit.HoleTask.Extensions
                     }
                 }
             }
+
             if (delta == 0)
             {
-                directShape.SetShape(new GeometryObject[] { largestSolid });
+                // Create solid in the model by DirectShape
+                //directShape.SetShape(new GeometryObject[] { largestSolid });
                 return largestSolid;
             }
 
@@ -129,7 +131,7 @@ namespace Strana.Revit.HoleTask.Extensions
             Solid movedSolid = SolidUtils.CreateTransformed(solidWithDelta, translationTransform);
 
             // Create solid in the model by DirectShape
-            directShape.SetShape(new GeometryObject[] { movedSolid });
+            //directShape.SetShape(new GeometryObject[] { movedSolid });
 
             return movedSolid;
         }

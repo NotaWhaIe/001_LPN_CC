@@ -36,12 +36,14 @@ namespace Strana.Revit.HoleTask.Utils
         /// </summary>
         /// <param name="doc"><seealso cref="Document"/></param>
         /// <param name="center"><seealso cref="XYZ"/></param>
-        public static void CreateSphereByPoint(Document doc, XYZ center)
+        public static void CreateSphereByPoint(Document doc, XYZ center/*, double diameter*/)
         {
             List<Curve> profile = [];
 
             // first create sphere with 2' radius
-            double radius = 0.5;
+            //diameter = 0.5;
+            //double radius = diameter/2;
+            double radius = 0.2;
             XYZ profilePlus = center + new XYZ(0, radius, 0);
             XYZ profileMinus = center - new XYZ(0, radius, 0);
 
