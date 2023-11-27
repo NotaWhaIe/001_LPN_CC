@@ -9,6 +9,8 @@ using System.Linq;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Structure;
 using Autodesk.Revit.UI;
+using Strana.Revit.HoleTask.Extensions;
+using Strana.Revit.HoleTask.RevitCommands;
 
 namespace Strana.Revit.HoleTask.Utils
 {
@@ -36,8 +38,9 @@ namespace Strana.Revit.HoleTask.Utils
         /// </summary>
         /// <param name="doc"><seealso cref="Document"/></param>
         /// <param name="center"><seealso cref="XYZ"/></param>
-        public static void CreateSphereByPoint(Document doc, XYZ center/*, double diameter*/)
+        public static void CreateSphereByPoint(XYZ center/*, double diameter*/)
         {
+            
             List<Curve> profile = [];
 
             // first create sphere with 2' radius
@@ -60,7 +63,7 @@ namespace Strana.Revit.HoleTask.Utils
                 //using (Transaction t = new(doc, "create SphereByPoint"))
                 //{
                 //t.Start();
-                DirectShape ds = DirectShape.CreateElement(doc, new ElementId(BuiltInCategory.OST_Furniture));
+                DirectShape ds = DirectShape.CreateElement(docsaver.doc, new ElementId(BuiltInCategory.OST_Furniture));
                 ds.ApplicationId = "Application id";
                 ds.ApplicationDataId = "Geometry object id";
                 ds.SetShape(new GeometryObject[] { sphere });
@@ -128,7 +131,7 @@ namespace Strana.Revit.HoleTask.Utils
 
             double holeTaskWidth = this.RoundUpToIncrement(mepHeight + clearance, roundHoleSizesUpIncrement);
             double holeTaskThickness = this.RoundUpToIncrement(this.CalculatedWidth(mepWidth, intersectedElement, intersection) + clearance, roundHoleSizesUpIncrement);
-            double holeTaskHeight = this.GetInterctedElementThickness(intersectedElement) + (60 / 304.8);
+            double holeTaskHeight = intersectedElement.GetInterctedElementThickness() + (60 / 304.8);
 
             Level lvl = GetClosestFloorLevel(docLvlList, linkDoc, intersectedElement);
             XYZ intersectionCurveCenter = this.GetIntersectionCurveCenter(intersection);
@@ -230,21 +233,6 @@ namespace Strana.Revit.HoleTask.Utils
             return intersectionCurveCenter;
         }
 
-        private double GetInterctedElementThickness(Element intersectedElement)
-        {
-            if (intersectedElement.GetType() == typeof(Wall))
-            {
-                Wall wall = intersectedElement as Wall;
-                double wallThickness = wall.Width;
-                return wallThickness;
-            }
-            else
-            {
-                double floorThickness = intersectedElement.get_Parameter(BuiltInParameter.FLOOR_ATTR_THICKNESS_PARAM).AsDouble();
-                return floorThickness;
-            }
-        }
-
         private double ExchangeParameters(OrientaionType orientaionType, double holeTaskHeight, double holeTaskWidth)
         {
             if (orientaionType == OrientaionType.Vertical)
@@ -271,7 +259,7 @@ namespace Strana.Revit.HoleTask.Utils
                 XYZ intersectionCurveStartPoint = intersection.GetCurveSegment(0).GetEndPoint(0);
                 XYZ intersectionCurveEndPoint = intersection.GetCurveSegment(0).GetEndPoint(1);
 
-                double legTriangle = this.GetInterctedElementThickness(intersectedElement);
+                double legTriangle = intersectedElement.GetInterctedElementThickness();
                 double hypotenuseTriangle = intersectionCurveStartPoint.DistanceTo(intersectionCurveEndPoint);
 
                 if (legTriangle == hypotenuseTriangle)

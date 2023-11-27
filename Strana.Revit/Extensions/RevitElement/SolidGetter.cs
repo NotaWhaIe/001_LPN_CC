@@ -3,9 +3,15 @@
 // Licensed under the NC license. See LICENSE.md file in the project root for full license information.
 // </copyright>
 
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.IFC;
+using Autodesk.Revit.UI;
+using Strana.Revit.HoleTask.Extensions;
+using Strana.Revit.HoleTask.RevitCommands;
+using Strana.Revit.HoleTask.Utils;
 
 namespace Strana.Revit.HoleTask.Extension.RevitElement
 {
@@ -14,7 +20,7 @@ namespace Strana.Revit.HoleTask.Extension.RevitElement
     /// </summary>
     public static class SolidGetter
     {
-        private static readonly Options Opt = new ()
+        private static readonly Options Opt = new()
         {
             ComputeReferences = true,
             DetailLevel = ViewDetailLevel.Fine,
@@ -35,13 +41,37 @@ namespace Strana.Revit.HoleTask.Extension.RevitElement
                 Solid solidWithHoles = element.GetSolidWithHoles();
                 Face solidFacade = GetSolidMainFace(solidWithHoles);
 
+
+                /// фикс получения солида. беру нормль от фейс.
+                XYZ solidFacadeNormal = solidFacade.ComputeNormal(new UV(0, 0));
+
                 CurveLoop outerСontour = MainOuterContourFromFace(solidFacade); // внешний контур
                 List<CurveLoop> outerLoops = [outerСontour];
 
-                CurveLoop sweepPath = GetSweepPath(solidWithHoles); // траектория выдавливания
+                /// получаем длину в дабл от кёрв лууп
+                double GetCurveLoopLength(CurveLoop curveLoop)
+                {
+                    double totalLength = 0.0;
+
+                    foreach (Curve curve in curveLoop)
+                    {
+                        totalLength += curve.Length;
+                    }
+
+                    return totalLength;
+                }
+                double sweepPathLenght=element.GetInterctedElementThickness();
+                XYZ start_point = outerСontour.GetCurveLoopIterator().Current.GetEndPoint(0);
+                XYZ end_point = start_point - sweepPathLenght * solidFacadeNormal.Normalize();
+
+                // Создаем кривую на основе точек начала и конца
+                Curve curve = Line.CreateBound(start_point, end_point);
+
+                List<Curve> curvel = [curve];
+                CurveLoop edgeMinCurvesLoop = CurveLoop.Create(curvel);
 
                 Solid solidWithoutHoles = GeometryCreationUtilities
-                    .CreateSweptGeometry(sweepPath, 0, 0, outerLoops);
+                    .CreateSweptGeometry(edgeMinCurvesLoop, 0, 0, outerLoops);
 
                 return SolidUtils.CreateTransformed(solidWithoutHoles, transform);
             }
@@ -52,7 +82,6 @@ namespace Strana.Revit.HoleTask.Extension.RevitElement
                 return SolidUtils.CreateTransformed(solidWithHoles, transform);
             }
         }
-
         /// <summary>
         /// bool give information are need see collision by this element.
         /// </summary>
@@ -127,7 +156,7 @@ namespace Strana.Revit.HoleTask.Extension.RevitElement
         {
             EdgeArrayArray allFaceEdges = faceWithHoles.EdgeLoops;
 
-            List<CurveLoop> currentUnitedCurveLoopList = new ();
+            List<CurveLoop> currentUnitedCurveLoopList = new();
             CurveLoop currentUnitedCurveLoop = null;
 
             foreach (EdgeArray agesOfOneFace in allFaceEdges)
@@ -140,7 +169,7 @@ namespace Strana.Revit.HoleTask.Extension.RevitElement
                     unitedCurve.Add(curve);
                 }
 
-                List<CurveLoop> curveLoopList = new ();
+                List<CurveLoop> curveLoopList = new();
                 CurveLoop curvesLoop = CurveLoop.Create(unitedCurve);
                 curveLoopList.Add(curvesLoop);
                 if (currentUnitedCurveLoop == null || ExporterIFCUtils
@@ -171,5 +200,21 @@ namespace Strana.Revit.HoleTask.Extension.RevitElement
             CurveLoop edgeMinCurvesLoop = CurveLoop.Create(curve);
             return edgeMinCurvesLoop;
         }
+        //private static CurveLoop GetSweepPath(Solid solid)
+        //{
+        //    Edge edgeMin = null;
+        //    var edges = solid.Edges;
+        //    foreach (Edge solidEdge in edges)
+        //    {
+        //        if (edgeMin == null || edgeMin.AsCurve().Length > solidEdge.AsCurve().Length)
+        //        {
+        //            edgeMin = solidEdge;
+        //        }
+        //    }
+
+        //    List<Curve> curve = [edgeMin?.AsCurve() ?? null];
+        //    CurveLoop edgeMinCurvesLoop = CurveLoop.Create(curve);
+        //    return edgeMinCurvesLoop;
+        //}
     }
 }

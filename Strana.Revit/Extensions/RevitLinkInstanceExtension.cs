@@ -21,7 +21,7 @@ namespace Strana.Revit.HoleTask.Extensions
                 List<FamilyInstance> allHoleTaskByRevitLinkInstance = new();
                 Document linkDoc = linkInstance.GetLinkDocument();
 
-                // Взять стены и перекрытия
+                /// Take walls and floors
                 IEnumerable<Element> allIntersectingElements = CollectionsOfIntersectingElements.AllIntersectingElements(linkDoc);
 
                 foreach (Element intersectingElement in allIntersectingElements)
@@ -31,8 +31,8 @@ namespace Strana.Revit.HoleTask.Extensions
                         .CreateHoleTasksByIntersectedElements(linkInstance))
                         .ToList();
                 }
-                // Тест создания солида с дельтой.
 
+                /// HoleTasksJoiner.
                 List<FamilyInstance> joinHoleTaskList= new HoleTasksJoiner().JoinAllHoleTask(allHoleTaskByRevitLinkInstance);
                 t.Commit();
             }

@@ -21,7 +21,7 @@ namespace Strana.Revit.HoleTask.Extensions
         /// <returns> list off holetasks items by intersected element (wall or floor).</returns>
         public static List<FamilyInstance> CreateHoleTasksByIntersectedElements(this Element intersectingElement, RevitLinkInstance linkInstance)
         {
-            List<FamilyInstance> intersectedItemHoleTasks = new ();
+            List<FamilyInstance> intersectedItemHoleTasks = new();
 
             if (intersectingElement.AreElementsHaveFaces())
             {
@@ -29,20 +29,23 @@ namespace Strana.Revit.HoleTask.Extensions
                 Document linkDoc = linkInstance.GetLinkDocument();
 
                 IEnumerable<Element> mepElements = MepElementCollections.AllMepElementsByBBox(doc, intersectingElement, linkInstance.GetTotalTransform());
-
+                /// For test with only one pipe/duct/cable tray
+                //if (intersectingElement.Id.IntegerValue == 4040632)
+                //{
                 Solid floorWallSolid = intersectingElement.GetSolidWithoutHoles(linkInstance);
                 foreach (Element mepElement in mepElements)
                 {
                     Curve mepCurve = (mepElement.Location as LocationCurve).Curve;
-                    SolidCurveIntersectionOptions defOptions = new ();
+                    SolidCurveIntersectionOptions defOptions = new();
                     SolidCurveIntersection solidCurve = floorWallSolid.IntersectWithCurve(mepCurve, defOptions);
 
                     if (solidCurve != null && solidCurve.SegmentCount > 0)
                     {
-                        HoleTaskCreator holeTaskCreator = new (doc);
+                        HoleTaskCreator holeTaskCreator = new(doc);
                         FamilyInstance createdHoleTask = holeTaskCreator.PlaceHoleTaskFamilyInstance(mepElement, solidCurve, intersectingElement, linkDoc, linkInstance, 200 / 304.8, 10);
                         intersectedItemHoleTasks.Add(createdHoleTask);
                     }
+                    //}
                 }
             }
 

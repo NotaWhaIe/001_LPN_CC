@@ -36,7 +36,7 @@ namespace Strana.Revit.HoleTask.RevitCommands
 
             UIDocument uidoc = commandData.Application.ActiveUIDocument;
             Document doc = uidoc.Document;
-
+            docsaver.doc = doc;
             using (var gt = new TransactionGroup(doc, "HoleTasks"))
             {
                 gt.Start();
@@ -55,5 +55,9 @@ namespace Strana.Revit.HoleTask.RevitCommands
 
             return Result.Succeeded;
         }
+    }
+    public static class docsaver
+    {
+        public static Document doc { get; set; }
     }
 }
