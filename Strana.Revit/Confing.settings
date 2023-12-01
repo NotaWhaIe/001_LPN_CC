@@ -8,8 +8,29 @@
     <Setting Name="wallHoleTaskPath" Type="System.String" Scope="User">
       <Value Profile="(Default)">\\sb-sharegp\StranaDev_FamilyManager\430_Задания на отверстия\(Отв_Задание)_Стены_Прямоугольное.rfa</Value>
     </Setting>
-    <Setting Name="G" Type="System.Guid" Scope="User">
-      <Value Profile="(Default)">00000000-0000-0000-0000-000000000000</Value>
+    <Setting Name="offSetJoin" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">20</Value>
+    </Setting>
+    <Setting Name="revitLinks" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="areJoin" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="arePickUpElements" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="offSetHoleTask" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">50</Value>
+    </Setting>
+    <Setting Name="roundHoleTaskDimensions" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">10</Value>
+    </Setting>
+    <Setting Name="roundHoleTaskInPlane" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">100</Value>
+    </Setting>
+    <Setting Name="areRoundHoleTaskInPlane" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
     </Setting>
   </Settings>
 </SettingsFile>

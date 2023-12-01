@@ -1,0 +1,93 @@
+﻿<Window x:Class="Strana.Revit.HoleTask.ViewModel.HoleTaskView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Strana.Revit.HoleTask.ViewModel"
+             xmlns:core="clr-namespace:Strana.Revit.HoleTask.ViewModel;assembly=Strana.Revit.HoleTask" d:DataContext="{d:DesignInstance Type=core:HoleTaskView}"
+             mc:Ignorable="d"
+             Title="Задание на отверстия" 
+
+    xmlns:Behaviors="http://schemas.microsoft.com/xaml/behaviors"
+             d:MaxHeight="250" d:MaxWidth="450">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.DeepPurple.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Accent/MaterialDesignColor.Lime.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="60*"/>
+            <ColumnDefinition Width="40*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="75*"/>
+            <RowDefinition Height="25*"/>
+        </Grid.RowDefinitions>
+        <Image 
+            x:Name="image0" 
+            Source="/Strana.Revit.HoleTask;component/Resources/holeTask.png" 
+            Grid.Row="0" Grid.Column="0" RenderOptions.BitmapScalingMode="Fant" HorizontalAlignment="Left"/>
+        <Image 
+            x:Name="image1" 
+            Source="/Strana.Revit.HoleTask;component/Resources/holeTaskLegend.png" 
+            Grid.Row="1" Grid.Column="0" RenderOptions.BitmapScalingMode="Fant" HorizontalAlignment="Center"/>
+
+
+        <Grid Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" >
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <Grid  Grid.Column="1" Grid.Row="0" HorizontalAlignment="Left">
+                <TextBlock Text="Расстояние между MEP элементом и отверстием" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <TextBox Grid.Row="0" HorizontalAlignment="Center"  TextWrapping="Wrap" Text="{Binding Path=OffSetJoin}" VerticalAlignment="Center" Width="25"  Grid.RowSpan="2"/>
+                <TextBlock Text="Δ3 =                " HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <CheckBox Content="Округлить размеры заданий" VerticalAlignment="Bottom" IsChecked="True" />
+            </Grid>
+
+            <Grid  Grid.Column="1" Grid.Row="1" HorizontalAlignment="Left">
+                <TextBlock Text="Δ2 =                " HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                <TextBox Grid.Row="0" HorizontalAlignment="Center"  TextWrapping="Wrap" Text="{Binding Path=OffSetJoin}" VerticalAlignment="Top" Width="25"  Grid.RowSpan="2"/>
+                <CheckBox Content="Округлить расстояния заданий до оси" VerticalAlignment="Center" IsChecked="True" />
+                <TextBlock Text="Δ1 =                " HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
+
+            </Grid>
+
+            <Grid  Grid.Column="1" Grid.Row="2" HorizontalAlignment="Left">
+                <CheckBox Content="Объединять пересекающиеся отверстия" VerticalAlignment="Top" IsChecked="True" />
+                <TextBlock Text="Δ4 =                " HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <TextBox Grid.Row="0" HorizontalAlignment="Center"  TextWrapping="Wrap" Text="{Binding Path=OffSetJoin}" VerticalAlignment="Center" Width="25"  Grid.RowSpan="2"/>
+            </Grid>
+
+            <Grid  Grid.Column="1" Grid.Row="3" HorizontalAlignment="Left">
+                <CheckBox Content="Выбрать отдельные MEP элементы" VerticalAlignment="Top" IsChecked="True" />
+                <TextBlock Text="Выберите связанный файл:" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                <ListBox x:Name="listBox_RevitLinkInstance" SelectionMode="Extended" Height="70" VerticalAlignment="Bottom" Grid.ColumnSpan="2"/>
+            </Grid>
+
+            <Button Grid.Column="1" Grid.Row="6" Opacity ="1" Content="Запустить Магию!" MinWidth="130" Click="CloseWindow"
+                    Margin="6,0,6,0" Padding="-10"
+                    Cursor="Hand">
+
+                <Button.ToolTip>
+                    <ToolTip>
+                        <TextBlock Text="Настройки"/>
+                    </ToolTip>
+                </Button.ToolTip>
+            </Button>
+
+        </Grid>
+
+    </Grid>
+</Window>

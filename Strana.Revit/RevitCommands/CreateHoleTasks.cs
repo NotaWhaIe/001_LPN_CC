@@ -13,6 +13,7 @@ using Strana.Revit.HoleTask.ElementCollections;
 using Strana.Revit.HoleTask.Extension.RevitElement;
 using Strana.Revit.HoleTask.Extensions;
 using Strana.Revit.HoleTask.Utils;
+using Strana.Revit.HoleTask.ViewModel;
 
 namespace Strana.Revit.HoleTask.RevitCommands
 {
@@ -33,6 +34,9 @@ namespace Strana.Revit.HoleTask.RevitCommands
         {
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
+
+            HoleTaskView taskView = new ();
+            taskView.ShowDialog();
 
             UIDocument uidoc = commandData.Application.ActiveUIDocument;
             Document doc = uidoc.Document;

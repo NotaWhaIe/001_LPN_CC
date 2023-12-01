@@ -12,7 +12,7 @@ namespace Strana.Revit.HoleTask {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.7.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.8.0.0")]
     internal sealed partial class Confing : global::System.Configuration.ApplicationSettingsBase {
         
         private static Confing defaultInstance = ((Confing)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Confing())));
@@ -51,13 +51,97 @@ namespace Strana.Revit.HoleTask {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("00000000-0000-0000-0000-000000000000")]
-        public global::System.Guid G {
+        [global::System.Configuration.DefaultSettingValueAttribute("20")]
+        public int offSetJoin {
             get {
-                return ((global::System.Guid)(this["G"]));
+                return ((int)(this["offSetJoin"]));
             }
             set {
-                this["G"] = value;
+                this["offSetJoin"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string revitLinks {
+            get {
+                return ((string)(this["revitLinks"]));
+            }
+            set {
+                this["revitLinks"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool areJoin {
+            get {
+                return ((bool)(this["areJoin"]));
+            }
+            set {
+                this["areJoin"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool arePickUpElements {
+            get {
+                return ((bool)(this["arePickUpElements"]));
+            }
+            set {
+                this["arePickUpElements"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("50")]
+        public int offSetHoleTask {
+            get {
+                return ((int)(this["offSetHoleTask"]));
+            }
+            set {
+                this["offSetHoleTask"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("10")]
+        public int roundHoleTaskDimensions {
+            get {
+                return ((int)(this["roundHoleTaskDimensions"]));
+            }
+            set {
+                this["roundHoleTaskDimensions"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        public int roundHoleTaskInPlane {
+            get {
+                return ((int)(this["roundHoleTaskInPlane"]));
+            }
+            set {
+                this["roundHoleTaskInPlane"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool areRoundHoleTaskInPlane {
+            get {
+                return ((bool)(this["areRoundHoleTaskInPlane"]));
+            }
+            set {
+                this["areRoundHoleTaskInPlane"] = value;
             }
         }
     }

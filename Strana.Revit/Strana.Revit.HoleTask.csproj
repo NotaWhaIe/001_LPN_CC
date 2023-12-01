@@ -16,6 +16,8 @@
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <xmlHeader>true</xmlHeader>
     <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -61,6 +63,17 @@
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
+    <Reference Include="MaterialDesignColors, Version=2.1.4.0, Culture=neutral, PublicKeyToken=df2a72020bd7962a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MaterialDesignColors.2.1.4\lib\net462\MaterialDesignColors.dll</HintPath>
+    </Reference>
+    <Reference Include="MaterialDesignThemes.Wpf, Version=4.9.0.0, Culture=neutral, PublicKeyToken=df2a72020bd7962a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MaterialDesignThemes.4.9.0\lib\net462\MaterialDesignThemes.Wpf.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Xaml.Behaviors, Version=1.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Xaml.Behaviors.Wpf.1.1.77\lib\net462\Microsoft.Xaml.Behaviors.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="RevitAPI">
       <HintPath>..\..\Program Files\Autodesk\Revit 2021\RevitAPI.dll</HintPath>
       <Private>False</Private>
@@ -75,6 +88,8 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -86,6 +101,7 @@
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Confing.Designer.cs">
@@ -96,6 +112,11 @@
     <Compile Include="ElementCollections\LinkInstanseCollections.cs" />
     <Compile Include="ElementCollections\MepElementCollections.cs" />
     <Compile Include="Extensions\GetterElementThickness.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Utils\HoleTasksStatusDeterminator.cs" />
     <Compile Include="Extensions\RevitElement\SolidGetter.cs" />
     <Compile Include="Extensions\RevitDocumentExstensions.cs" />
@@ -112,6 +133,13 @@
     <Compile Include="Utils\HoleTasksJoiner.cs" />
     <Compile Include="Extensions\HoleTaskSolidGetter.cs" />
     <Compile Include="Utils\OrientaionType.cs" />
+    <Compile Include="ViewModel\Base\BaseViewModel.cs" />
+    <Compile Include="ViewModel\Base\CommandHandler.cs" />
+    <Compile Include="ViewModel\Base\RouteCommands.cs" />
+    <Compile Include="ViewModel\HoleTaskView.xaml.cs">
+      <DependentUpon>HoleTaskView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ViewModel\HoleTaskViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.editorconfig">
@@ -144,7 +172,28 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Resources\holeTask.png" />
+    <Resource Include="Resources\holeTaskLegend.png" />
     <Content Include="Resources\RevitRuneasyexample.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <Page Include="ViewModel\HoleTaskView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\packages\MaterialDesignThemes.4.9.0\build\MaterialDesignThemes.targets" Condition="Exists('..\packages\MaterialDesignThemes.4.9.0\build\MaterialDesignThemes.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>Данный проект ссылается на пакеты NuGet, отсутствующие на этом компьютере. Используйте восстановление пакетов NuGet, чтобы скачать их.  Дополнительную информацию см. по адресу: http://go.microsoft.com/fwlink/?LinkID=322105. Отсутствует следующий файл: {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\MaterialDesignThemes.4.9.0\build\MaterialDesignThemes.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MaterialDesignThemes.4.9.0\build\MaterialDesignThemes.targets'))" />
+  </Target>
 </Project>
