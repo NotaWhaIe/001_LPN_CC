@@ -87,7 +87,7 @@ namespace Strana.Revit.HoleTask {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool arePickUpElements {
             get {
                 return ((bool)(this["arePickUpElements"]));
@@ -142,6 +142,30 @@ namespace Strana.Revit.HoleTask {
             }
             set {
                 this["areRoundHoleTaskInPlane"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool arePlaceHoleTaskInOpenings {
+            get {
+                return ((bool)(this["arePlaceHoleTaskInOpenings"]));
+            }
+            set {
+                this["arePlaceHoleTaskInOpenings"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool areRoundHoleTaskDimensions {
+            get {
+                return ((bool)(this["areRoundHoleTaskDimensions"]));
+            }
+            set {
+                this["areRoundHoleTaskDimensions"] = value;
             }
         }
     }

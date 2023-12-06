@@ -34,13 +34,15 @@ namespace Strana.Revit.HoleTask.RevitCommands
         {
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
-
-            HoleTaskView taskView = new ();
-            taskView.ShowDialog();
-
             UIDocument uidoc = commandData.Application.ActiveUIDocument;
             Document doc = uidoc.Document;
             docsaver.doc = doc;
+
+            HoleTaskView taskView = new (doc);
+            taskView.ShowDialog();
+            HoleTaskViewModel tt = taskView.DataContext as HoleTaskViewModel;
+
+
             using (var gt = new TransactionGroup(doc, "HoleTasks"))
             {
                 gt.Start();

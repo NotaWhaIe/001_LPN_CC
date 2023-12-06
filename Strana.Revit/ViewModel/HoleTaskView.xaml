@@ -4,12 +4,14 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Strana.Revit.HoleTask.ViewModel"
-             xmlns:core="clr-namespace:Strana.Revit.HoleTask.ViewModel;assembly=Strana.Revit.HoleTask" d:DataContext="{d:DesignInstance Type=core:HoleTaskView}"
+             xmlns:core="clr-namespace:Strana.Revit.HoleTask.ViewModel;assembly=Strana.Revit.HoleTask"
+             d:DataContext="{d:DesignInstance Type=core:HoleTaskViewModel}"
              mc:Ignorable="d"
              Title="Задание на отверстия" 
+             d:Height="550" Width="700" MaxHeight="550" MaxWidth="700"
 
     xmlns:Behaviors="http://schemas.microsoft.com/xaml/behaviors"
-             d:MaxHeight="250" d:MaxWidth="450">
+>
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -23,8 +25,8 @@
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="60*"/>
-            <ColumnDefinition Width="40*"/>
+            <ColumnDefinition Width="53*"/>
+            <ColumnDefinition Width="47*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="75*"/>
@@ -42,41 +44,83 @@
 
         <Grid Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" >
             <Grid.RowDefinitions>
+                <!-- Колонка 0 -->
                 <RowDefinition/>
+                <!-- Колонка 1 -->
                 <RowDefinition/>
+                <!-- Колонка 2 -->
                 <RowDefinition/>
+                <!-- Колонка 3 -->
                 <RowDefinition/>
+                <!-- Колонка 4 -->
+                <RowDefinition/>
+                <!-- Колонка 5 -->
+                <RowDefinition/>
+                <!-- Колонка 6 -->
+                <RowDefinition/>
+                <!-- Колонка 7 -->
                 <RowDefinition/>
             </Grid.RowDefinitions>
 
             <Grid  Grid.Column="1" Grid.Row="0" HorizontalAlignment="Left">
-                <TextBlock Text="Расстояние между MEP элементом и отверстием" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                <TextBox Grid.Row="0" HorizontalAlignment="Center"  TextWrapping="Wrap" Text="{Binding Path=OffSetJoin}" VerticalAlignment="Center" Width="25"  Grid.RowSpan="2"/>
-                <TextBlock Text="Δ3 =                " HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                <CheckBox Content="Округлить размеры заданий" VerticalAlignment="Bottom" IsChecked="True" />
+                <CheckBox Content="Округлить расстояния заданий до оси" VerticalAlignment="Top" IsChecked="{Binding Path=AreRoundHoleTaskInPlane,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Width="312"/>
+                <TextBlock Text="Δ1 =                " HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <TextBox Grid.Row="0" HorizontalAlignment="Center"  TextWrapping="Wrap" Text="{Binding Path=RoundHoleTaskInPlane}" VerticalAlignment="Center" Width="25"  Grid.RowSpan="2"/>
             </Grid>
 
             <Grid  Grid.Column="1" Grid.Row="1" HorizontalAlignment="Left">
-                <TextBlock Text="Δ2 =                " HorizontalAlignment="Center" VerticalAlignment="Top"/>
-                <TextBox Grid.Row="0" HorizontalAlignment="Center"  TextWrapping="Wrap" Text="{Binding Path=OffSetJoin}" VerticalAlignment="Top" Width="25"  Grid.RowSpan="2"/>
-                <CheckBox Content="Округлить расстояния заданий до оси" VerticalAlignment="Center" IsChecked="True" />
-                <TextBlock Text="Δ1 =                " HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
-
+                <CheckBox Content="Округлить размеры заданий" VerticalAlignment="Top" IsChecked="{Binding Path=AreRoundHoleTaskDimensions,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Width="312" />
+                <TextBlock Text="Δ2 =                " HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <TextBox Grid.Row="0" HorizontalAlignment="Center"  TextWrapping="Wrap" Text="{Binding Path=RoundHoleTaskDimensions}" VerticalAlignment="Center" Width="25"  Grid.RowSpan="2"/>
             </Grid>
 
             <Grid  Grid.Column="1" Grid.Row="2" HorizontalAlignment="Left">
-                <CheckBox Content="Объединять пересекающиеся отверстия" VerticalAlignment="Top" IsChecked="True" />
+                <TextBox Grid.Row="0" HorizontalAlignment="Center"  TextWrapping="Wrap" Text="{Binding Path=OffSetHoleTask}" VerticalAlignment="Center" Width="25"  Grid.RowSpan="2"/>
+                <TextBlock Text="Расстояние между инженерной системой и отверстием" HorizontalAlignment="Left" VerticalAlignment="Top" Width="312"/>
+                <TextBlock Text="Δ3 =                " HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Grid>
+
+            <Grid  Grid.Column="1" Grid.Row="3" HorizontalAlignment="Left">
+                <CheckBox Content="Объединять пересекающиеся отверстия" VerticalAlignment="Top" IsChecked="{Binding Path=AreJoin,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Width="312" />
                 <TextBlock Text="Δ4 =                " HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 <TextBox Grid.Row="0" HorizontalAlignment="Center"  TextWrapping="Wrap" Text="{Binding Path=OffSetJoin}" VerticalAlignment="Center" Width="25"  Grid.RowSpan="2"/>
             </Grid>
 
-            <Grid  Grid.Column="1" Grid.Row="3" HorizontalAlignment="Left">
-                <CheckBox Content="Выбрать отдельные MEP элементы" VerticalAlignment="Top" IsChecked="True" />
-                <TextBlock Text="Выберите связанный файл:" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                <ListBox x:Name="listBox_RevitLinkInstance" SelectionMode="Extended" Height="70" VerticalAlignment="Bottom" Grid.ColumnSpan="2"/>
+            <Grid  Grid.Column="1" Grid.Row="4" HorizontalAlignment="Left">
+                <CheckBox Content="Размещать отверстия в проемах" VerticalAlignment="Top" IsChecked="{Binding Path=ArePlaceHoleTaskInOpenings,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Width="312"/>
+                <CheckBox Content="Выбрать отдельные MEP элементы" VerticalAlignment="Center" IsChecked="{Binding Path=ArePickUpElements,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Width="312" />
+                <TextBlock Text="Выберите связанный файл:" HorizontalAlignment="Left" VerticalAlignment="Bottom"  Width="312"/>
             </Grid>
 
-            <Button Grid.Column="1" Grid.Row="6" Opacity ="1" Content="Запустить Магию!" MinWidth="130" Click="CloseWindow"
+
+            <Grid Grid.Column="1" Grid.Row="5" HorizontalAlignment="Left" Grid.RowSpan="6">
+                <!-- Элемент в колонке 5 и 6, который занимает одну колонку -->
+                <ListBox x:Name="listBox_RevitLinkInstance" 
+                     ItemsSource="{Binding Path= LinkedFileData}" 
+                     SelectionMode="Extended" 
+                     Height="147" 
+                     VerticalAlignment="Top" 
+                     HorizontalAlignment="Left"
+                     Width="312">
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="{x:Type ListBoxItem}">
+                            <Setter Property="IsSelected" Value="{Binding Path=IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+
+                    <ListBox.ItemTemplate>
+
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Path=Name}" TextWrapping="Wrap" MaxWidth="290" FontSize ="11"/>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Grid>
+
+            <!--<Grid  Grid.Column="1" Grid.Row="6" HorizontalAlignment="Left">
+            </Grid>-->
+
+            <Button Grid.Column="1" Grid.Row="7" Opacity ="1" Content="Запустить Магию!" MinWidth="130" Click="CloseWindow"
                     Margin="6,0,6,0" Padding="-10"
                     Cursor="Hand">
 
@@ -86,8 +130,6 @@
                     </ToolTip>
                 </Button.ToolTip>
             </Button>
-
         </Grid>
-
     </Grid>
 </Window>

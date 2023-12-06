@@ -4,8 +4,10 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Collections.Generic;
+using System.Windows.Shapes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Electrical;
 using Autodesk.Revit.DB.Mechanical;
@@ -45,6 +47,11 @@ namespace Strana.Revit.Extension
                     .OfClass(type)
                     .WhereElementIsNotElementType()
                     .ToElements());
+        }
+
+        public static List<string> GetAllRevitLinkedFileNames(this Document doc)
+        {
+            return doc.GetAllRevitLinkInstances().Select(link => link.Name).ToList();
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Autodesk.Revit.DB;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,14 +21,15 @@ namespace Strana.Revit.HoleTask.ViewModel
     /// </summary>
     public partial class HoleTaskView : Window
     {
-        public HoleTaskView()
+        public HoleTaskView(Document doc)
         {
-            this.DataContext = new HoleTaskViewModel();
+            this.DataContext = new HoleTaskViewModel(doc);
             InitializeComponent();
         }
 
         public void CloseWindow(object sender, RoutedEventArgs e)
         {
+            var t = this.DataContext as HoleTaskViewModel;
             this.Close();
         }
     }

@@ -381,5 +381,10 @@ namespace GloryHole
             this.DialogResult = false;
             this.Close();
         }
+
+        private void checkBox_CombineHoles_Checked(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
