@@ -29,7 +29,7 @@ namespace Strana.Revit.HoleTask.ViewModel
 
         public void CloseWindow(object sender, RoutedEventArgs e)
         {
-            var t = this.DataContext as HoleTaskViewModel;
+            //var t = this.DataContext as HoleTaskViewModel;
             this.Close();
         }
     }

@@ -19,11 +19,24 @@ namespace Strana.Revit.HoleTask.ElementCollections
         /// </summary>
         /// <param name="doc"><seealso cref="Document"/></param>
         /// <returns>collection with revit links.</returns>
-        public static IEnumerable<RevitLinkInstance> RevitLinks(Document doc)
+        public static IEnumerable<RevitLinkInstance> RevitLinks(Document doc, bool isReternSelected = true)
         {
-            return new FilteredElementCollector(doc)
-                .OfClass(typeof(RevitLinkInstance))
-                .Cast<RevitLinkInstance>();
+            var revitLinksCollector = new FilteredElementCollector(doc)
+                  .OfClass(typeof(RevitLinkInstance))
+                  .Cast<RevitLinkInstance>();
+
+            if (isReternSelected)
+            {
+                string revitLinks = Confing.Default.revitLinks;
+                List<string> revitLinksList = revitLinks.Split(';').ToList();
+                var selectedRevitLinks = revitLinksCollector.Where(link => revitLinksList.Any(link.Name.Contains));
+                return selectedRevitLinks;
+            }
+            else
+            {
+                return revitLinksCollector;
+            }
+
         }
     }
 }

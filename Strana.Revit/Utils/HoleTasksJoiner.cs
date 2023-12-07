@@ -21,11 +21,6 @@ namespace Strana.Revit.HoleTask.Utils
         {
         }
 
-        public HoleTasksJoiner(Document doc)
-        {
-            this.doc = doc;
-        }
-
         /// <summary>
         /// list of hole tasks after joining.
         /// </summary>

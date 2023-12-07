@@ -49,6 +49,7 @@ namespace Strana.Revit.HoleTask.RevitCommands
 
                 foreach (RevitLinkInstance linkInstance in LinkInstanseCollections.RevitLinks(doc))
                 {
+                    /// Разместить метод по парсингу связи
                     linkInstance.CreateHoleTasksByCurrentLink();
                 }
 
