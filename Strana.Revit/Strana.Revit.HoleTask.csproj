@@ -117,7 +117,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Utils\GetRevitLinksNameFromConfig.cs" />
     <Compile Include="Utils\HoleTasksStatusDeterminator.cs" />
     <Compile Include="Extensions\RevitElement\SolidGetter.cs" />
     <Compile Include="Extensions\RevitDocumentExstensions.cs" />

@@ -25,13 +25,11 @@ namespace Strana.Revit.HoleTask.ViewModel
                 {
                     Confing.Default.revitLinks = Confing.Default.revitLinks + this.Name + ";";
                     Confing.Default.Save();
-
                 }
                 else
                 {
                     Confing.Default.revitLinks = Confing.Default.revitLinks.Replace(this.Name + ";", string.Empty);
                     Confing.Default.Save();
-
                 }
             }
         }

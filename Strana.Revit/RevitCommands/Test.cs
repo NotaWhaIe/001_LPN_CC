@@ -17,157 +17,56 @@ namespace Strana.Revit.HoleTask.RevitCommands
     public class Test : IExternalCommand
     {
         static AddInId addinId = new AddInId(new Guid("f64706dd-e8f6-4cbe-9cc6-a2910be5ad5a"));
-        private object offsetCurves;
-
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
-            UIDocument uidoc = commandData.Application.ActiveUIDocument;
-            Autodesk.Revit.DB.Document doc = uidoc.Document;
-
-            ElementId selFiId = null;
-            Selection sel = uidoc.Selection;
-            if (sel.GetElementIds().Count() != 1)
+            try
             {
-                Reference selRef = sel.PickObject(ObjectType.Element, "Выберите семейство");
-                selFiId = selRef.ElementId;
-            }
-            else
-            {
-                selFiId = sel.GetElementIds().First();
-            }
+                UIDocument uidoc = commandData.Application.ActiveUIDocument;
+                Autodesk.Revit.DB.Document doc = uidoc.Document;
+                var reference = uidoc.Selection.PickObject(ObjectType.Element, "Select a wall");
+                var point1 = uidoc.Selection.PickPoint("Select first point");
+                var point2 = uidoc.Selection.PickPoint("Select second point");
 
-            FamilyInstance selFi = doc.GetElement(selFiId) as FamilyInstance;
-            if (selFi == null)
-            {
-                TaskDialog.Show("Ошибка!", "Выбрано не семейство");
-                return Result.Succeeded;
-            }
+                Line line = Line.CreateBound(point1, new XYZ(point2.X, point1.Y, point2.Z));
 
-            /// FamilyInstance - GeometryElement - GeometryInstance - Solid
-            Options options = new Options();
-            GeometryElement geometryElement = selFi.get_Geometry(options);
-
-            Solid largestSolid = null;
-
-            foreach (GeometryObject geometry in geometryElement)
-            {
-                GeometryInstance instance = geometry as GeometryInstance;
-                if (instance != null)
+                var wall = doc.GetElement(reference) as Wall;
+                double thickness = wall.Width;
+                var array = new ReferenceArray();
+                var options = new Options()
                 {
-                    GeometryElement instanceGeometryElement = instance.GetInstanceGeometry();
-                    foreach (GeometryObject o in instanceGeometryElement)
-                    {
-                        Solid solid = o as Solid;
-                        if (solid != null && solid.Volume != 0)
-                        {
-                            largestSolid = solid;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            if (largestSolid == null)
-            {
-                TaskDialog.Show(":(", "Solid == null");
-            }
-
-            CurveLoop GetCurveLoopFromSolid(Solid largestSolid)
-            {
-                FaceArray faces = largestSolid.Faces;
-                foreach (Face face in faces)
+                    View = doc.ActiveView,
+                    ComputeReferences = true
+                };
+                var geom = wall.get_Geometry(options);
+                foreach (GeometryObject go in geom)
                 {
-                    if (face is PlanarFace planarFace && planarFace.FaceNormal.IsAlmostEqualTo(XYZ.BasisZ))
+                    if (go is Solid)
                     {
-                        CurveLoop curveLoop = planarFace.GetEdgesAsCurveLoops().FirstOrDefault();
-
-                        if (curveLoop != null)
+                        var solid = go as Solid;
+                        foreach (Edge edge in solid.Edges)
                         {
-                            return curveLoop;
+                            if (Math.Abs(thickness - edge.ApproximateLength) < 0.00001 &&
+                                //edge.Reference.ElementReferenceType == ElementReferenceType.REFERENCE_TYPE_CUT_EDGE) 
+                                edge.Reference.ElementReferenceType == ElementReferenceType.REFERENCE_TYPE_LINEAR)
+                            {
+                                array.Insert(edge.Reference, array.Size);
+                            }
                         }
                     }
                 }
 
-                return null;
-            }
-            CurveLoop curveLoopSolid = GetCurveLoopFromSolid(largestSolid);
-
-            double offsetDistance = 50.0 / 304.8;
-
-            // Get sweep's profile
-            List<double> DoubleListOffset(CurveLoop curveLoopSolid, double offsetDistance)
-            {
-                List<double> list = new List<double>();
-                foreach (Curve curve in curveLoopSolid)
+                using (Transaction t = new Transaction(doc, "Dimension creation"))
                 {
-                    list.Add(offsetDistance);
+                    t.Start();
+                    doc.Create.NewDimension(doc.ActiveView, line, array);
+                    t.Commit();
                 }
-
-                return list;
             }
-
-            List<double> doubleOffsetСontour = DoubleListOffset(curveLoopSolid, offsetDistance);
-            CurveLoop curveLoopOffset = CurveLoop.CreateViaOffset(curveLoopSolid, DoubleListOffset(curveLoopSolid, offsetDistance), XYZ.BasisZ);
-            List<CurveLoop> curveLoopOffsetСontour = [curveLoopOffset];
-
-            // Get sweep's path
-            CurveLoop GetSweepPathOfSolid(Solid largestSolid)
+            catch (Exception e)
             {
-                EdgeArray sweeps = largestSolid.Edges;
-                foreach (Edge edge in sweeps)
-                {
-                    Curve curve = edge.AsCurve();
-                    XYZ point0 = curve.GetEndPoint(0);
-                    XYZ point1 = curve.GetEndPoint(1);
-                    double tolerance = 0.1; // Tolerance=0.1 == 1 degree, tolerance=0.2 == 3 degree, tolerance=0.3 == 4 degree.
-                    if ((point0.Z - point1.Z) > tolerance)
-                    {
-                        curve = AddOffsetToSweepPath(curve, offsetDistance);
-                        CurveLoop curveLoop = new CurveLoop();
-                        curveLoop.Append(curve);
-                        return curveLoop;
-                    }
-                }
-                return null;
-            }
-            Curve AddOffsetToSweepPath(Curve sweepPath, double offsetDistance)
-            {
-                if (sweepPath is Line line)
-                {
-                    double currentLength = line.Length;
-                    double newLength = currentLength + 2 * offsetDistance;
-
-                    XYZ direction = line.Direction.Normalize();
-                    XYZ newEndPoint = line.GetEndPoint(0) + newLength * direction;
-
-                    Line newLine = Line.CreateBound(line.GetEndPoint(0), newEndPoint);
-                    Curve curve = newLine as Curve;
-                    return curve;
-                }
-                return null;
-            }
-            CurveLoop sweepPath = GetSweepPathOfSolid(largestSolid);
-
-            // Create geomentry by sweep
-            Solid solidWithDelta = GeometryCreationUtilities.CreateSweptGeometry(sweepPath, 0, 0, curveLoopOffsetСontour);
-
-            // Move solid on the Z axis to the delta
-            XYZ translationVector = new XYZ(0, 0, offsetDistance);
-            Transform translationTransform = Transform.CreateTranslation(translationVector);
-            Solid movedSolid = SolidUtils.CreateTransformed(solidWithDelta, translationTransform);
-
-            // Create solid in the model by DirectShape
-            using (Transaction tе = new(doc, "create solidWithDelta"))
-            {
-                tе.Start();
-
-                DirectShape directShape = DirectShape.CreateElement(doc, new ElementId(BuiltInCategory.OST_Furniture));
-                directShape.SetShape(new GeometryObject[] { movedSolid });
-
-                tе.Commit();
+                TaskDialog.Show("1", e.Message + e.StackTrace);
             }
 
-            TaskDialog.Show(":)", ":)");
             return Result.Succeeded;
         }
     }

@@ -50,7 +50,6 @@ namespace Strana.Revit.HoleTask.ViewModel
             List< RevitLinkData> rvtlinksData = new List<RevitLinkData>();
             foreach(string name in  linkedFileNames) 
             {
-
                 rvtlinksData.Add(new RevitLinkData(name.Split(':')[0]));
             }
 
