@@ -14,7 +14,6 @@ using Strana.Revit.HoleTask.RevitCommands;
 
 namespace Strana.Revit.HoleTask.Utils
 {
-
     /// <summary>
     /// This class contains metod set up a HoleTasks familySybol.
     /// </summary>
@@ -22,6 +21,7 @@ namespace Strana.Revit.HoleTask.Utils
     {
         private readonly Document doc;
         private readonly List<FamilyInstance> intersectionFloorRectangularCombineList = new List<FamilyInstance>();
+        private static double clearance => Confing.Default.offSetHoleTask/304.8;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="HoleTaskCreator"/> class.
@@ -91,9 +91,7 @@ namespace Strana.Revit.HoleTask.Utils
             SolidCurveIntersection intersection,
             Element intersectedElement,
             Document linkDoc,
-            RevitLinkInstance linkInstance,
-            double clearance,
-            double roundHoleSizesUpIncrement)
+            RevitLinkInstance linkInstance)
         {
             OrientaionType orientation = this.GetElementOrientationType(mepElement);
             FamilySymbol holeFamilySymbol;
@@ -129,9 +127,9 @@ namespace Strana.Revit.HoleTask.Utils
             FamilyInstance holeTask;
             IEnumerable<Level> docLvlList = this.GetDocumentLevels(this.doc);
 
-            double holeTaskWidth = this.RoundUpToIncrement(mepHeight + clearance, roundHoleSizesUpIncrement);
-            double holeTaskThickness = this.RoundUpToIncrement(this.CalculatedWidth(mepWidth, intersectedElement, intersection) + clearance, roundHoleSizesUpIncrement);
-            double holeTaskHeight = intersectedElement.GetInterctedElementThickness() + (60 / 304.8);
+            double holeTaskWidth = (mepHeight + clearance);
+            double holeTaskThickness = (this.CalculatedWidth(mepWidth, intersectedElement, intersection) + clearance);
+            double holeTaskHeight = intersectedElement.GetInterctedElementThickness() + clearance;
 
             Level lvl = GetClosestFloorLevel(docLvlList, linkDoc, intersectedElement);
             XYZ intersectionCurveCenter = this.GetIntersectionCurveCenter(intersection);
@@ -173,21 +171,7 @@ namespace Strana.Revit.HoleTask.Utils
                     lvl = docLvl;
                 }
             }
-
             return lvl;
-        }
-
-        /// <summary>
-        /// RoundUp Height and Width familys parameter in project.
-        /// </summary>
-        /// <param name="heightWidth">Element size in model.</param>
-        /// <param name="roundingValue">Величина округления.</param>
-        /// <returns>
-        /// The rounded-up value of the height or width, ensuring it is a multiple of the specified increment.
-        /// </returns>
-        private double RoundUpToIncrement(double heightWidth, double roundingValue)
-        {
-            return (((int)Math.Ceiling(heightWidth * 304.8 / roundingValue)) * roundingValue) / 304.8;
         }
 
         /// <summary>
