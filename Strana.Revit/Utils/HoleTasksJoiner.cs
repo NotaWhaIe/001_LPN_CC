@@ -70,12 +70,12 @@ namespace Strana.Revit.HoleTask.Utils
                         for (int i = 0; i < intersectionWallRectangularSolidIntersectCombineList.Count; i++)
                         {
                             FamilyInstance firstIntersectionPoint = intersectionWallRectangularSolidIntersectCombineList[i];
-                            Solid firstIntersectionPointSolid = firstIntersectionPoint.GetHoleTaskSolidWithDelta(0 / 304.8);
+                            Solid firstIntersectionPointSolid = firstIntersectionPoint.GetHoleTaskSolidWithDelta();
 
                             for (int j = 0; j < tmpIntersectionWallRectangularSolidIntersectCombineList.Count; j++)
                             {
                                 FamilyInstance secondIntersectionPoint = tmpIntersectionWallRectangularSolidIntersectCombineList[j];
-                                Solid secondIntersectionPointSolid = secondIntersectionPoint.GetHoleTaskSolidWithDelta(0.0 / 304.8);
+                                Solid secondIntersectionPointSolid = secondIntersectionPoint.GetHoleTaskSolidWithDelta();
                                 double unionvolume = 0;
 
                                 try
@@ -307,13 +307,13 @@ namespace Strana.Revit.HoleTask.Utils
                         for (int i = 0; i < intersectionFloorRectangularSolidIntersectCombineList.Count; i++)
                         {
                             FamilyInstance firstIntersectionPoint = intersectionFloorRectangularSolidIntersectCombineList[i];
-                            Solid firstIntersectionPointSolid = firstIntersectionPoint.GetHoleTaskSolidWithDelta(20.0 / 304.8);
+                            Solid firstIntersectionPointSolid = firstIntersectionPoint.GetHoleTaskSolidWithDelta();
 
                             for (int j = 0; j < tmpIntersectionFloorRectangularSolidIntersectCombineList.Count; j++)
                             {
                                 FamilyInstance secondIntersectionPoint =
                                     tmpIntersectionFloorRectangularSolidIntersectCombineList[j];
-                                Solid secondIntersectionPointSolid = secondIntersectionPoint.GetHoleTaskSolidWithDelta(20.0 / 304.8);
+                                Solid secondIntersectionPointSolid = secondIntersectionPoint.GetHoleTaskSolidWithDelta();
                                 double unionvolume = 0;
 
                                 try

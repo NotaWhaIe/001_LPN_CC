@@ -21,7 +21,7 @@ namespace Strana.Revit.HoleTask.Utils
     {
         private readonly Document doc;
         private readonly List<FamilyInstance> intersectionFloorRectangularCombineList = new List<FamilyInstance>();
-        private static double clearance => Confing.Default.offSetHoleTask/304.8;
+        private static double clearance => (Confing.Default.offSetHoleTask/304.8)*2;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="HoleTaskCreator"/> class.

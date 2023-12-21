@@ -16,7 +16,9 @@ namespace Strana.Revit.HoleTask.Extensions
     /// </summary>
     public static class HoleTaskSolidGetter
     {
-        public static Solid GetHoleTaskSolidWithDelta(this FamilyInstance holeTaskItem, double delta)
+        private static double delta => Confing.Default.offSetJoin / 304.8;
+        private static bool areJoin => Confing.Default.areJoin;
+        public static Solid GetHoleTaskSolidWithDelta(this FamilyInstance holeTaskItem)
         {
             Document doc = holeTaskItem.Document;
             Options options = new Options();
@@ -42,7 +44,7 @@ namespace Strana.Revit.HoleTask.Extensions
                 }
             }
 
-            if (delta == 0)
+            if (delta == 0 || areJoin)
             {
                 // Create solid in the model by DirectShape
                 //directShape.SetShape(new GeometryObject[] { largestSolid });
