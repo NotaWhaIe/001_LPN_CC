@@ -21,7 +21,7 @@ using Strana.Revit.Extension;
 
 namespace Strana.Revit.HoleTask.ViewModel
 {
-    internal class HoleTaskViewModel : BaseViewModel
+    public class HoleTaskViewModel : BaseViewModel
     {
         private bool areRoundHoleTaskInPlane = Confing.Default.areRoundHoleTaskInPlane;
         private int roundHoleTaskInPlane = Confing.Default.roundHoleTaskInPlane;
@@ -43,12 +43,11 @@ namespace Strana.Revit.HoleTask.ViewModel
 
         public Document currentDocument { get; set; }
 
-
         public List<RevitLinkData> GetLinkedFileNames()
         {
             List<string> linkedFileNames = this.currentDocument.GetAllRevitLinkedFileNames();
-            List< RevitLinkData> rvtlinksData = new List<RevitLinkData>();
-            foreach(string name in  linkedFileNames) 
+            List<RevitLinkData> rvtlinksData = new List<RevitLinkData>();
+            foreach (string name in linkedFileNames)
             {
                 rvtlinksData.Add(new RevitLinkData(name.Split(':')[0]));
             }
@@ -56,138 +55,135 @@ namespace Strana.Revit.HoleTask.ViewModel
             return rvtlinksData;
         }
 
-
         public bool AreRoundHoleTaskInPlane
         {
-            get { return roundHoleTaskInPlane != 0; }
+            get => this.areRoundHoleTaskInPlane;
             set
             {
-                OnPropertyChanged(nameof(AreRoundHoleTaskInPlane));
-                roundHoleTaskInPlane = value ? 1 : 0;
-                Confing.Default.roundHoleTaskInPlane = roundHoleTaskInPlane;
+                this.areRoundHoleTaskInPlane = value;
+                Confing.Default.areRoundHoleTaskInPlane = this.areRoundHoleTaskInPlane;
                 Confing.Default.Save();
+                OnPropertyChanged(nameof(this.areRoundHoleTaskInPlane));
             }
         }
         public int RoundHoleTaskInPlane
         {
-            get
-            {
-                return roundHoleTaskInPlane;
-            }
+            get => this.roundHoleTaskInPlane;
             set
             {
-                OnPropertyChanged(nameof(RoundHoleTaskInPlane));
                 if (value is int)
                 {
-                    roundHoleTaskInPlane = value;
-                    Confing.Default.roundHoleTaskInPlane = roundHoleTaskInPlane;
+                    this.roundHoleTaskInPlane = value;
+                    Confing.Default.roundHoleTaskInPlane = this.roundHoleTaskInPlane;
                     Confing.Default.Save();
                 }
+                OnPropertyChanged(nameof(RoundHoleTaskInPlane));
             }
         }
         public bool AreRoundHoleTaskDimensions
         {
-            get { return roundHoleTaskInPlane != 0; }
+            get => this.areRoundHoleTaskDimensions;
             set
             {
-                OnPropertyChanged(nameof(AreRoundHoleTaskDimensions));
-                roundHoleTaskInPlane = value ? 1 : 0;
-                Confing.Default.areRoundHoleTaskDimensions = areRoundHoleTaskDimensions;
+                this.areRoundHoleTaskDimensions = value;
+                Confing.Default.areRoundHoleTaskDimensions = this.areRoundHoleTaskDimensions;
                 Confing.Default.Save();
+                OnPropertyChanged(nameof(this.areRoundHoleTaskDimensions));
             }
         }
         public int RoundHoleTaskDimensions
         {
-            get
-            {
-                return roundHoleTaskDimensions;
-            }
+            get => this.roundHoleTaskDimensions;
             set
             {
-                OnPropertyChanged(nameof(RoundHoleTaskDimensions));
                 if (value is int)
                 {
-                    roundHoleTaskDimensions = value;
-                    Confing.Default.roundHoleTaskDimensions = roundHoleTaskDimensions;
+                    this.roundHoleTaskDimensions = value;
+                    Confing.Default.roundHoleTaskDimensions = this.roundHoleTaskDimensions;
                     Confing.Default.Save();
                 }
+                OnPropertyChanged(nameof(this.roundHoleTaskDimensions));
             }
         }
         public int OffSetHoleTask
         {
-            get
-            {
-                return offSetHoleTask;
-            }
+            get => offSetHoleTask;
             set
             {
-                OnPropertyChanged(nameof(OffSetHoleTask));
                 if (value is int)
                 {
-                    offSetHoleTask = value;
-                    Confing.Default.offSetHoleTask = offSetHoleTask;
+                    this.offSetHoleTask = value;
+                    Confing.Default.offSetHoleTask = this.offSetHoleTask;
                     Confing.Default.Save();
                 }
+                OnPropertyChanged(nameof(this.offSetHoleTask));
             }
         }
         public bool AreJoin
         {
-            get { return roundHoleTaskInPlane != 0; }
+            get => this.areJoin;
             set
             {
-                OnPropertyChanged(nameof(AreJoin));
-                roundHoleTaskInPlane = value ? 1 : 0;
-                Confing.Default.areJoin = areJoin;
+                this.areJoin = value;
+                Confing.Default.areJoin = this.areJoin;
                 Confing.Default.Save();
+                OnPropertyChanged(nameof(this.areJoin));
             }
         }
         public int OffSetJoin
         {
-            get
-            {
-                return offSetJoin;
-            }
+            get => this.offSetJoin;
             set
             {
-                OnPropertyChanged(nameof(OffSetJoin));
                 if (value is int)
                 {
                     offSetJoin = value;
-                    Confing.Default.offSetJoin = offSetJoin;
+                    Confing.Default.offSetJoin = this.offSetJoin;
                     Confing.Default.Save();
                 }
+                OnPropertyChanged(nameof(this.offSetJoin));
             }
         }
         public bool ArePlaceHoleTaskInOpenings
         {
-            get { return roundHoleTaskInPlane != 0; }
+            get => this.arePlaceHoleTaskInOpenings;
             set
             {
-                OnPropertyChanged(nameof(ArePlaceHoleTaskInOpenings));
-                roundHoleTaskInPlane = value ? 1 : 0;
-                Confing.Default.arePlaceHoleTaskInOpenings = arePlaceHoleTaskInOpenings;
+                this.arePlaceHoleTaskInOpenings = value;
+                Confing.Default.arePlaceHoleTaskInOpenings = this.arePlaceHoleTaskInOpenings;
                 Confing.Default.Save();
+                OnPropertyChanged(nameof(this.arePlaceHoleTaskInOpenings));
             }
         }
         public bool ArePickUpElements
         {
-            get { return roundHoleTaskInPlane != 0; }
+            get => this.arePickUpElements;
             set
             {
-                OnPropertyChanged(nameof(ArePickUpElements));
-                roundHoleTaskInPlane = value ? 1 : 0;
-                Confing.Default.arePickUpElements = arePickUpElements;
+                this.arePickUpElements = value;
+                Confing.Default.arePickUpElements = this.arePickUpElements;
                 Confing.Default.Save();
+                OnPropertyChanged(nameof(this.arePickUpElements));
             }
         }
 
-
-
+        ///test example
         public ICommand RunScriptCommand => new RouteCommands(() => this.runScript());
 
         private void runScript()
         {
             TaskDialog.Show("asdfasdf", "asdf");
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            // Здесь можно добавить вашу логику, которая должна выполняться при закрытии окна
+        }
+
+        internal void ExecuteProgram()
+        {
+            // Здесь добавьте логику, которая должна быть выполнена
+            // Например, запуск процессов создания отверстий, расчетов и т.д.
         }
     }
 }

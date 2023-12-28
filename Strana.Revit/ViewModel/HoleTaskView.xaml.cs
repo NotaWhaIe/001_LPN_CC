@@ -16,19 +16,36 @@ using System.Windows.Shapes;
 
 namespace Strana.Revit.HoleTask.ViewModel
 {
-    /// <summary>
-    /// Логика взаимодействия для HoleTaskView.xaml
-    /// </summary>
     public partial class HoleTaskView : Window
     {
+        private bool shouldExecuteProgram = false;
+        private bool isMagicButtonPressed = false;
+
+
         public HoleTaskView(Document doc)
         {
             this.DataContext = new HoleTaskViewModel(doc);
             InitializeComponent();
         }
 
-        public void CloseWindow(object sender, RoutedEventArgs e)
+        public bool ShouldExecuteProgram
         {
+            get { return shouldExecuteProgram; }
+        }
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            // Если окно закрывается обычным способом, программа не выполняется
+            if (!isMagicButtonPressed)
+            {
+                shouldExecuteProgram = false;
+            }
+        }
+
+        public void RunProgram(object sender, RoutedEventArgs e)
+        {
+            // При нажатии на кнопку "Запустить магию!", программа должна быть выполнена
+            isMagicButtonPressed = true;
+            shouldExecuteProgram = true;
             this.Close();
         }
     }

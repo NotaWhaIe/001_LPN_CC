@@ -8,6 +8,7 @@
              d:DataContext="{d:DesignInstance Type=core:HoleTaskViewModel}"
              mc:Ignorable="d"
              Title="Задание на отверстия" 
+             Closing="Window_Closing"
              d:Height="550" Width="700" MaxHeight="550" MaxWidth="700"
 
     xmlns:Behaviors="http://schemas.microsoft.com/xaml/behaviors"
@@ -120,13 +121,13 @@
             <!--<Grid  Grid.Column="1" Grid.Row="6" HorizontalAlignment="Left">
             </Grid>-->
 
-            <Button Grid.Column="1" Grid.Row="7" Opacity ="1" Content="Запустить Магию!" MinWidth="130" Click="CloseWindow"
+            <Button Grid.Column="1" Grid.Row="7" Opacity ="1" Content="Запустить Магию!" MinWidth="130" Click="RunProgram"
                     Margin="6,0,6,0" Padding="-10"
                     Cursor="Hand">
 
                 <Button.ToolTip>
                     <ToolTip>
-                        <TextBlock Text="Настройки"/>
+                        <TextBlock Text="Кликай для запуска"/>
                     </ToolTip>
                 </Button.ToolTip>
             </Button>
