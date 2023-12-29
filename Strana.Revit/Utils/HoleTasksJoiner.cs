@@ -42,7 +42,23 @@ namespace Strana.Revit.HoleTask.Utils
                     List<FamilyInstance> intersectionFloorRectangularCombineList = allFamilyInstances
                          .Where(fi => fi.Name.ToString() == "(Отв_Задание)_Перекрытия_Прямоугольное")
                          .ToList();
+                    ///2023 исправлял ошибку, чтоб после проверки, есть ли в той же локации уже ЗНО программа не ломалась
+                    // Убедитесь, что в списке есть ненулевые элементы
+                    ///
+                    //if (allFamilyInstances.Any(fi => fi != null))
+                    //{
+                    //    Document doc = allFamilyInstances.First(fi => fi != null)?.Document;
+                    //    HoleTaskFamilyLoader familyLoader = new(doc);
+                    //    FamilySymbol holeFamilySymbol;
 
+                    //    List<FamilyInstance> intersectionWallRectangularCombineList = allFamilyInstances
+                    //        .Where(fi => fi != null && fi.Name.ToString() == "(Отв_Задание)_Стены_Прямоугольное")
+                    //        .ToList();
+                    //    List<FamilyInstance> intersectionFloorRectangularCombineList = allFamilyInstances
+                    //        .Where(fi => fi != null && fi.Name.ToString() == "(Отв_Задание)_Перекрытия_Прямоугольное")
+                    //        .ToList();
+
+                    ///
                     Options opt = new();
                     opt.ComputeReferences = true;
                     opt.DetailLevel = ViewDetailLevel.Fine;

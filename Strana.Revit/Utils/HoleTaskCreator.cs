@@ -135,6 +135,16 @@ namespace Strana.Revit.HoleTask.Utils
             XYZ intersectionCurveCenter = this.GetIntersectionCurveCenter(intersection);
             intersectionCurveCenter = new XYZ(intersectionCurveCenter.X, intersectionCurveCenter.Y, intersectionCurveCenter.Z - lvl.ProjectElevation);
 
+            ///2023 добавляю проверку есть ли в intersectionCurveCenter уже ЗНО
+            ///2023 start
+            // Проверка, существует ли уже FamilyInstance в этой позиции
+            if (IsFamilyInstanceAtLocation(intersectionCurveCenter))
+            {
+                // Если в этой позиции уже есть FamilyInstance, пропускаем создание нового
+                return null;
+            }
+            ///2023 finish
+
             holeTask = this.doc.Create.NewFamilyInstance(
                 intersectionCurveCenter,
                 holeFamilySymbol,
@@ -149,6 +159,48 @@ namespace Strana.Revit.HoleTask.Utils
             this.RotateHoleTask(mepElement, orientation, holeTask, intersection, intersectedElement, lvl, linkInstance);
             return holeTask;
         }
+
+        /// 2023
+        private bool IsFamilyInstanceAtLocation(XYZ location, double tolerance = 0.0)
+        {
+            FilteredElementCollector collector = new FilteredElementCollector(doc)
+                .OfClass(typeof(FamilyInstance))
+                .WherePasses(new BoundingBoxContainsPointFilter(location, tolerance));
+
+            return collector.Any(); // Возвращает true, если найден хотя бы один элемент
+        }
+        ///проверить этот метод
+        //private bool IsFamilyInstanceAtLocation(XYZ location, double width, double height, double depth, double tolerance = 0.0)
+        //{
+        //    var collector = new FilteredElementCollector(doc)
+        //        .OfClass(typeof(FamilyInstance))
+        //        .WherePasses(new BoundingBoxContainsPointFilter(location, tolerance));
+
+        //    foreach (FamilyInstance fi in collector)
+        //    {
+        //        // Получение габаритных размеров экземпляра семейства
+        //        double fiWidth = GetDimension(fi, "Ширина");
+        //        double fiHeight = GetDimension(fi, "Высота");
+        //        double fiDepth = GetDimension(fi, "Глубина");
+
+        //        // Проверка совпадения размеров с заданными значениями
+        //        if (Math.Abs(fiWidth - width) < tolerance &&
+        //            Math.Abs(fiHeight - height) < tolerance &&
+        //            Math.Abs(fiDepth - depth) < tolerance)
+        //        {
+        //            return true; // Найден экземпляр семейства с соответствующими размерами
+        //        }
+        //    }
+
+        //    return false; // Соответствующий экземпляр семейства не найден
+        //}
+
+        //private double GetDimension(FamilyInstance instance, string parameterName)
+        //{
+        //    Parameter param = instance.LookupParameter(parameterName);
+        //    return param?.AsDouble() ?? 0.0;
+        //}
+///
 
         /// <summary>
         /// Gets the closest floor level from the list of document levels based on the elevation of the linked floor.
