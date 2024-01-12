@@ -14,13 +14,12 @@ using Strana.Revit.HoleTask.RevitCommands;
 
 namespace Strana.Revit.HoleTask.Utils
 {
-    /// <summary>
-    /// This class contains metod set up a HoleTasks familySybol.
-    /// </summary>
+    #nullable enable
+    /// <summary> This class contains metod set up a HoleTasks familySybol. </summary>
     internal class HoleTaskCreator
     {
         private readonly Document doc;
-        private readonly List<FamilyInstance> intersectionFloorRectangularCombineList = new List<FamilyInstance>();
+        private readonly List<FamilyInstance> intersectionRectangularCombineList = new List<FamilyInstance>();
         private static double clearance => (Confing.Default.offSetHoleTask/304.8)*2;
 
         /// <summary>
@@ -33,6 +32,8 @@ namespace Strana.Revit.HoleTask.Utils
             this.doc = doc;
         }
 
+
+        ///*Вынести в отдельный вспомогательный класс этот метод:
         /// <summary>
         /// Create DirectShape sphere For test.
         /// </summary>
@@ -86,13 +87,18 @@ namespace Strana.Revit.HoleTask.Utils
         /// <returns>
         /// The created FamilyInstance representing the hole task.
         /// </returns>
-        public FamilyInstance PlaceHoleTaskFamilyInstance(
+        public FamilyInstance? PlaceHoleTaskFamilyInstance(
             Element mepElement,
             SolidCurveIntersection intersection,
             Element intersectedElement,
             Document linkDoc,
             RevitLinkInstance linkInstance)
         {
+            ///Добавляю в список уже существующие задания на отверстия:
+            AddFamilyInstancesToList(this.doc, "(Отв_Задание)_Стены_Прямоугольное", this.intersectionRectangularCombineList);
+            AddFamilyInstancesToList(this.doc, "(Отв_Задание)_Перекрытия_Прямоугольное", this.intersectionRectangularCombineList);
+            ///
+
             OrientaionType orientation = this.GetElementOrientationType(mepElement);
             FamilySymbol holeFamilySymbol;
             HoleTaskFamilyLoader familyLoader = new(this.doc);
@@ -135,72 +141,66 @@ namespace Strana.Revit.HoleTask.Utils
             XYZ intersectionCurveCenter = this.GetIntersectionCurveCenter(intersection);
             intersectionCurveCenter = new XYZ(intersectionCurveCenter.X, intersectionCurveCenter.Y, intersectionCurveCenter.Z - lvl.ProjectElevation);
 
-            ///2023 добавляю проверку есть ли в intersectionCurveCenter уже ЗНО
-            ///2023 start
-            // Проверка, существует ли уже FamilyInstance в этой позиции
-            if (IsFamilyInstanceAtLocation(intersectionCurveCenter))
+
+            /// проверка есть ли в intersectionCurveCenter уже ЗНО с теми же геометрическими размерами и в том же месте
+            if (!DoesFamilyInstanceExistAtLocation(intersectionCurveCenter))
             {
-                // Если в этой позиции уже есть FamilyInstance, пропускаем создание нового
+                holeTask = this.doc.Create.NewFamilyInstance(
+                    intersectionCurveCenter,
+                    holeFamilySymbol,
+                    lvl,
+                    StructuralType.NonStructural);
+                this.intersectionRectangularCombineList.Add(holeTask);
+
+                holeTask.LookupParameter("Глубина").Set(holeTaskThickness);
+                holeTask.LookupParameter("Ширина").Set(this.ExchangeParameters(orientation, holeTaskWidth, holeTaskHeight)); // Width
+                holeTask.LookupParameter("Высота").Set(this.ExchangeParameters(orientation, holeTaskHeight, holeTaskWidth)); // Height
+
+                this.RotateHoleTask(mepElement, orientation, holeTask, intersection, intersectedElement, lvl, linkInstance);
+                return holeTask;
+            }
+            else
+            {
                 return null;
             }
-            ///2023 finish
-
-            holeTask = this.doc.Create.NewFamilyInstance(
-                intersectionCurveCenter,
-                holeFamilySymbol,
-                lvl,
-                StructuralType.NonStructural);
-            this.intersectionFloorRectangularCombineList.Add(holeTask);
-
-            holeTask.LookupParameter("Глубина").Set(holeTaskThickness);
-            holeTask.LookupParameter("Ширина").Set(this.ExchangeParameters(orientation, holeTaskWidth, holeTaskHeight));// Width
-            holeTask.LookupParameter("Высота").Set(this.ExchangeParameters(orientation, holeTaskHeight, holeTaskWidth));// Height
-
-            this.RotateHoleTask(mepElement, orientation, holeTask, intersection, intersectedElement, lvl, linkInstance);
-            return holeTask;
         }
 
-        /// 2023
-        private bool IsFamilyInstanceAtLocation(XYZ location, double tolerance = 0.0)
+        private bool DoesFamilyInstanceExistAtLocation(XYZ location)
         {
-            FilteredElementCollector collector = new FilteredElementCollector(doc)
-                .OfClass(typeof(FamilyInstance))
-                .WherePasses(new BoundingBoxContainsPointFilter(location, tolerance));
+            const double tolerance = 0.02; // Небольшой допуск для сравнения координат
 
-            return collector.Any(); // Возвращает true, если найден хотя бы один элемент
+            foreach (FamilyInstance fi in this.intersectionRectangularCombineList)
+            {
+                XYZ existingLocation = (fi.Location as LocationPoint)?.Point;
+                if (existingLocation != null && existingLocation.IsAlmostEqualTo(location, tolerance))
+                {
+                    return true; // Найден существующий экземпляр в заданных координатах
+                }
+            }
+
+            return false; // Экземпляр в заданных координатах не найден
         }
-        ///проверить этот метод
-        //private bool IsFamilyInstanceAtLocation(XYZ location, double width, double height, double depth, double tolerance = 0.0)
-        //{
-        //    var collector = new FilteredElementCollector(doc)
-        //        .OfClass(typeof(FamilyInstance))
-        //        .WherePasses(new BoundingBoxContainsPointFilter(location, tolerance));
 
-        //    foreach (FamilyInstance fi in collector)
-        //    {
-        //        // Получение габаритных размеров экземпляра семейства
-        //        double fiWidth = GetDimension(fi, "Ширина");
-        //        double fiHeight = GetDimension(fi, "Высота");
-        //        double fiDepth = GetDimension(fi, "Глубина");
 
-        //        // Проверка совпадения размеров с заданными значениями
-        //        if (Math.Abs(fiWidth - width) < tolerance &&
-        //            Math.Abs(fiHeight - height) < tolerance &&
-        //            Math.Abs(fiDepth - depth) < tolerance)
-        //        {
-        //            return true; // Найден экземпляр семейства с соответствующими размерами
-        //        }
-        //    }
+        public void AddFamilyInstancesToList(Document doc, string familyName, List<FamilyInstance> list)
+        {
+            var collector = new FilteredElementCollector(doc)
+                .OfClass(typeof(FamilyInstance))
+                .OfCategory(BuiltInCategory.OST_GenericModel)
+                .Where(x => x.Name == familyName)
+                .Cast<FamilyInstance>();
 
-        //    return false; // Соответствующий экземпляр семейства не найден
-        //}
+            if (collector.Any())
+            {
+                foreach (FamilyInstance fi in collector)
+                {
+                    list.Add(fi);
+                }
+            }
+        }
 
-        //private double GetDimension(FamilyInstance instance, string parameterName)
-        //{
-        //    Parameter param = instance.LookupParameter(parameterName);
-        //    return param?.AsDouble() ?? 0.0;
-        //}
-///
+
+        /// *2023
 
         /// <summary>
         /// Gets the closest floor level from the list of document levels based on the elevation of the linked floor.

@@ -43,9 +43,11 @@ namespace Strana.Revit.HoleTask.Extensions
                     {
                         HoleTaskCreator holeTaskCreator = new(doc);
                         FamilyInstance createdHoleTask = holeTaskCreator.PlaceHoleTaskFamilyInstance(mepElement, solidCurve, intersectingElement, linkDoc, linkInstance);
-                        intersectedItemHoleTasks.Add(createdHoleTask);
+                        if (createdHoleTask is not null)
+                        {
+                            intersectedItemHoleTasks.Add(createdHoleTask);
+                        }
                     }
-                    //}
                 }
             }
 

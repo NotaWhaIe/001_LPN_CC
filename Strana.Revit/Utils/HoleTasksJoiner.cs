@@ -42,23 +42,7 @@ namespace Strana.Revit.HoleTask.Utils
                     List<FamilyInstance> intersectionFloorRectangularCombineList = allFamilyInstances
                          .Where(fi => fi.Name.ToString() == "(Отв_Задание)_Перекрытия_Прямоугольное")
                          .ToList();
-                    ///2023 исправлял ошибку, чтоб после проверки, есть ли в той же локации уже ЗНО программа не ломалась
-                    // Убедитесь, что в списке есть ненулевые элементы
-                    ///
-                    //if (allFamilyInstances.Any(fi => fi != null))
-                    //{
-                    //    Document doc = allFamilyInstances.First(fi => fi != null)?.Document;
-                    //    HoleTaskFamilyLoader familyLoader = new(doc);
-                    //    FamilySymbol holeFamilySymbol;
 
-                    //    List<FamilyInstance> intersectionWallRectangularCombineList = allFamilyInstances
-                    //        .Where(fi => fi != null && fi.Name.ToString() == "(Отв_Задание)_Стены_Прямоугольное")
-                    //        .ToList();
-                    //    List<FamilyInstance> intersectionFloorRectangularCombineList = allFamilyInstances
-                    //        .Where(fi => fi != null && fi.Name.ToString() == "(Отв_Задание)_Перекрытия_Прямоугольное")
-                    //        .ToList();
-
-                    ///
                     Options opt = new();
                     opt.ComputeReferences = true;
                     opt.DetailLevel = ViewDetailLevel.Fine;
@@ -77,9 +61,9 @@ namespace Strana.Revit.HoleTask.Utils
                         string holeTaskName = intersectionWallRectangularCombineList.First()?.Name.ToString();
 
                         List<FamilyInstance> intersectionWallRectangularSolidIntersectCombineList = new()
-                {
-                   intersectionWallRectangularCombineList[0],
-                };
+                             {
+                                intersectionWallRectangularCombineList[0],
+                             };
                         intersectionWallRectangularCombineList.RemoveAt(0);
 
                         List<FamilyInstance> tmpIntersectionWallRectangularSolidIntersectCombineList = [.. intersectionWallRectangularCombineList];
@@ -330,11 +314,11 @@ namespace Strana.Revit.HoleTask.Utils
                                 FamilyInstance secondIntersectionPoint =
                                     tmpIntersectionFloorRectangularSolidIntersectCombineList[j];
                                 Solid secondIntersectionPointSolid = secondIntersectionPoint.GetHoleTaskSolidWithDelta();
-                                double unionvolume = 0;
+                                double unionVolume = 0;
 
                                 try
                                 {
-                                    unionvolume = BooleanOperationsUtils.ExecuteBooleanOperation(
+                                    unionVolume = BooleanOperationsUtils.ExecuteBooleanOperation(
                                        firstIntersectionPointSolid,
                                        secondIntersectionPointSolid,
                                        BooleanOperationsType.Intersect).Volume;
@@ -345,7 +329,7 @@ namespace Strana.Revit.HoleTask.Utils
                                     /// Do nothing.
                                 }
 
-                                if (unionvolume > 0)
+                                if (unionVolume > 0)
                                 {
                                     intersectionFloorRectangularSolidIntersectCombineList
                                         .Add(secondIntersectionPoint);
