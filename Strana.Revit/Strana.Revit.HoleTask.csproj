@@ -112,11 +112,14 @@
     <Compile Include="ElementCollections\LinkInstanseCollections.cs" />
     <Compile Include="ElementCollections\MepElementCollections.cs" />
     <Compile Include="Extensions\GetterElementThickness.cs" />
+    <Compile Include="Extensions\RevitElement\HoleTasksGetter.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Utils\HoleTasksLineStretch.cs" />
+    <Compile Include="Utils\HoleTasksRoundUpDimension.cs" />
     <Compile Include="Utils\HoleTasksStatusDeterminator.cs" />
     <Compile Include="Extensions\RevitElement\SolidGetter.cs" />
     <Compile Include="Extensions\RevitDocumentExstensions.cs" />

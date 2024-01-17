@@ -5,6 +5,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Autodesk.Revit.DB;
 using Strana.Revit.HoleTask.ElementCollections;
 using Strana.Revit.HoleTask.Utils;
@@ -32,8 +33,16 @@ namespace Strana.Revit.HoleTask.Extensions
                         .ToList();
                 }
 
-                /// HoleTasksJoiner.
-                List<FamilyInstance> joinHoleTaskList= new HoleTasksJoiner().JoinAllHoleTask(allHoleTaskByRevitLinkInstance);
+                /// HoleTasksJoiner необходимо доработать, не возвращается список заданий у метода
+                List<FamilyInstance> roundHoleTaskList = new HoleTasksJoiner().JoinAllHoleTask(allHoleTaskByRevitLinkInstance);
+
+                ///округлить геометрию заданий
+                new HoleTasksRoundUpDimension().RoundUpAllHoleTask(linkInstance);
+
+                ///округлить в плане
+
+                ///растянуть по высоте
+                new HoleTasksLineStretch().StretchLinesAllHoleTask(linkInstance);
                 t.Commit();
             }
         }

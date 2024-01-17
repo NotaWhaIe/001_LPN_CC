@@ -10,6 +10,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Structure;
 using Autodesk.Revit.UI;
 using Strana.Revit.HoleTask.Extensions;
+using Strana.Revit.HoleTask.Extensions.RevitElement;
 using Strana.Revit.HoleTask.RevitCommands;
 
 namespace Strana.Revit.HoleTask.Utils
@@ -94,8 +95,8 @@ namespace Strana.Revit.HoleTask.Utils
             RevitLinkInstance linkInstance)
         {
             ///Добавляю в список уже существующие задания на отверстия:
-            AddFamilyInstancesToList(this.doc, "(Отв_Задание)_Стены_Прямоугольное", this.intersectionRectangularCombineList);
-            AddFamilyInstancesToList(this.doc, "(Отв_Задание)_Перекрытия_Прямоугольное", this.intersectionRectangularCombineList);
+            HoleTasksGetter.AddFamilyInstancesToList(this.doc, "(Отв_Задание)_Стены_Прямоугольное", this.intersectionRectangularCombineList);
+            HoleTasksGetter.AddFamilyInstancesToList(this.doc, "(Отв_Задание)_Перекрытия_Прямоугольное", this.intersectionRectangularCombineList);
             ///
 
             OrientaionType orientation = this.GetElementOrientationType(mepElement);
@@ -155,26 +156,26 @@ namespace Strana.Revit.HoleTask.Utils
                 holeTask.LookupParameter("Ширина").Set(this.ExchangeParameters(orientation, holeTaskWidth, holeTaskHeight)); // Width
                 holeTask.LookupParameter("Высота").Set(this.ExchangeParameters(orientation, holeTaskHeight, holeTaskWidth)); // Height
 
-                if (holeTask.Name == "(Отв_Задание)_Стены_Прямоугольное")
-                {
-                    double upperLevelElevation = ElevationOfNearestUpperLevel(this.doc, intersectionCurveCenter);
-                    if (upperLevelElevation != -1)
-                    {
-                        holeTask.LookupParameter("Отметка этажа над заданием").Set(upperLevelElevation);
-                    }
+                //if (holeTask.Name == "(Отв_Задание)_Стены_Прямоугольное")
+                //{
+                //    double upperLevelElevation = ElevationOfNearestUpperLevel(this.doc, intersectionCurveCenter);
+                //    if (upperLevelElevation != -1)
+                //    {
+                //        holeTask.LookupParameter("Отметка этажа над заданием").Set(upperLevelElevation);
+                //    }
 
-                    double lowerLevelElevation = ElevationOfNearestLowerLevel(this.doc, intersectionCurveCenter);
-                    if (lowerLevelElevation != -1)
-                    {
-                        holeTask.LookupParameter("Отметка этажа под заданием").Set(lowerLevelElevation);
-                    }
+                //    double lowerLevelElevation = ElevationOfNearestLowerLevel(this.doc, intersectionCurveCenter);
+                //    if (lowerLevelElevation != -1)
+                //    {
+                //        holeTask.LookupParameter("Отметка этажа под заданием").Set(lowerLevelElevation);
+                //    }
 
-                    double zeroLevelElevation = DistanceFromZeroElevationLevelToFamilyInstance(this.doc, intersectionCurveCenter);
-                    if (zeroLevelElevation != -1)
-                    {
-                        holeTask.LookupParameter("ADSK_Отверстие_Отметка от нуля").Set(zeroLevelElevation);
-                    }
-                }
+                //    double zeroLevelElevation = DistanceFromZeroElevationLevelToFamilyInstance(this.doc, intersectionCurveCenter);
+                //    if (zeroLevelElevation != -1)
+                //    {
+                //        holeTask.LookupParameter("ADSK_Отверстие_Отметка от нуля").Set(zeroLevelElevation);
+                //    }
+                //}
 
                 this.RotateHoleTask(mepElement, orientation, holeTask, intersection, intersectedElement, lvl, linkInstance);
                 return holeTask;
@@ -185,67 +186,67 @@ namespace Strana.Revit.HoleTask.Utils
             }
         }
 
-        public static double DistanceFromZeroElevationLevelToFamilyInstance(Document doc, XYZ intersectionCurveCenter)
-        {
-            // Получаем все уровни в документе
-            var levels = new FilteredElementCollector(doc)
-                .OfClass(typeof(Level))
-                .Cast<Level>();
+        //public static double DistanceFromZeroElevationLevelToFamilyInstance(Document doc, XYZ intersectionCurveCenter)
+        //{
+        //    // Получаем все уровни в документе
+        //    var levels = new FilteredElementCollector(doc)
+        //        .OfClass(typeof(Level))
+        //        .Cast<Level>();
 
-            // Ищем уровень с отметкой, равной нулю
-            Level zeroElevationLevel = levels.FirstOrDefault(level =>
-                Math.Abs(level.get_Parameter(BuiltInParameter.LEVEL_ELEV).AsDouble()) < 0.001);
+        //    // Ищем уровень с отметкой, равной нулю
+        //    Level zeroElevationLevel = levels.FirstOrDefault(level =>
+        //        Math.Abs(level.get_Parameter(BuiltInParameter.LEVEL_ELEV).AsDouble()) < 0.001);
 
-            if (zeroElevationLevel != null)
-            {
-                // Вычисляем расстояние от нулевого уровня до заданной точки
-                return intersectionCurveCenter.Z - zeroElevationLevel.Elevation;
-            }
-            else
-            {
-                // Возвращаем -1, если уровень с нулевой отметкой не найден
-                return -1;
-            }
-        }
+        //    if (zeroElevationLevel != null)
+        //    {
+        //        // Вычисляем расстояние от нулевого уровня до заданной точки
+        //        return intersectionCurveCenter.Z - zeroElevationLevel.Elevation;
+        //    }
+        //    else
+        //    {
+        //        // Возвращаем -1, если уровень с нулевой отметкой не найден
+        //        return -1;
+        //    }
+        //}
 
 
-        public static double ElevationOfNearestUpperLevel(Document doc, XYZ point)
-        {
-            var levels = new FilteredElementCollector(doc)
-                .OfClass(typeof(Level))
-                .Cast<Level>()
-                .OrderBy(l => l.Elevation)
-                .ToList();
+        //public static double ElevationOfNearestUpperLevel(Document doc, XYZ point)
+        //{
+        //    var levels = new FilteredElementCollector(doc)
+        //        .OfClass(typeof(Level))
+        //        .Cast<Level>()
+        //        .OrderBy(l => l.Elevation)
+        //        .ToList();
 
-            foreach (var level in levels)
-            {
-                if (level.Elevation > point.Z)
-                {
-                    return level.Elevation;
-                }
-            }
+        //    foreach (var level in levels)
+        //    {
+        //        if (level.Elevation > point.Z)
+        //        {
+        //            return level.Elevation;
+        //        }
+        //    }
 
-            return -1; // Возвращаем -1, если ближайший верхний уровень не найден
-        }
+        //    return -1; // Возвращаем -1, если ближайший верхний уровень не найден
+        //}
 
-        public static double ElevationOfNearestLowerLevel(Document doc, XYZ point)
-        {
-            var levels = new FilteredElementCollector(doc)
-                .OfClass(typeof(Level))
-                .Cast<Level>()
-                .OrderByDescending(l => l.Elevation)
-                .ToList();
+        //public static double ElevationOfNearestLowerLevel(Document doc, XYZ point)
+        //{
+        //    var levels = new FilteredElementCollector(doc)
+        //        .OfClass(typeof(Level))
+        //        .Cast<Level>()
+        //        .OrderByDescending(l => l.Elevation)
+        //        .ToList();
 
-            foreach (var level in levels)
-            {
-                if (level.Elevation < point.Z)
-                {
-                    return level.Elevation;
-                }
-            }
+        //    foreach (var level in levels)
+        //    {
+        //        if (level.Elevation < point.Z)
+        //        {
+        //            return level.Elevation;
+        //        }
+        //    }
 
-            return -1; // Возвращаем -1, если ближайший нижний уровень не найден
-        }
+        //    return -1; // Возвращаем -1, если ближайший нижний уровень не найден
+        //}
 
 
 
@@ -266,22 +267,6 @@ namespace Strana.Revit.HoleTask.Utils
         }
 
 
-        public void AddFamilyInstancesToList(Document doc, string familyName, List<FamilyInstance> list)
-        {
-            var collector = new FilteredElementCollector(doc)
-                .OfClass(typeof(FamilyInstance))
-                .OfCategory(BuiltInCategory.OST_GenericModel)
-                .Where(x => x.Name == familyName)
-                .Cast<FamilyInstance>();
-
-            if (collector.Any())
-            {
-                foreach (FamilyInstance fi in collector)
-                {
-                    list.Add(fi);
-                }
-            }
-        }
 
 
         /// *2023

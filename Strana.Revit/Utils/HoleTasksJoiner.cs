@@ -15,18 +15,14 @@ namespace Strana.Revit.HoleTask.Utils
 {
     internal class HoleTasksJoiner
     {
-        private readonly Document doc;
         private static bool areJoin => Confing.Default.areJoin;
-        public HoleTasksJoiner()
-        {
-        }
 
         /// <summary>
         /// list of hole tasks after joining.
         /// </summary>
         /// <param name="allFamilyInstances"></param>
         /// <returns></returns>
-        /// <remark>Intersected volume don't calculeted corrected, that whay I used try-catch</remark>
+        /// <remark>Intersected volume don't calculeted corrected, that whay I used try-catch</remark>t
         internal List<FamilyInstance> JoinAllHoleTask(List<FamilyInstance> allFamilyInstances)
         {
             if (areJoin)
