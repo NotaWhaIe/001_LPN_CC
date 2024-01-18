@@ -33,11 +33,11 @@ namespace Strana.Revit.HoleTask.Extensions
                         .ToList();
                 }
 
-                /// HoleTasksJoiner необходимо доработать, не возвращается список заданий у метода
+                /// HoleTasksJoiner необходимо доработать, не возвращается список заданий у метода, Сделать Void!!!!!
                 List<FamilyInstance> roundHoleTaskList = new HoleTasksJoiner().JoinAllHoleTask(allHoleTaskByRevitLinkInstance);
 
                 ///округлить геометрию заданий
-                new HoleTasksRoundUpDimension().RoundUpAllHoleTask(linkInstance);
+                //new HoleTasksRoundUpDimension().RoundUpAllHoleTask(roundHoleTaskList);
 
                 ///округлить в плане
 

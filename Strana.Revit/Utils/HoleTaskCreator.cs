@@ -152,9 +152,9 @@ namespace Strana.Revit.HoleTask.Utils
                     StructuralType.NonStructural);
                 this.intersectionRectangularCombineList.Add(holeTask);
 
-                holeTask.LookupParameter("Глубина").Set(holeTaskThickness);
-                holeTask.LookupParameter("Ширина").Set(this.ExchangeParameters(orientation, holeTaskWidth, holeTaskHeight)); // Width
-                holeTask.LookupParameter("Высота").Set(this.ExchangeParameters(orientation, holeTaskHeight, holeTaskWidth)); // Height
+                holeTask.LookupParameter("Глубина").Set(HoleTasksRoundUpDimension.RoundUpParameter(holeTaskThickness));
+                holeTask.LookupParameter("Ширина").Set(HoleTasksRoundUpDimension.RoundUpParameter(this.ExchangeParameters(orientation, holeTaskWidth, holeTaskHeight))); // Width
+                holeTask.LookupParameter("Высота").Set(HoleTasksRoundUpDimension.RoundUpParameter(this.ExchangeParameters(orientation, holeTaskHeight, holeTaskWidth))); // Height
 
                 //if (holeTask.Name == "(Отв_Задание)_Стены_Прямоугольное")
                 //{
