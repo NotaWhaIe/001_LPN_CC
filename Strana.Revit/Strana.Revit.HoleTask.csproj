@@ -118,6 +118,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Utils\SphereByPoint.cs" />
+    <Compile Include="Utils\HoleTaskGridDelta.cs" />
     <Compile Include="Utils\HoleTasksLineStretch.cs" />
     <Compile Include="Utils\HoleTasksRoundUpDimension.cs" />
     <Compile Include="Utils\HoleTasksStatusDeterminator.cs" />
@@ -136,6 +138,7 @@
     <Compile Include="Utils\HoleTasksJoiner.cs" />
     <Compile Include="Extensions\HoleTaskSolidGetter.cs" />
     <Compile Include="Utils\OrientaionType.cs" />
+    <Compile Include="Utils\GridRoundUpDimension.cs" />
     <Compile Include="ViewModel\Base\BaseViewModel.cs" />
     <Compile Include="ViewModel\Base\CommandHandler.cs" />
     <Compile Include="ViewModel\Base\RouteCommands.cs" />

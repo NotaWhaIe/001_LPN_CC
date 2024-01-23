@@ -17,8 +17,8 @@ namespace Strana.Revit.HoleTask.RevitCommands
     {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
+            //Stopwatch stopwatch = new Stopwatch();
+            //stopwatch.Start();
             UIDocument uidoc = commandData.Application.ActiveUIDocument;
             Document doc = uidoc.Document;
             docsaver.doc = doc;
@@ -43,9 +43,9 @@ namespace Strana.Revit.HoleTask.RevitCommands
                 }
             }
 
-            stopwatch.Stop();
-            TimeSpan elapsedTime = stopwatch.Elapsed;
-            TaskDialog.Show("Время работы", elapsedTime.TotalSeconds.ToString() + " сек.");
+            //stopwatch.Stop();
+            //TimeSpan elapsedTime = stopwatch.Elapsed;
+            //TaskDialog.Show("Время работы", elapsedTime.TotalSeconds.ToString() + " сек.");
 
             return Result.Succeeded;
         }

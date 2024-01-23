@@ -33,46 +33,6 @@ namespace Strana.Revit.HoleTask.Utils
             this.doc = doc;
         }
 
-        ///*Вынести в отдельный вспомогательный класс этот метод:
-        /// <summary>
-        /// Create DirectShape sphere For test.
-        /// </summary>
-        /// <param name="doc"><seealso cref="Document"/></param>
-        /// <param name="center"><seealso cref="XYZ"/></param>
-        public static void CreateSphereByPoint(XYZ center/*, double diameter*/)
-        {
-
-            List<Curve> profile = [];
-
-            // first create sphere with 2' radius
-            //diameter = 0.5;
-            //double radius = diameter/2;
-            double radius = 0.2;
-            XYZ profilePlus = center + new XYZ(0, radius, 0);
-            XYZ profileMinus = center - new XYZ(0, radius, 0);
-
-            profile.Add(Line.CreateBound(profilePlus, profileMinus));
-            profile.Add(Arc.Create(profileMinus, profilePlus, center + new XYZ(radius, 0, 0)));
-
-            CurveLoop curveLoop = CurveLoop.Create(profile);
-            SolidOptions options = new SolidOptions(ElementId.InvalidElementId, ElementId.InvalidElementId);
-
-            Frame frame = new Frame(center, XYZ.BasisX, -XYZ.BasisZ, XYZ.BasisY);
-            if (Frame.CanDefineRevitGeometry(frame))
-            {
-                Solid sphere = GeometryCreationUtilities.CreateRevolvedGeometry(frame, new CurveLoop[] { curveLoop }, 0, 2 * Math.PI, options);
-                //using (Transaction t = new(doc, "create SphereByPoint"))
-                //{
-                //t.Start();
-                DirectShape ds = DirectShape.CreateElement(docsaver.doc, new ElementId(BuiltInCategory.OST_Furniture));
-                ds.ApplicationId = "Application id";
-                ds.ApplicationDataId = "Geometry object id";
-                ds.SetShape(new GeometryObject[] { sphere });
-                //t.Commit();
-                //}
-            }
-        }
-
         /// <summary>
         /// Set up a HoleTasks familySybol into a middle intersection meps element.
         /// </summary>
@@ -97,23 +57,26 @@ namespace Strana.Revit.HoleTask.Utils
             ///Добавляю в список уже существующие задания на отверстия:
             HoleTasksGetter.AddFamilyInstancesToList(this.doc, "(Отв_Задание)_Стены_Прямоугольное", this.intersectionRectangularCombineList);
             HoleTasksGetter.AddFamilyInstancesToList(this.doc, "(Отв_Задание)_Перекрытия_Прямоугольное", this.intersectionRectangularCombineList);
-            ///
 
             OrientaionType orientation = this.GetElementOrientationType(mepElement);
             FamilySymbol holeFamilySymbol;
             HoleTaskFamilyLoader familyLoader = new(this.doc);
             Wall wall = intersectedElement as Wall;
+            int tipe;
             if (intersectedElement != wall && orientation == OrientaionType.Vertical)
             {
                 holeFamilySymbol = familyLoader.FloorFamilySymbol;
+                tipe = 0;
             }
             else if (intersectedElement != wall && orientation == OrientaionType.Horizontal)// Horizontal == Inclined
             {
                 holeFamilySymbol = familyLoader.FloorFamilySymbol;
+                tipe = 1;
             }
             else
             {
                 holeFamilySymbol = familyLoader.WallFamilySymbol;
+                tipe = 2;
             }
 
             double mepDiameter = mepElement.get_Parameter(BuiltInParameter.RBS_CURVE_DIAMETER_PARAM)?.AsDouble() ?? 0;
@@ -141,7 +104,7 @@ namespace Strana.Revit.HoleTask.Utils
             XYZ intersectionCurveCenter = this.GetIntersectionCurveCenter(intersection);
             intersectionCurveCenter = new XYZ(intersectionCurveCenter.X, intersectionCurveCenter.Y, intersectionCurveCenter.Z - lvl.ProjectElevation);
 
-
+            ///Добавить в метод чтоб при определении захватывало область вокрг точки вставки
             /// проверка есть ли в intersectionCurveCenter уже ЗНО с теми же геометрическими размерами и в том же месте
             if (!DoesFamilyInstanceExistAtLocation(intersectionCurveCenter))
             {
@@ -152,32 +115,42 @@ namespace Strana.Revit.HoleTask.Utils
                     StructuralType.NonStructural);
                 this.intersectionRectangularCombineList.Add(holeTask);
 
-                holeTask.LookupParameter("Глубина").Set(HoleTasksRoundUpDimension.RoundUpParameter(holeTaskThickness));
-                holeTask.LookupParameter("Ширина").Set(HoleTasksRoundUpDimension.RoundUpParameter(this.ExchangeParameters(orientation, holeTaskWidth, holeTaskHeight))); // Width
-                holeTask.LookupParameter("Высота").Set(HoleTasksRoundUpDimension.RoundUpParameter(this.ExchangeParameters(orientation, holeTaskHeight, holeTaskWidth))); // Height
+                double holeTaskAngle = this.RotateHoleTaskAngle(mepElement, orientation, holeTask, intersection, intersectedElement, lvl, linkInstance);
 
-                //if (holeTask.Name == "(Отв_Задание)_Стены_Прямоугольное")
-                //{
-                //    double upperLevelElevation = ElevationOfNearestUpperLevel(this.doc, intersectionCurveCenter);
-                //    if (upperLevelElevation != -1)
-                //    {
-                //        holeTask.LookupParameter("Отметка этажа над заданием").Set(upperLevelElevation);
-                //    }
+                double holeTaskWidthEX = this.ExchangeParameters(orientation, holeTaskWidth, holeTaskHeight);
+                double holeTaskHeightEX = this.ExchangeParameters(orientation, holeTaskHeight, holeTaskWidth);
 
-                //    double lowerLevelElevation = ElevationOfNearestLowerLevel(this.doc, intersectionCurveCenter);
-                //    if (lowerLevelElevation != -1)
-                //    {
-                //        holeTask.LookupParameter("Отметка этажа под заданием").Set(lowerLevelElevation);
-                //    }
+                double roundHTThickness = HoleTasksRoundUpDimension.RoundUpParameter(holeTaskThickness);
+                double roundHTWidth = HoleTasksRoundUpDimension.RoundUpParameter(holeTaskWidthEX);
+                double roundHTHeight = HoleTasksRoundUpDimension.RoundUpParameter(holeTaskHeightEX);
 
-                //    double zeroLevelElevation = DistanceFromZeroElevationLevelToFamilyInstance(this.doc, intersectionCurveCenter);
-                //    if (zeroLevelElevation != -1)
-                //    {
-                //        holeTask.LookupParameter("ADSK_Отверстие_Отметка от нуля").Set(zeroLevelElevation);
-                //    }
-                //}
+                double _roundHTThickness = HoleTasksRoundUpDimension.RoundUpParameter(holeTaskThickness) * 304.8;
+                double _roundHTWidth = HoleTasksRoundUpDimension.RoundUpParameter(holeTaskWidthEX) * 304.8;
+                double _roundHTHeight = HoleTasksRoundUpDimension.RoundUpParameter(holeTaskHeightEX) * 304.8;
+
+                holeTask.LookupParameter("Глубина").Set(roundHTThickness);
+                holeTask.LookupParameter("Ширина").Set(roundHTWidth);
+                holeTask.LookupParameter("Высота").Set(roundHTHeight);
+                //holeTask.LookupParameter("Глубина").Set(HoleTasksRoundUpDimension.RoundUpParameter(holeTaskThickness)+(delta.deltaGridMax));
+                //holeTask.LookupParameter("Ширина").Set(HoleTasksRoundUpDimension.RoundUpParameter(this.ExchangeParameters(orientation, holeTaskWidth, holeTaskHeight)+(delta.deltaGridMax))); // Width
+                //holeTask.LookupParameter("Высота").Set(HoleTasksRoundUpDimension.RoundUpParameter(this.ExchangeParameters(orientation, holeTaskHeight, holeTaskWidth))); // Height
+
+                HoleTaskGridDelta delta = GridRoundUpDimension.DeltaHoleTaskToGrids(this.doc, intersectionCurveCenter, roundHTThickness, roundHTWidth, holeTaskAngle);
+
 
                 this.RotateHoleTask(mepElement, orientation, holeTask, intersection, intersectedElement, lvl, linkInstance);
+
+                double O1;
+                double Oa;
+
+                O1 = UnitUtils.ConvertToInternalUnits(delta.DeltaGridNumber, UnitTypeId.Millimeters);
+                MoveFamilyInstance(holeTask, O1, "X");
+
+                ///сдвинуть семейство по оси У в верх, от оси и А
+                Oa = UnitUtils.ConvertToInternalUnits(delta.deltaGridLetter, UnitTypeId.Millimeters);
+                MoveFamilyInstance(holeTask, Oa, "Y");
+
+
                 return holeTask;
             }
             else
@@ -185,70 +158,39 @@ namespace Strana.Revit.HoleTask.Utils
                 return null;
             }
         }
+        public void MoveFamilyInstance(FamilyInstance familyInstance, double distanceInFeet, string direction)
+        {
+            if (familyInstance == null)
+            {
+                throw new ArgumentNullException(nameof(familyInstance));
+            }
 
-        //public static double DistanceFromZeroElevationLevelToFamilyInstance(Document doc, XYZ intersectionCurveCenter)
-        //{
-        //    // Получаем все уровни в документе
-        //    var levels = new FilteredElementCollector(doc)
-        //        .OfClass(typeof(Level))
-        //        .Cast<Level>();
+            if (string.IsNullOrWhiteSpace(direction))
+            {
+                throw new ArgumentException("Direction cannot be null or empty.", nameof(direction));
+            }
 
-        //    // Ищем уровень с отметкой, равной нулю
-        //    Level zeroElevationLevel = levels.FirstOrDefault(level =>
-        //        Math.Abs(level.get_Parameter(BuiltInParameter.LEVEL_ELEV).AsDouble()) < 0.001);
+            // Получение документа из экземпляра семейства
+            Document doc = familyInstance.Document;
 
-        //    if (zeroElevationLevel != null)
-        //    {
-        //        // Вычисляем расстояние от нулевого уровня до заданной точки
-        //        return intersectionCurveCenter.Z - zeroElevationLevel.Elevation;
-        //    }
-        //    else
-        //    {
-        //        // Возвращаем -1, если уровень с нулевой отметкой не найден
-        //        return -1;
-        //    }
-        //}
+            // Определяем вектор перемещения в зависимости от направления
+            XYZ moveVector = null;
+            if (direction.Equals("X", StringComparison.OrdinalIgnoreCase))
+            {
+                moveVector = new XYZ(distanceInFeet, 0, 0); // Влево по оси X
+            }
+            else if (direction.Equals("Y", StringComparison.OrdinalIgnoreCase))
+            {
+                moveVector = new XYZ(0, distanceInFeet, 0); // Влево по оси Y
+            }
+            else
+            {
+                throw new ArgumentException("Invalid direction. Only 'X' or 'Y' are allowed.", nameof(direction));
+            }
 
-
-        //public static double ElevationOfNearestUpperLevel(Document doc, XYZ point)
-        //{
-        //    var levels = new FilteredElementCollector(doc)
-        //        .OfClass(typeof(Level))
-        //        .Cast<Level>()
-        //        .OrderBy(l => l.Elevation)
-        //        .ToList();
-
-        //    foreach (var level in levels)
-        //    {
-        //        if (level.Elevation > point.Z)
-        //        {
-        //            return level.Elevation;
-        //        }
-        //    }
-
-        //    return -1; // Возвращаем -1, если ближайший верхний уровень не найден
-        //}
-
-        //public static double ElevationOfNearestLowerLevel(Document doc, XYZ point)
-        //{
-        //    var levels = new FilteredElementCollector(doc)
-        //        .OfClass(typeof(Level))
-        //        .Cast<Level>()
-        //        .OrderByDescending(l => l.Elevation)
-        //        .ToList();
-
-        //    foreach (var level in levels)
-        //    {
-        //        if (level.Elevation < point.Z)
-        //        {
-        //            return level.Elevation;
-        //        }
-        //    }
-
-        //    return -1; // Возвращаем -1, если ближайший нижний уровень не найден
-        //}
-
-
+            // Перемещаем экземпляр семейства
+            ElementTransformUtils.MoveElement(doc, familyInstance.Id, moveVector);
+        }
 
         private bool DoesFamilyInstanceExistAtLocation(XYZ location)
         {
@@ -265,11 +207,6 @@ namespace Strana.Revit.HoleTask.Utils
 
             return false; // Экземпляр в заданных координатах не найден
         }
-
-
-
-
-        /// *2023
 
         /// <summary>
         /// Gets the closest floor level from the list of document levels based on the elevation of the linked floor.
@@ -439,5 +376,41 @@ namespace Strana.Revit.HoleTask.Utils
                 }
             }
         }
+
+        private double RotateHoleTaskAngle(Element mepElement, OrientaionType orientaionType, FamilyInstance holeTask, SolidCurveIntersection intersection, Element intersectedElement, Level lvl, RevitLinkInstance linkInstance)
+        {
+            Wall wall = intersectedElement as Wall;
+            MEPCurve curve = mepElement as MEPCurve;
+            Transform transform = linkInstance.GetTotalTransform();
+            XYZ xAxis = transform.BasisX;
+            double linkRotation = Math.Atan2(xAxis.Y, xAxis.X);
+            double rotationAngle = 0.0;
+
+            if (intersectedElement != wall && orientaionType == OrientaionType.Vertical)
+            {
+                rotationAngle = GetAngleFromMEPCurve(curve);
+                // Дополнительные действия для вертикального ориентации, если они нужны
+            }
+            else if (intersectedElement != wall && orientaionType == OrientaionType.Horizontal) // Horizontal == Inclined
+            {
+                rotationAngle = GetAngleFromMEPCurve(curve) + linkRotation;
+                // Дополнительные действия для горизонтального или наклонного ориентации, если они нужны
+            }
+            else // Wall
+            {
+                XYZ wallOrientation = wall.Orientation;
+                double wallRotationAngle = wallOrientation.AngleTo(holeTask.FacingOrientation);
+                if (wallOrientation.AngleOnPlaneTo(holeTask.FacingOrientation, XYZ.BasisZ) < Math.PI)
+                {
+                    wallRotationAngle *= -1;
+                }
+                rotationAngle = wallRotationAngle + linkRotation - (Math.PI / 2);
+                // Дополнительные действия для ориентации стены, если они нужны
+            }
+
+            return rotationAngle;
+        }
+
     }
+
 }

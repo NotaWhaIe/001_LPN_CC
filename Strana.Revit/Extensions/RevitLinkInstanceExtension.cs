@@ -25,6 +25,10 @@ namespace Strana.Revit.HoleTask.Extensions
                 /// Take walls and floors
                 IEnumerable<Element> allIntersectingElements = CollectionsOfIntersectingElements.AllIntersectingElements(linkDoc);
 
+                ///метод округляет при задании геометрических размеров:
+                ///округлить геометрию заданий
+                ///округлить в плане
+
                 foreach (Element intersectingElement in allIntersectingElements)
                 {
                     allHoleTaskByRevitLinkInstance = allHoleTaskByRevitLinkInstance
@@ -33,14 +37,9 @@ namespace Strana.Revit.HoleTask.Extensions
                         .ToList();
                 }
 
-                /// HoleTasksJoiner необходимо доработать, не возвращается список заданий у метода, Сделать Void!!!!!
+                /// HoleTasksJoiner 
                 List<FamilyInstance> roundHoleTaskList = new HoleTasksJoiner().JoinAllHoleTask(allHoleTaskByRevitLinkInstance);
-
-                ///округлить геометрию заданий
-                //new HoleTasksRoundUpDimension().RoundUpAllHoleTask(roundHoleTaskList);
-
-                ///округлить в плане
-
+                
                 ///растянуть по высоте
                 new HoleTasksLineStretch().StretchLinesAllHoleTask(linkInstance);
                 t.Commit();
