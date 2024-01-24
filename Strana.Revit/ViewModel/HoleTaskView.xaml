@@ -7,7 +7,7 @@
              xmlns:core="clr-namespace:Strana.Revit.HoleTask.ViewModel;assembly=Strana.Revit.HoleTask"
              d:DataContext="{d:DesignInstance Type=core:HoleTaskViewModel}"
              mc:Ignorable="d"
-             Title="Задание на отверстия" 
+             Title="Задание на отверстия 1.0.0" 
              Closing="Window_Closing"
              d:Height="550" Width="700" MaxHeight="550" MaxWidth="700"
 
@@ -76,9 +76,10 @@
             </Grid>
 
             <Grid  Grid.Column="1" Grid.Row="2" HorizontalAlignment="Left">
-                <TextBox Grid.Row="0" HorizontalAlignment="Center"  TextWrapping="Wrap" Text="{Binding Path=OffSetHoleTask}" VerticalAlignment="Center" Width="25"  Grid.RowSpan="2"/>
+                <TextBox HorizontalAlignment="Center"  TextWrapping="Wrap" Text="{Binding Path=OffSetHoleTask}" VerticalAlignment="Center" Width="26"/>
+                <TextBlock Text="Δ3 =" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="117,0,0,0"/>
+
                 <TextBlock Text="Расстояние между инженерной системой и отверстием" HorizontalAlignment="Left" VerticalAlignment="Top" Width="312"/>
-                <TextBlock Text="Δ3 =                " HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Grid>
 
             <Grid  Grid.Column="1" Grid.Row="3" HorizontalAlignment="Left">
@@ -88,8 +89,8 @@
             </Grid>
 
             <Grid  Grid.Column="1" Grid.Row="4" HorizontalAlignment="Left">
-                <CheckBox Content="Размещать отверстия в проемах" VerticalAlignment="Top" IsChecked="{Binding Path=ArePlaceHoleTaskInOpenings,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Width="312"/>
-                <CheckBox Content="Выбрать отдельные MEP элементы" VerticalAlignment="Center" IsChecked="{Binding Path=ArePickUpElements,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Width="312" />
+                <!--<CheckBox Content="Размещать отверстия в проемах" VerticalAlignment="Top" IsChecked="{Binding Path=ArePlaceHoleTaskInOpenings,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Width="312"/>
+                <CheckBox Content="Выбрать отдельные MEP элементы" VerticalAlignment="Center" IsChecked="{Binding Path=ArePickUpElements,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Width="312" />-->
                 <TextBlock Text="Выберите связанный файл:" HorizontalAlignment="Left" VerticalAlignment="Bottom"  Width="312"/>
             </Grid>
 

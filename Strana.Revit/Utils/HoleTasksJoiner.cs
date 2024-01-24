@@ -38,8 +38,6 @@ namespace Strana.Revit.HoleTask.Utils
                 HoleTaskFamilyLoader familyLoader = new(doc);
                 FamilySymbol holeFamilySymbol;
 
-
-
                 List<FamilyInstance> intersectionWallRectangularCombineList01 = allFamilyInstances00
                     .Where(fi => fi.Name.ToString() == "(Отв_Задание)_Стены_Прямоугольное")
                     .ToList();
@@ -287,10 +285,9 @@ namespace Strana.Revit.HoleTask.Utils
 
                         double O1 = UnitUtils.ConvertToInternalUnits(delta.DeltaGridNumber, UnitTypeId.Millimeters);
                         double Oa = UnitUtils.ConvertToInternalUnits(delta.deltaGridLetter, UnitTypeId.Millimeters);
-                        //HoleTaskCreator.MoveFamilyInstance(intersectionPoint, O1, "X");
-                        /////сдвинуть семейство по оси У в верх, от оси и А
-                        //HoleTaskCreator.MoveFamilyInstance(intersectionPoint, Oa, "Y");
-
+                        HoleTaskCreator.MoveFamilyInstance(intersectionPoint, O1, "X");
+                        ///сдвинуть семейство по оси У в верх, от оси и А
+                        HoleTaskCreator.MoveFamilyInstance(intersectionPoint, Oa, "Y");
 
                         foreach (FamilyInstance forDel in intersectionWallRectangularSolidIntersectCombineList001)
                         {
@@ -502,10 +499,31 @@ namespace Strana.Revit.HoleTask.Utils
                             holeFamilySymbol,
                             pointLevel,
                             StructuralType.NonStructural);
-                        intersectionPoint.LookupParameter(holeTaskWidth).Set(HoleTasksRoundUpDimension.RoundUpParameter(intersectionPointWidth));
-                        intersectionPoint.LookupParameter(holeTaskHeight).Set(HoleTasksRoundUpDimension.RoundUpParameter(intersectionPointHeight));
-                        intersectionPoint.LookupParameter(holeTaskThickness).Set(HoleTasksRoundUpDimension.RoundUpParameter(intersectionPointThickness));
 
+                        double roundHTWidth = HoleTasksRoundUpDimension.RoundUpParameter(intersectionPointWidth);
+                        double roundHTThickness = HoleTasksRoundUpDimension.RoundUpParameter(intersectionPointThickness);
+                        double roundHTHeight = HoleTasksRoundUpDimension.RoundUpParameter(intersectionPointHeight);
+
+                        intersectionPoint.LookupParameter(holeTaskWidth).Set(roundHTWidth);
+                        intersectionPoint.LookupParameter(holeTaskThickness).Set(roundHTThickness);
+                        intersectionPoint.LookupParameter(holeTaskHeight).Set(roundHTHeight);
+
+                        var locationPoint = intersectionPoint.Location as LocationPoint;
+                        double rotationAngle1 = locationPoint?.Rotation ?? 0.0;
+
+                        HoleTaskGridDelta delta = GridRoundUpDimension.DeltaHoleTaskToGrids(doc, newCenterPoint, roundHTThickness, roundHTWidth, rotationAngle1);
+
+                        double O1 = UnitUtils.ConvertToInternalUnits(delta.DeltaGridNumber, UnitTypeId.Millimeters);
+                        double Oa = UnitUtils.ConvertToInternalUnits(delta.deltaGridLetter, UnitTypeId.Millimeters);
+                        HoleTaskCreator.MoveFamilyInstance(intersectionPoint, O1, "X");
+                        ///сдвинуть семейство по оси У в верх, от оси и А
+                        HoleTaskCreator.MoveFamilyInstance(intersectionPoint, Oa, "Y");
+
+
+
+
+
+                        /// Цитрусовская часть, не трогал. 
                         double rotationAngle = pointFacingOrientation
                             .AngleTo(intersectionPoint.FacingOrientation);
                         if (rotationAngle != 0)

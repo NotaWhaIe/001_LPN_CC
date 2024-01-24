@@ -179,8 +179,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\holeTask.png" />
     <Resource Include="Resources\holeTaskLegend.png" />
+    <Resource Include="Resources\holeTask.png" />
     <Content Include="Resources\RevitRuneasyexample.txt" />
   </ItemGroup>
   <ItemGroup>

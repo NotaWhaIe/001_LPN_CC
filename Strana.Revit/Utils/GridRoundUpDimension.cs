@@ -31,7 +31,7 @@ namespace Strana.Revit.HoleTask.Utils
             double width00     = UnitUtils.ConvertFromInternalUnits(width, UnitTypeId.Millimeters); 
 
             ///насколько нужно сместить семейство
-            double delta1 = Math.Ceiling((toGrid1 - width00 / 2) / roundHoleTaskInPlane) * roundHoleTaskInPlane - (toGrid1 - width00 / 2);
+            double delta1 = Math.Ceiling((toGrid1 - width00 / 2    ) / roundHoleTaskInPlane) * roundHoleTaskInPlane - (toGrid1 - width00     / 2);
             double deltaA = Math.Ceiling((toGridA - thickness00 / 2) / roundHoleTaskInPlane) * roundHoleTaskInPlane - (toGridA - thickness00 / 2);
 
             ///насколько нужно увеличить семейство
@@ -66,20 +66,6 @@ namespace Strana.Revit.HoleTask.Utils
 
         public static double MeasureDistanceToGrid(Document doc, XYZ intersectionCurveCenter, string gridName)
         {
-            if (doc == null)
-            {
-                throw new ArgumentNullException(nameof(doc), "Document cannot be null.");
-            }
-
-            if (intersectionCurveCenter == null)
-            {
-                throw new ArgumentNullException(nameof(intersectionCurveCenter), "Intersection curve center cannot be null.");
-            }
-
-            if (string.IsNullOrWhiteSpace(gridName))
-            {
-                throw new ArgumentException("Grid name cannot be null or empty.", nameof(gridName));
-            }
 
             // Найти ось с заданным именем
             Grid grid = new FilteredElementCollector(doc)
@@ -89,15 +75,18 @@ namespace Strana.Revit.HoleTask.Utils
 
             if (grid == null || !(grid.Curve is Line gridLine))
             {
-                return -1;
+                return 0;
             }
 
             // Проекция точки на линию сетки в плоскости XY
             XYZ pointInXYPlane = new XYZ(intersectionCurveCenter.X, intersectionCurveCenter.Y, gridLine.GetEndPoint(0).Z);
-            XYZ closestPoint = gridLine.Project(pointInXYPlane).XYZPoint;
+            //SphereByPoint.CreateSphereByPoint(pointInXYPlane);
+            //SphereByPoint.CreateSphereByPoint(gridLine.GetEndPoint(0));
+            //SphereByPoint.CreateSphereByPoint(gridLine.GetEndPoint(1));
 
+            var distance = gridLine.Distance(pointInXYPlane);
             // Вычисление горизонтального расстояния и конвертация из футов в миллиметры
-            return UnitUtils.ConvertFromInternalUnits(pointInXYPlane.DistanceTo(closestPoint), UnitTypeId.Millimeters);
+            return UnitUtils.ConvertFromInternalUnits(distance, UnitTypeId.Millimeters);
             //return pointInXYPlane.DistanceTo(closestPoint);
         }
     }
