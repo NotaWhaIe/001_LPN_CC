@@ -271,10 +271,28 @@ namespace Strana.Revit.HoleTask.Utils
                                     .FacingOrientation.AngleTo(intersectionPoint.FacingOrientation));
                         }
 
-                        intersectionPoint.LookupParameter(holeTaskHeight).Set(HoleTasksRoundUpDimension.RoundUpParameter(intersectionPointHeight));
-                        intersectionPoint.LookupParameter(holeTaskWidth).Set(HoleTasksRoundUpDimension.RoundUpParameter(intersectionPointWidthCalculete));
-                        intersectionPoint.LookupParameter(holeTaskThickness).Set(HoleTasksRoundUpDimension.RoundUpParameter(intersectionPointThickness));
+                        double roundHTWidth = HoleTasksRoundUpDimension.RoundUpParameter(intersectionPointWidthCalculete);
+                        double roundHTThickness = HoleTasksRoundUpDimension.RoundUpParameter(intersectionPointThickness);
+                        double roundHTHeight = HoleTasksRoundUpDimension.RoundUpParameter(intersectionPointHeight);
+
+                        intersectionPoint.LookupParameter(holeTaskWidth).Set(roundHTWidth);
+                        intersectionPoint.LookupParameter(holeTaskThickness).Set(roundHTThickness);
+                        intersectionPoint.LookupParameter(holeTaskHeight).Set(roundHTHeight);
                         intersectionPoint.get_Parameter(BuiltInParameter.INSTANCE_ELEVATION_PARAM).Set(newCenterPoint.Z);
+
+                        //var locationPoint = intersectionPoint.Location as LocationPoint;
+                        //double rotationAngle = locationPoint?.Rotation ?? 0.0;
+
+                        //HoleTaskGridDelta delta = GridRoundUpDimension.DeltaHoleTaskToGrids(doc, newCenterPoint, roundHTThickness, roundHTWidth, rotationAngle);
+                        
+                        
+                        //double O1 = UnitUtils.ConvertToInternalUnits(delta.DeltaGridNumber, UnitTypeId.Millimeters);
+                        //HoleTaskCreator.MoveFamilyInstance(intersectionPoint, O1, "X");
+
+                        /////сдвинуть семейство по оси У в верх, от оси и А
+                        //double Oa = UnitUtils.ConvertToInternalUnits(delta.deltaGridLetter, UnitTypeId.Millimeters);
+                        //HoleTaskCreator.MoveFamilyInstance(intersectionPoint, Oa, "Y");
+
 
                         foreach (FamilyInstance forDel in intersectionWallRectangularSolidIntersectCombineList001)
                         {
