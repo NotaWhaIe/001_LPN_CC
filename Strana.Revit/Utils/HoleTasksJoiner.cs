@@ -280,17 +280,15 @@ namespace Strana.Revit.HoleTask.Utils
                         intersectionPoint.LookupParameter(holeTaskHeight).Set(roundHTHeight);
                         intersectionPoint.get_Parameter(BuiltInParameter.INSTANCE_ELEVATION_PARAM).Set(newCenterPoint.Z);
 
-                        //var locationPoint = intersectionPoint.Location as LocationPoint;
-                        //double rotationAngle = locationPoint?.Rotation ?? 0.0;
+                        var locationPoint = intersectionPoint.Location as LocationPoint;
+                        double rotationAngle = locationPoint?.Rotation ?? 0.0;
 
-                        //HoleTaskGridDelta delta = GridRoundUpDimension.DeltaHoleTaskToGrids(doc, newCenterPoint, roundHTThickness, roundHTWidth, rotationAngle);
-                        
-                        
-                        //double O1 = UnitUtils.ConvertToInternalUnits(delta.DeltaGridNumber, UnitTypeId.Millimeters);
+                        HoleTaskGridDelta delta = GridRoundUpDimension.DeltaHoleTaskToGrids(doc, newCenterPoint, roundHTThickness, roundHTWidth, rotationAngle);
+
+                        double O1 = UnitUtils.ConvertToInternalUnits(delta.DeltaGridNumber, UnitTypeId.Millimeters);
+                        double Oa = UnitUtils.ConvertToInternalUnits(delta.deltaGridLetter, UnitTypeId.Millimeters);
                         //HoleTaskCreator.MoveFamilyInstance(intersectionPoint, O1, "X");
-
                         /////сдвинуть семейство по оси У в верх, от оси и А
-                        //double Oa = UnitUtils.ConvertToInternalUnits(delta.deltaGridLetter, UnitTypeId.Millimeters);
                         //HoleTaskCreator.MoveFamilyInstance(intersectionPoint, Oa, "Y");
 
 
@@ -504,7 +502,7 @@ namespace Strana.Revit.HoleTask.Utils
                             holeFamilySymbol,
                             pointLevel,
                             StructuralType.NonStructural);
-                        intersectionPoint.LookupParameter(holeTaskWidth).Set( HoleTasksRoundUpDimension.RoundUpParameter(intersectionPointWidth));
+                        intersectionPoint.LookupParameter(holeTaskWidth).Set(HoleTasksRoundUpDimension.RoundUpParameter(intersectionPointWidth));
                         intersectionPoint.LookupParameter(holeTaskHeight).Set(HoleTasksRoundUpDimension.RoundUpParameter(intersectionPointHeight));
                         intersectionPoint.LookupParameter(holeTaskThickness).Set(HoleTasksRoundUpDimension.RoundUpParameter(intersectionPointThickness));
 
