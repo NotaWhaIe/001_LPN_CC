@@ -130,14 +130,11 @@ namespace Strana.Revit.HoleTask.Utils
                 //holeTask.LookupParameter("Глубина").Set(HoleTasksRoundUpDimension.RoundUpParameter(holeTaskThickness)+(delta.deltaGridMax));
                 //holeTask.LookupParameter("Ширина").Set(HoleTasksRoundUpDimension.RoundUpParameter(this.ExchangeParameters(orientation, holeTaskWidth, holeTaskHeight)+(delta.deltaGridMax))); // Width
                 //holeTask.LookupParameter("Высота").Set(HoleTasksRoundUpDimension.RoundUpParameter(this.ExchangeParameters(orientation, holeTaskHeight, holeTaskWidth))); // Height
-
-                HoleTaskGridDelta delta = GridRoundUpDimension.DeltaHoleTaskToGrids(this.doc, intersectionCurveCenter, roundHTThickness, roundHTWidth, holeTaskAngle);
-
                 this.RotateHoleTask(mepElement, orientation, holeTask, intersection, intersectedElement, lvl, linkInstance);
 
+                HoleTaskGridDelta delta = GridRoundUpDimension.DeltaHoleTaskToGrids(this.doc, intersectionCurveCenter, roundHTThickness, roundHTWidth, holeTaskAngle);
                 double O1 = UnitUtils.ConvertToInternalUnits(delta.DeltaGridNumber, UnitTypeId.Millimeters);
                 MoveFamilyInstance(holeTask, O1, "X");
-
                 ///сдвинуть семейство по оси У в верх, от оси и А
                 double Oa = UnitUtils.ConvertToInternalUnits(delta.deltaGridLetter, UnitTypeId.Millimeters);
                 MoveFamilyInstance(holeTask, Oa, "Y");

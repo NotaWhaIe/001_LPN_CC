@@ -282,11 +282,10 @@ namespace Strana.Revit.HoleTask.Utils
                         double rotationAngle = locationPoint?.Rotation ?? 0.0;
 
                         HoleTaskGridDelta delta = GridRoundUpDimension.DeltaHoleTaskToGrids(doc, newCenterPoint, roundHTThickness, roundHTWidth, rotationAngle);
-
                         double O1 = UnitUtils.ConvertToInternalUnits(delta.DeltaGridNumber, UnitTypeId.Millimeters);
                         double Oa = UnitUtils.ConvertToInternalUnits(delta.deltaGridLetter, UnitTypeId.Millimeters);
                         HoleTaskCreator.MoveFamilyInstance(intersectionPoint, O1, "X");
-                        ///сдвинуть семейство по оси У в верх, от оси и А
+                        ///сдвинуть семейство по оси фУ в верх, от оси и А
                         HoleTaskCreator.MoveFamilyInstance(intersectionPoint, Oa, "Y");
 
                         foreach (FamilyInstance forDel in intersectionWallRectangularSolidIntersectCombineList001)
@@ -508,23 +507,7 @@ namespace Strana.Revit.HoleTask.Utils
                         intersectionPoint.LookupParameter(holeTaskThickness).Set(roundHTThickness);
                         intersectionPoint.LookupParameter(holeTaskHeight).Set(roundHTHeight);
 
-                        var locationPoint = intersectionPoint.Location as LocationPoint;
-                        double rotationAngle1 = locationPoint?.Rotation ?? 0.0;
-
-                        HoleTaskGridDelta delta = GridRoundUpDimension.DeltaHoleTaskToGrids(doc, newCenterPoint, roundHTThickness, roundHTWidth, rotationAngle1);
-
-                        double O1 = UnitUtils.ConvertToInternalUnits(delta.DeltaGridNumber, UnitTypeId.Millimeters);
-                        double Oa = UnitUtils.ConvertToInternalUnits(delta.deltaGridLetter, UnitTypeId.Millimeters);
-                        HoleTaskCreator.MoveFamilyInstance(intersectionPoint, O1, "X");
-                        ///сдвинуть семейство по оси У в верх, от оси и А
-                        HoleTaskCreator.MoveFamilyInstance(intersectionPoint, Oa, "Y");
-
-
-
-
-
-                        /// Цитрусовская часть, не трогал. 
-                        double rotationAngle = pointFacingOrientation
+                         double rotationAngle = pointFacingOrientation
                             .AngleTo(intersectionPoint.FacingOrientation);
                         if (rotationAngle != 0)
                         {
@@ -536,6 +519,19 @@ namespace Strana.Revit.HoleTask.Utils
                                 rotationAxis,
                                 rotationAngle);
                         }
+
+
+
+                        var locationPoint = intersectionPoint.Location as LocationPoint;
+                        double rotationAngle1 = locationPoint?.Rotation ?? 0.0;
+
+                        HoleTaskGridDelta delta = GridRoundUpDimension.DeltaHoleTaskToGrids(doc, newCenterPoint, roundHTThickness, roundHTWidth, rotationAngle1);
+
+                        double O1 = UnitUtils.ConvertToInternalUnits(delta.DeltaGridNumber, UnitTypeId.Millimeters);
+                        double Oa = UnitUtils.ConvertToInternalUnits(delta.deltaGridLetter, UnitTypeId.Millimeters);
+                        HoleTaskCreator.MoveFamilyInstance(intersectionPoint, O1, "X");
+                        ///сдвинуть семейство по оси У в верх, от оси и А
+                        HoleTaskCreator.MoveFamilyInstance(intersectionPoint, Oa, "Y");
 
                         foreach (FamilyInstance forDel in intersectionFloorRectangularSolidIntersectCombineList002)
                         {
