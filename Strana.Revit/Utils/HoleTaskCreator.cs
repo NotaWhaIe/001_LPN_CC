@@ -57,6 +57,7 @@ namespace Strana.Revit.HoleTask.Utils
             ///Добавляю в список уже существующие задания на отверстия:
             HoleTasksGetter.AddFamilyInstancesToList(this.doc, "(Отв_Задание)_Стены_Прямоугольное", this.intersectionRectangularCombineList);
             HoleTasksGetter.AddFamilyInstancesToList(this.doc, "(Отв_Задание)_Перекрытия_Прямоугольное", this.intersectionRectangularCombineList);
+            int a = intersectionRectangularCombineList.Count;
 
             OrientaionType orientation = this.GetElementOrientationType(mepElement);
             FamilySymbol holeFamilySymbol;
@@ -104,9 +105,17 @@ namespace Strana.Revit.HoleTask.Utils
             XYZ intersectionCurveCenter = this.GetIntersectionCurveCenter(intersection);
             intersectionCurveCenter = new XYZ(intersectionCurveCenter.X, intersectionCurveCenter.Y, intersectionCurveCenter.Z - lvl.ProjectElevation);
 
+            double holeTaskWidthEX = this.ExchangeParameters(orientation, holeTaskWidth, holeTaskHeight);
+            double holeTaskHeightEX = this.ExchangeParameters(orientation, holeTaskHeight, holeTaskWidth);
+
+            double roundHTThickness = HoleTasksRoundUpDimension.RoundUpParameter(holeTaskThickness);
+            double roundHTWidth = HoleTasksRoundUpDimension.RoundUpParameter(holeTaskWidthEX);
+            double roundHTHeight = HoleTasksRoundUpDimension.RoundUpParameter(holeTaskHeightEX);
+
             ///Добавить в метод чтоб при определении захватывало область вокрг точки вставки
             /// проверка есть ли в intersectionCurveCenter уже ЗНО с теми же геометрическими размерами и в том же месте
-            if (!DoesFamilyInstanceExistAtLocation(intersectionCurveCenter))
+            if (!DoesFamilyInstanceExistAtLocation(intersectionCurveCenter, roundHTThickness, roundHTWidth, roundHTHeight))
+            //if (!DoesFamilyInstanceExistAtLocation(intersectionCurveCenter))
             {
                 holeTask = this.doc.Create.NewFamilyInstance(
                     intersectionCurveCenter,
@@ -117,19 +126,9 @@ namespace Strana.Revit.HoleTask.Utils
 
                 double holeTaskAngle = this.RotateHoleTaskAngle(mepElement, orientation, holeTask, intersection, intersectedElement, lvl, linkInstance);
 
-                double holeTaskWidthEX = this.ExchangeParameters(orientation, holeTaskWidth, holeTaskHeight);
-                double holeTaskHeightEX = this.ExchangeParameters(orientation, holeTaskHeight, holeTaskWidth);
-
-                double roundHTThickness = HoleTasksRoundUpDimension.RoundUpParameter(holeTaskThickness);
-                double roundHTWidth = HoleTasksRoundUpDimension.RoundUpParameter(holeTaskWidthEX);
-                double roundHTHeight = HoleTasksRoundUpDimension.RoundUpParameter(holeTaskHeightEX);
-
                 holeTask.LookupParameter("Глубина").Set(roundHTThickness);
                 holeTask.LookupParameter("Ширина").Set(roundHTWidth);
                 holeTask.LookupParameter("Высота").Set(roundHTHeight);
-                //holeTask.LookupParameter("Глубина").Set(HoleTasksRoundUpDimension.RoundUpParameter(holeTaskThickness)+(delta.deltaGridMax));
-                //holeTask.LookupParameter("Ширина").Set(HoleTasksRoundUpDimension.RoundUpParameter(this.ExchangeParameters(orientation, holeTaskWidth, holeTaskHeight)+(delta.deltaGridMax))); // Width
-                //holeTask.LookupParameter("Высота").Set(HoleTasksRoundUpDimension.RoundUpParameter(this.ExchangeParameters(orientation, holeTaskHeight, holeTaskWidth))); // Height
                 this.RotateHoleTask(mepElement, orientation, holeTask, intersection, intersectedElement, lvl, linkInstance);
 
                 HoleTaskGridDelta delta = GridRoundUpDimension.DeltaHoleTaskToGrids(this.doc, intersectionCurveCenter, roundHTThickness, roundHTWidth, holeTaskAngle);
@@ -182,7 +181,7 @@ namespace Strana.Revit.HoleTask.Utils
 
         private bool DoesFamilyInstanceExistAtLocation(XYZ location)
         {
-            const double tolerance = 0.02; // Небольшой допуск для сравнения координат
+            const double tolerance = 0.01; // Небольшой допуск для сравнения координат, около 3 мм
 
             foreach (FamilyInstance fi in this.intersectionRectangularCombineList)
             {
@@ -195,6 +194,36 @@ namespace Strana.Revit.HoleTask.Utils
 
             return false; // Экземпляр в заданных координатах не найден
         }
+
+        /// Перегрузка, проверка по габаритным размерам
+        private bool DoesFamilyInstanceExistAtLocation(XYZ location, double roundHTThickness, double roundHTWidth, double roundHTHeight)
+        {
+            const double tolerance = 0.01; // Небольшой допуск для сравнения координат, около 3 мм
+
+            // Предполагается, что roundHTThickness, roundHTWidth, и roundHTHeight уже в футах
+            double roundHT = roundHTThickness + roundHTWidth + roundHTHeight;
+
+            foreach (FamilyInstance fi in this.intersectionRectangularCombineList)
+            {
+                XYZ existingLocation = (fi.Location as LocationPoint)?.Point;
+
+                double Thickness = fi.LookupParameter("Глубина")?.AsDouble() ?? 0;
+                double Width = fi.LookupParameter("Ширина")?.AsDouble() ?? 0;
+                double Height = fi.LookupParameter("Высота")?.AsDouble() ?? 0;
+                double round = Thickness + Width + Height;
+
+                // Точность сравнения суммарных размеров с учетом допуска
+                bool sizeMatches = Math.Abs(roundHT - round) < tolerance;
+
+                if (existingLocation != null && existingLocation.IsAlmostEqualTo(location, tolerance) && sizeMatches)
+                {
+                    return true; // Найден существующий экземпляр в заданных координатах с соответствующими размерами
+                }
+            }
+
+            return false; // Экземпляр в заданных координатах не найден
+        }
+
 
         /// <summary>
         /// Gets the closest floor level from the list of document levels based on the elevation of the linked floor.

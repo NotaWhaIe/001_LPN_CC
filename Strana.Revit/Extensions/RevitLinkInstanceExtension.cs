@@ -6,8 +6,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Windows.Controls;
 using Autodesk.Revit.DB;
 using Strana.Revit.HoleTask.ElementCollections;
+using Strana.Revit.HoleTask.Extensions.RevitElement;
 using Strana.Revit.HoleTask.Utils;
 
 namespace Strana.Revit.HoleTask.Extensions
@@ -19,8 +21,12 @@ namespace Strana.Revit.HoleTask.Extensions
             using (var t = new Transaction(linkInstance.Document, "Create all instances of hole task"))
             {
                 t.Start();
-                List<FamilyInstance> allHoleTaskByRevitLinkInstance = new();
                 Document linkDoc = linkInstance.GetLinkDocument();
+                Document doc = linkInstance.Document;
+                List<FamilyInstance> allHoleTaskByRevitLinkInstance = new();
+                HoleTasksGetter.AddFamilyInstancesToList(doc, "(Отв_Задание)_Стены_Прямоугольное", allHoleTaskByRevitLinkInstance);
+                HoleTasksGetter.AddFamilyInstancesToList(doc, "(Отв_Задание)_Перекрытия_Прямоугольное", allHoleTaskByRevitLinkInstance);
+
 
                 /// Take walls and floors
                 IEnumerable<Element> allIntersectingElements = CollectionsOfIntersectingElements.AllIntersectingElements(linkDoc);
@@ -39,7 +45,7 @@ namespace Strana.Revit.HoleTask.Extensions
 
                 /// HoleTasksJoiner 
                 List<FamilyInstance> roundHoleTaskList = new HoleTasksJoiner().JoinAllHoleTask(allHoleTaskByRevitLinkInstance);
-                
+
                 ///растянуть по высоте
                 new HoleTasksLineStretch().StretchLinesAllHoleTask(linkInstance);
                 t.Commit();

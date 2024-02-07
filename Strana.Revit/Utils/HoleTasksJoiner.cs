@@ -38,6 +38,7 @@ namespace Strana.Revit.HoleTask.Utils
                 HoleTaskFamilyLoader familyLoader = new(doc);
                 FamilySymbol holeFamilySymbol;
 
+
                 List<FamilyInstance> intersectionWallRectangularCombineList01 = allFamilyInstances00
                     .Where(fi => fi.Name.ToString() == "(Отв_Задание)_Стены_Прямоугольное")
                     .ToList();
@@ -48,6 +49,9 @@ namespace Strana.Revit.HoleTask.Utils
                 Options opt = new();
                 opt.ComputeReferences = true;
                 opt.DetailLevel = ViewDetailLevel.Fine;
+
+
+
 
                 while (intersectionWallRectangularCombineList01.Count != 0)
                 {
@@ -301,7 +305,7 @@ namespace Strana.Revit.HoleTask.Utils
                 }
 
 
-
+               
 
                 while (intersectionFloorRectangularCombineList02.Count != 0)
                 {
