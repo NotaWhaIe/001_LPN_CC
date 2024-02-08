@@ -43,7 +43,7 @@ namespace Strana.Revit.HoleTask.ViewModel
 
         public void RunProgram(object sender, RoutedEventArgs e)
         {
-            // При нажатии на кнопку "Запустить магию!", программа должна быть выполнена
+            // При нажатии на кнопку "Запустить", программа должна быть выполнена
             isMagicButtonPressed = true;
             shouldExecuteProgram = true;
             this.Close();

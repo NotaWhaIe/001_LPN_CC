@@ -32,7 +32,9 @@ namespace Strana.Revit.HoleTask.RevitCommands
                 using (var gt = new TransactionGroup(doc, "HoleTasks"))
                 {
                     gt.Start();
-
+                    
+                    
+                    ///сюда закинукинуть линк по которой строить зно
                     // Здесь выполняется основная логика вашего плагина
                     foreach (RevitLinkInstance linkInstance in LinkInstanseCollections.RevitLinks(doc))
                     {

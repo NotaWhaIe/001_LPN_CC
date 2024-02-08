@@ -64,7 +64,7 @@
             </Grid.RowDefinitions>
 
             <Grid  Grid.Column="1" Grid.Row="0" HorizontalAlignment="Left">
-                <CheckBox Content="Округлить расстояния заданий до оси" VerticalAlignment="Top" IsChecked="{Binding Path=AreRoundHoleTaskInPlane,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Width="312"/>
+                <CheckBox Content="Округлить расстояния от заданий до оси в плане" VerticalAlignment="Top" IsChecked="{Binding Path=AreRoundHoleTaskInPlane,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Width="312"/>
                 <TextBlock Text="Δ1 =                " HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 <TextBox Grid.Row="0" HorizontalAlignment="Center"  TextWrapping="Wrap" Text="{Binding Path=RoundHoleTaskInPlane}" VerticalAlignment="Center" Width="25"  Grid.RowSpan="2"/>
             </Grid>
@@ -79,11 +79,11 @@
                 <TextBox HorizontalAlignment="Center"  TextWrapping="Wrap" Text="{Binding Path=OffSetHoleTask}" VerticalAlignment="Center" Width="26"/>
                 <TextBlock Text="Δ3 =" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="117,0,0,0"/>
 
-                <TextBlock Text="Расстояние между инженерной системой и отверстием" HorizontalAlignment="Left" VerticalAlignment="Top" Width="312"/>
+                <TextBlock Text="Расстояние между инженерной системой и заданием" HorizontalAlignment="Left" VerticalAlignment="Top" Width="312"/>
             </Grid>
 
             <Grid  Grid.Column="1" Grid.Row="3" HorizontalAlignment="Left">
-                <CheckBox Content="Объединять пересекающиеся отверстия" VerticalAlignment="Top" IsChecked="{Binding Path=AreJoin,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Width="312" />
+                <CheckBox Content="Объединять пересекающиеся задания" VerticalAlignment="Top" IsChecked="{Binding Path=AreJoin,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Width="312" />
                 <TextBlock Text="Δ4 =                " HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 <TextBox Grid.Row="0" HorizontalAlignment="Center"  TextWrapping="Wrap" Text="{Binding Path=OffSetJoin}" VerticalAlignment="Center" Width="25"  Grid.RowSpan="2"/>
             </Grid>
@@ -91,7 +91,7 @@
             <Grid  Grid.Column="1" Grid.Row="4" HorizontalAlignment="Left">
                 <!--<CheckBox Content="Размещать отверстия в проемах" VerticalAlignment="Top" IsChecked="{Binding Path=ArePlaceHoleTaskInOpenings,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Width="312"/>
                 <CheckBox Content="Выбрать отдельные MEP элементы" VerticalAlignment="Center" IsChecked="{Binding Path=ArePickUpElements,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Width="312" />-->
-                <TextBlock Text="Выберите связанный файл:" HorizontalAlignment="Left" VerticalAlignment="Bottom"  Width="312"/>
+                <TextBlock Text="Выберите связанный файл (несколько):" HorizontalAlignment="Left" VerticalAlignment="Bottom"  Width="312"/>
             </Grid>
 
 
@@ -122,7 +122,7 @@
             <!--<Grid  Grid.Column="1" Grid.Row="6" HorizontalAlignment="Left">
             </Grid>-->
 
-            <Button Grid.Column="1" Grid.Row="7" Opacity ="1" Content="Запустить Магию!" MinWidth="130" Click="RunProgram"
+            <Button Grid.Column="1" Grid.Row="7" Opacity ="1" Content="Запустить" MinWidth="130" Click="RunProgram"
                     Margin="6,0,6,0" Padding="-10"
                     Cursor="Hand">
 
