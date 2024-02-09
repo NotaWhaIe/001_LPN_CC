@@ -54,6 +54,8 @@ namespace Strana.Revit.HoleTask.Utils
             Document linkDoc,
             RevitLinkInstance linkInstance)
         {
+            linkInstance.Name.ToString();
+            
             ///Добавляю в список уже существующие задания на отверстия:
             HoleTasksGetter.AddFamilyInstancesToList(this.doc, "(Отв_Задание)_Стены_Прямоугольное", this.intersectionRectangularCombineList);
             HoleTasksGetter.AddFamilyInstancesToList(this.doc, "(Отв_Задание)_Перекрытия_Прямоугольное", this.intersectionRectangularCombineList);
@@ -137,6 +139,9 @@ namespace Strana.Revit.HoleTask.Utils
                 ///сдвинуть семейство по оси У в верх, от оси и А
                 double Oa = UnitUtils.ConvertToInternalUnits(delta.deltaGridLetter, UnitTypeId.Millimeters);
                 MoveFamilyInstance(holeTask, Oa, "Y");
+
+
+                holeTask.LookupParameter(":Назначение отверстия").Set(linkInstance.Name.ToString());
 
                 return holeTask;
             }

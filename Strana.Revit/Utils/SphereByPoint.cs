@@ -41,7 +41,7 @@ namespace Strana.Revit.HoleTask.Utils
                 //using (Transaction t = new(doc, "create SphereByPoint"))
                 //{
                 //t.Start();
-                DirectShape ds = DirectShape.CreateElement(docsaver.doc, new ElementId(BuiltInCategory.OST_Furniture));
+                DirectShape ds = DirectShape.CreateElement(Docsaver.doc, new ElementId(BuiltInCategory.OST_Furniture));
                 ds.ApplicationId = "Application id";
                 ds.ApplicationDataId = "Geometry object id";
                 ds.SetShape(new GeometryObject[] { sphere });

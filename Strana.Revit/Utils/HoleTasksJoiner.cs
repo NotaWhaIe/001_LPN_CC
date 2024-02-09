@@ -49,7 +49,7 @@ namespace Strana.Revit.HoleTask.Utils
                 Options opt = new();
                 opt.ComputeReferences = true;
                 opt.DetailLevel = ViewDetailLevel.Fine;
-
+                string info;
 
 
 
@@ -114,9 +114,13 @@ namespace Strana.Revit.HoleTask.Utils
                         double intersectionPointThickness = 0;
                         foreach (FamilyInstance holeTask in intersectionWallRectangularSolidIntersectCombineList001)
                         {
+                            info = holeTask.LookupParameter(":Назначение отверстия").ToString();
                             width = holeTask.LookupParameter(holeTaskWidth).AsDouble();
                             height = holeTask.LookupParameter(holeTaskHeight).AsDouble();
                             thickness = holeTask.LookupParameter(holeTaskThickness).AsDouble();
+
+
+
                             XYZ originPoint = (holeTask.Location as LocationPoint).Point;
 
                             XYZ holeTaskholeTask = holeTask.HandOrientation;
@@ -254,6 +258,7 @@ namespace Strana.Revit.HoleTask.Utils
                             }
                         }
 
+
                         double intersectionPointHeight = maxZPoint.Z - minZPoint.Z;
                         XYZ newCenterPoint = new XYZ(centroidIntersectionPoint.X, centroidIntersectionPoint.Y, centroidIntersectionPoint.Z - (doc.GetElement(intersectionWallRectangularSolidIntersectCombineList001.First().LevelId) as Level).Elevation);
                         FamilyInstance intersectionPoint = doc.Create.NewFamilyInstance(
@@ -292,6 +297,9 @@ namespace Strana.Revit.HoleTask.Utils
                         ///сдвинуть семейство по оси фУ в верх, от оси и А
                         HoleTaskCreator.MoveFamilyInstance(intersectionPoint, Oa, "Y");
 
+                        intersectionPoint.LookupParameter(":Назначение отверстия").Set(info);
+
+
                         foreach (FamilyInstance forDel in intersectionWallRectangularSolidIntersectCombineList001)
                         {
                             doc.Delete(forDel.Id);
@@ -305,7 +313,7 @@ namespace Strana.Revit.HoleTask.Utils
                 }
 
 
-               
+
 
                 while (intersectionFloorRectangularCombineList02.Count != 0)
                 {
@@ -511,8 +519,8 @@ namespace Strana.Revit.HoleTask.Utils
                         intersectionPoint.LookupParameter(holeTaskThickness).Set(roundHTThickness);
                         intersectionPoint.LookupParameter(holeTaskHeight).Set(roundHTHeight);
 
-                         double rotationAngle = pointFacingOrientation
-                            .AngleTo(intersectionPoint.FacingOrientation);
+                        double rotationAngle = pointFacingOrientation
+                           .AngleTo(intersectionPoint.FacingOrientation);
                         if (rotationAngle != 0)
                         {
                             Line rotationAxis = Line.CreateBound(
