@@ -40,7 +40,7 @@ namespace Strana.Revit.HoleTask.RevitCommands
                     {
                         // Получаем имена выбранных связей
                         var selectedLinkNames = viewModel.GetSelectedLinks()
-                            .Select(link => 
+                            .Select(link =>
                             {
                                 var index = link.Name.LastIndexOf('.'); // Находим индекс последней точки
                                 return index == -1 ? link.Name : link.Name.Substring(0, index); // Обрезаем суффикс, если точка найдена
@@ -56,19 +56,13 @@ namespace Strana.Revit.HoleTask.RevitCommands
                         {
                             Document linkDoc = linkInstance.GetLinkDocument();
                             // Проверяем, загружена ли связь и совпадает ли её документ с одним из выбранных
-                            if (linkDoc != null)
+                            if (linkDoc != null && selectedLinkNames.Contains(linkDoc.Title)) // Условие включено
                             {
-                                // Проверяем, начинается ли имя документа связи с одним из выбранных префиксов
-                                bool isSelectedLink = selectedLinkNames.Any(name => linkDoc.Title.StartsWith(name, StringComparison.OrdinalIgnoreCase));
-
-                                if (isSelectedLink)
-                                {
-                                    // Обработка только для выбранных связей
-                                    linkInstance.CreateHoleTasksByCurrentLink();
-                                }
+                                // Обработка только для выбранных связей
+                                linkInstance.CreateHoleTasksByCurrentLink();
                             }
                         }
-                    
+                    }
                     gt.Assimilate();
                 }
             }
