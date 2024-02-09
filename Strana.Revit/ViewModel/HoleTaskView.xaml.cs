@@ -43,10 +43,19 @@ namespace Strana.Revit.HoleTask.ViewModel
 
         public void RunProgram(object sender, RoutedEventArgs e)
         {
-            // При нажатии на кнопку "Запустить", программа должна быть выполнена
+            // Указываем, что кнопка для запуска программы была нажата
             isMagicButtonPressed = true;
+
+            // Получаем ViewModel из DataContext
+            if (this.DataContext is HoleTaskViewModel viewModel)
+            {
+                // Вызываем метод ViewModel для обработки выбранных связей
+                viewModel.ProcessSelectedLinks();
+            }
+
+            // Подготавливаем окно к закрытию
             shouldExecuteProgram = true;
-            this.Close();
+            this.Close(); // Закрываем окно
         }
     }
 }

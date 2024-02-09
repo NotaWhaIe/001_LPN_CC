@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
@@ -27,20 +28,47 @@ namespace Strana.Revit.HoleTask.RevitCommands
             taskView.ShowDialog();
 
             // Проверка состояния выполнения после закрытия окна
-            if (taskView.ShouldExecuteProgram )
+            if (taskView.ShouldExecuteProgram)
             {
                 using (var gt = new TransactionGroup(doc, "HoleTasks"))
                 {
                     gt.Start();
-                    
-                    
-                    ///сюда закинукинуть линк по которой строить зно
-                    // Здесь выполняется основная логика вашего плагина
-                    foreach (RevitLinkInstance linkInstance in LinkInstanseCollections.RevitLinks(doc))
-                    {
-                        linkInstance.CreateHoleTasksByCurrentLink();
-                    }
 
+                    // Получаем ViewModel из DataContext
+                    var viewModel = taskView.DataContext as HoleTaskViewModel;
+                    if (viewModel != null)
+                    {
+                        // Получаем имена выбранных связей
+                        var selectedLinkNames = viewModel.GetSelectedLinks()
+                            .Select(link => 
+                            {
+                                var index = link.Name.LastIndexOf('.'); // Находим индекс последней точки
+                                return index == -1 ? link.Name : link.Name.Substring(0, index); // Обрезаем суффикс, если точка найдена
+                            })
+                            .ToList();
+
+                        // Итерация по всем экземплярам RevitLinkInstance в документе
+                        var linkInstances = new FilteredElementCollector(doc)
+                            .OfClass(typeof(RevitLinkInstance))
+                            .Cast<RevitLinkInstance>();
+
+                        foreach (RevitLinkInstance linkInstance in linkInstances)
+                        {
+                            Document linkDoc = linkInstance.GetLinkDocument();
+                            // Проверяем, загружена ли связь и совпадает ли её документ с одним из выбранных
+                            if (linkDoc != null)
+                            {
+                                // Проверяем, начинается ли имя документа связи с одним из выбранных префиксов
+                                bool isSelectedLink = selectedLinkNames.Any(name => linkDoc.Title.StartsWith(name, StringComparison.OrdinalIgnoreCase));
+
+                                if (isSelectedLink)
+                                {
+                                    // Обработка только для выбранных связей
+                                    linkInstance.CreateHoleTasksByCurrentLink();
+                                }
+                            }
+                        }
+                    
                     gt.Assimilate();
                 }
             }

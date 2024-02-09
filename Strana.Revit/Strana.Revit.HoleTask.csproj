@@ -146,6 +146,7 @@
       <DependentUpon>HoleTaskView.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewModel\HoleTaskViewModel.cs" />
+    <Compile Include="ViewModel\RelayCommand.cs" />
     <Compile Include="ViewModel\RevitLinkData.cs" />
   </ItemGroup>
   <ItemGroup>

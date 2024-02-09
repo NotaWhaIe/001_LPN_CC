@@ -33,13 +33,20 @@ namespace Strana.Revit.HoleTask.ViewModel
         private bool arePlaceHoleTaskInOpenings = Confing.Default.arePlaceHoleTaskInOpenings;
         private bool arePickUpElements = Confing.Default.arePickUpElements;
 
-        public List<RevitLinkData> LinkedFileData { get; set; }
-
+        public ObservableCollection<RevitLinkData> LinkedFileData { get; set; }
+        
         public HoleTaskViewModel(Document doc)
         {
             this.currentDocument = doc;
-            LinkedFileData = GetLinkedFileNames();
+            // Инициализация ObservableCollection с данными связанных файлов
+            LinkedFileData = new ObservableCollection<RevitLinkData>(GetLinkedFileNames());
         }
+
+        public  IEnumerable<RevitLinkData> GetSelectedLinks()
+        {
+            return LinkedFileData.Where(x => x.IsSelected);
+        }
+
 
         public Document currentDocument { get; set; }
 
@@ -169,6 +176,19 @@ namespace Strana.Revit.HoleTask.ViewModel
 
         ///test example
         public ICommand RunScriptCommand => new RouteCommands(() => this.runScript());
+
+        public ICommand ProcessSelectedLinksCommand => new RelayCommand(ProcessSelectedLinks);
+
+        public void ProcessSelectedLinks()
+        {
+            var selectedLinks = GetSelectedLinks();
+            foreach (var link in selectedLinks)
+            {
+                // Здесь ваша логика обработки выбранных связей
+                // Например, поиск RevitLinkInstance в документе Revit и выполнение операций с ним
+            }
+        }
+
 
         private void runScript()
         {

@@ -1,6 +1,5 @@
 ﻿using Strana.Revit.NavisReportViewer.ViewModels.Base;
 
-
 namespace Strana.Revit.HoleTask.ViewModel
 {
     public class RevitLinkData : BaseViewModel
@@ -9,30 +8,32 @@ namespace Strana.Revit.HoleTask.ViewModel
         {
             this.Name = name;
         }
-        public string Name { get; }
+
+        public string Name { get; private set; } // Сделал свойство только для чтения с возможностью установки в конструкторе
 
         private bool isSelected;
-
         public bool IsSelected
         {
-            get { return isSelected; }
+            get => isSelected;
             set
             {
-                isSelected = value;
-                ///Ставил точку останова для проверки события
-                OnPropertyChanged(nameof(isSelected));
-                if (isSelected && !Confing.Default.revitLinks.Contains(this.Name))
+                if (isSelected != value) // Проверка на изменение значения, чтобы избежать ненужных вызовов
                 {
-                    Confing.Default.revitLinks = Confing.Default.revitLinks + this.Name + ";";
-                    Confing.Default.Save();
-                }
-                else
-                {
-                    Confing.Default.revitLinks = Confing.Default.revitLinks.Replace(this.Name + ";", string.Empty);
+                    isSelected = value;
+                    OnPropertyChanged(nameof(IsSelected)); // Исправлено на имя публичного свойства
+
+                    // Обновление конфигурации при изменении состояния выбора
+                    if (isSelected && !Confing.Default.revitLinks.Contains(this.Name))
+                    {
+                        Confing.Default.revitLinks += this.Name + ";";
+                    }
+                    else
+                    {
+                        Confing.Default.revitLinks = Confing.Default.revitLinks.Replace(this.Name + ";", string.Empty);
+                    }
                     Confing.Default.Save();
                 }
             }
         }
-
     }
 }
