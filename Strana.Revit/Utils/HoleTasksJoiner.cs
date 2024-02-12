@@ -297,8 +297,6 @@ namespace Strana.Revit.HoleTask.Utils
                         ///сдвинуть семейство по оси фУ в верх, от оси и А
                         HoleTaskCreator.MoveFamilyInstance(intersectionPoint, Oa, "Y");
 
-                        intersectionPoint.LookupParameter(":Назначение отверстия").Set(info);
-
 
                         foreach (FamilyInstance forDel in intersectionWallRectangularSolidIntersectCombineList001)
                         {
