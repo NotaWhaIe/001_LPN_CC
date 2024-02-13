@@ -60,18 +60,22 @@
   <ItemGroup>
     <Reference Include="MaterialDesignColors, Version=3.0.0.0, Culture=neutral, PublicKeyToken=df2a72020bd7962a, processorArchitecture=MSIL">
       <HintPath>..\packages\MaterialDesignColors.3.0.0-ci508\lib\net462\MaterialDesignColors.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="MaterialDesignThemes.Wpf, Version=5.0.0.0, Culture=neutral, PublicKeyToken=df2a72020bd7962a, processorArchitecture=MSIL">
       <HintPath>..\packages\MaterialDesignThemes.5.0.0-ci508\lib\net462\MaterialDesignThemes.Wpf.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.Xaml.Behaviors, Version=1.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Xaml.Behaviors.Wpf.1.1.77\lib\net462\Microsoft.Xaml.Behaviors.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="RevitAPI, Version=0.0.51024.449, Culture=neutral">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\Program Files\Autodesk\Revit 2021\RevitAPI.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="RevitAPIIFC">
       <HintPath>..\..\Program Files\Autodesk\Revit 2021\RevitAPIIFC.dll</HintPath>
@@ -80,6 +84,7 @@
     <Reference Include="RevitAPIUI, Version=0.0.51024.449, Culture=neutral">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\Program Files\Autodesk\Revit 2021\RevitAPIUI.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -168,6 +173,7 @@
     <ProjectReference Include="..\GloryHole\GloryHole.csproj">
       <Project>{11f04b26-6601-47a1-be40-c22370664e4b}</Project>
       <Name>GloryHole</Name>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
