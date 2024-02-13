@@ -1,5 +1,4 @@
-﻿using Autodesk.Revit.Creation;
-using Autodesk.Revit.DB;
+﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.DB.Structure;
 using Autodesk.Revit.UI;
@@ -7,6 +6,7 @@ using Autodesk.Revit.UI.Selection;
 using Strana.Revit.HoleTask.Utils;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
@@ -20,41 +20,47 @@ namespace Strana.Revit.HoleTask.RevitCommands
         static AddInId addinId = new AddInId(new Guid("f64706dd-e8f6-4cbe-9cc6-a2910be5ad5a"));
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
-            Autodesk.Revit.DB.Document doc = commandData.Application.ActiveUIDocument.Document;
+            Document doc = commandData.Application.ActiveUIDocument.Document;
 
-            // Список имен вложенных семейств
+            // Имена вложенных семейств
             var nestedFamilyNames = new List<string>
-        {
-            "(Отв_Задание)_Стены_Прямоугольное",
-            "(Отв_Задание)_Перекрытия_Прямоугольное"
-        };
+    {
+        "(Отв_Задание)_Стены_Прямоугольное",
+        "(Отв_Задание)_Перекрытия_Прямоугольное"
+    };
 
-            // Найти все экземпляры вложенных семейств в проекте
-            var nestedInstances = new FilteredElementCollector(doc)
-                .OfClass(typeof(FamilyInstance))
-                .WhereElementIsNotElementType()
-                .Cast<FamilyInstance>()
-                .Where(fi => nestedFamilyNames.Contains(fi.Symbol.FamilyName))
-                .ToList();
-
-            using (Transaction trans = new Transaction(doc, "Размещение копий вложенных семейств"))
+            using (Transaction trans = new Transaction(doc, "Копирование вложенных семейств"))
             {
                 trans.Start();
 
-                foreach (var nestedInstance in nestedInstances)
+                // Поиск всех экземпляров семейств в проекте
+                var allInstances = new FilteredElementCollector(doc)
+                    .OfClass(typeof(FamilyInstance))
+                    .WhereElementIsNotElementType()
+                    .Cast<FamilyInstance>()
+                    .ToList();
+
+                foreach (var instance in allInstances)
                 {
-                    // Получаем местоположение и уровень для каждого экземпляра вложенного семейства
-                    LocationPoint locationPoint = nestedInstance.Location as LocationPoint;
-                    Level level = doc.GetElement(nestedInstance.LevelId) as Level;
+                    // Получение вложенных семейств для каждого экземпляра
+                    var nestedFamilies = instance.GetSubComponentIds().Select(id => doc.GetElement(id) as FamilyInstance);
 
-                    if (locationPoint != null && level != null)
+                    foreach (var nestedInstance in nestedFamilies)
                     {
-                        // Активируем тип семейства, если он не активен
-                        if (!nestedInstance.Symbol.IsActive)
-                            nestedInstance.Symbol.Activate();
+                        // Проверка, соответствует ли вложенное семейство заданным именам
+                        if (nestedInstance != null && nestedFamilyNames.Contains(nestedInstance.Symbol.FamilyName))
+                        {
+                            // Копирование вложенного семейства
+                            LocationPoint locationPoint = nestedInstance.Location as LocationPoint;
+                            if (locationPoint != null)
+                            {
+                                ElementId levelId = nestedInstance.LevelId;
+                                FamilySymbol symbol = nestedInstance.Symbol;
 
-                        // Создаем новый экземпляр семейства в том же месте и на том же уровне
-                        doc.Create.NewFamilyInstance(locationPoint.Point, nestedInstance.Symbol, level, StructuralType.NonStructural);
+                                // Создание копии вложенного семейства
+                                doc.Create.NewFamilyInstance(locationPoint.Point, symbol, doc.GetElement(levelId) as Level, StructuralType.NonStructural);
+                            }
+                        }
                     }
                 }
 
@@ -65,3 +71,4 @@ namespace Strana.Revit.HoleTask.RevitCommands
         }
     }
 }
+
