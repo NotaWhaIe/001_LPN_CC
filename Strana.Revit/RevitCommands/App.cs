@@ -15,16 +15,14 @@ namespace Strana.Revit.HoleTask.RevitCommands
         public Result OnStartup(UIControlledApplication application)
         {
             application.CreateRibbonTab("Strana");
-
             _ = CreateRibbonPanel(application);
-
             return Result.Succeeded;
         }
 
         public RibbonPanel CreateRibbonPanel(UIControlledApplication application, string tabName = "Strana")
         {
             RibbonPanel ribbonPanel = application.CreateRibbonPanel(tabName, "ИОС");
-            AddPushButton(ribbonPanel, "Задание на отверстия", Assembly.GetExecutingAssembly().Location, "Strana.Revit.HoleTask.RevitCommands", "Разместить задания на отверстия");
+            AddPushButton(ribbonPanel, "Задание на отверстия", Assembly.GetExecutingAssembly().Location, "Strana.Revit.HoleTask.RevitCommands.CreateHoleTasks", "Разместить задания на отверстия");
             return ribbonPanel;
         }
 

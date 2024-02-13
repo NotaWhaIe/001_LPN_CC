@@ -1,4 +1,6 @@
 ﻿using Autodesk.Revit.DB;
+using MaterialDesignColors;
+using MaterialDesignThemes.Wpf;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +27,8 @@ namespace Strana.Revit.HoleTask.ViewModel
         public HoleTaskView(Document doc)
         {
             this.DataContext = new HoleTaskViewModel(doc);
+            ColorZoneAssist.SetMode(new CheckBox(), ColorZoneMode.Dark);
+            Hue hue = new Hue("xyz", System.Windows.Media.Color.FromArgb(1, 2, 3, 4), System.Windows.Media.Color.FromArgb(1, 5, 6, 7));
             InitializeComponent();
         }
 
