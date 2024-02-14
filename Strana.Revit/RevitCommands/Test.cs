@@ -22,7 +22,6 @@ namespace Strana.Revit.HoleTask.RevitCommands
         {
             Document doc = commandData.Application.ActiveUIDocument.Document;
 
-            // Имена вложенных семейств
             var nestedFamilyNames = new List<string>
     {
         "(Отв_Задание)_Стены_Прямоугольное",
@@ -33,7 +32,6 @@ namespace Strana.Revit.HoleTask.RevitCommands
             {
                 trans.Start();
 
-                // Поиск всех экземпляров семейств в проекте
                 var allInstances = new FilteredElementCollector(doc)
                     .OfClass(typeof(FamilyInstance))
                     .WhereElementIsNotElementType()
@@ -42,23 +40,24 @@ namespace Strana.Revit.HoleTask.RevitCommands
 
                 foreach (var instance in allInstances)
                 {
-                    // Получение вложенных семейств для каждого экземпляра
-                    var nestedFamilies = instance.GetSubComponentIds().Select(id => doc.GetElement(id) as FamilyInstance);
-
-                    foreach (var nestedInstance in nestedFamilies)
+                    var dependentIds = instance.GetSubComponentIds();
+                    foreach (ElementId id in dependentIds)
                     {
-                        // Проверка, соответствует ли вложенное семейство заданным именам
+                        FamilyInstance nestedInstance = doc.GetElement(id) as FamilyInstance;
                         if (nestedInstance != null && nestedFamilyNames.Contains(nestedInstance.Symbol.FamilyName))
                         {
-                            // Копирование вложенного семейства
+                            // Активируем символ семейства, если он не активен
+                            if (!nestedInstance.Symbol.IsActive)
+                            {
+                                nestedInstance.Symbol.Activate();
+                                doc.Regenerate();
+                            }
+
                             LocationPoint locationPoint = nestedInstance.Location as LocationPoint;
                             if (locationPoint != null)
                             {
-                                ElementId levelId = nestedInstance.LevelId;
-                                FamilySymbol symbol = nestedInstance.Symbol;
-
-                                // Создание копии вложенного семейства
-                                doc.Create.NewFamilyInstance(locationPoint.Point, symbol, doc.GetElement(levelId) as Level, StructuralType.NonStructural);
+                                // Создание копии вложенного семейства в той же точке
+                                doc.Create.NewFamilyInstance(locationPoint.Point, nestedInstance.Symbol, StructuralType.NonStructural);
                             }
                         }
                     }

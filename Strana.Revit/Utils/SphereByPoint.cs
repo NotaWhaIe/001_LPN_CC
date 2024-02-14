@@ -16,7 +16,7 @@ namespace Strana.Revit.HoleTask.Utils
         /// </summary>
         /// <param name="doc"><seealso cref="Document"/></param>
         /// <param name="center"><seealso cref="XYZ"/></param>
-        public static void CreateSphereByPoint(XYZ center/*, double diameter*/)
+        public static void CreateSphereByPoint(XYZ center, Document doc)
         {
 
             List<Curve> profile = [];
@@ -41,7 +41,7 @@ namespace Strana.Revit.HoleTask.Utils
                 //using (Transaction t = new(doc, "create SphereByPoint"))
                 //{
                 //t.Start();
-                DirectShape ds = DirectShape.CreateElement(Docsaver.doc, new ElementId(BuiltInCategory.OST_Furniture));
+                DirectShape ds = DirectShape.CreateElement(doc, new ElementId(BuiltInCategory.OST_Furniture));
                 ds.ApplicationId = "Application id";
                 ds.ApplicationDataId = "Geometry object id";
                 ds.SetShape(new GeometryObject[] { sphere });

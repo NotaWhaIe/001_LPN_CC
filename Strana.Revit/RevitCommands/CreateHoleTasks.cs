@@ -23,7 +23,7 @@ namespace Strana.Revit.HoleTask.RevitCommands
 
             UIDocument uidoc = commandData.Application.ActiveUIDocument;
             Document doc = uidoc.Document;
-            Docsaver.doc = doc;
+            docsaver.doc = doc;
 
             HoleTaskView taskView = new(doc);
             taskView.ShowDialog();
@@ -76,7 +76,7 @@ namespace Strana.Revit.HoleTask.RevitCommands
         }
     }
 
-    public static class Docsaver
+    public static class docsaver
     {
         public static Document doc { get; set; }
     }
