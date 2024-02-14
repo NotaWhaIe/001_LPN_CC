@@ -28,7 +28,19 @@ namespace Strana.Revit.HoleTask.RevitCommands
         "(Отв_Задание)_Перекрытия_Прямоугольное"
     };
 
-            using (Transaction trans = new Transaction(doc, "Копирование вложенных семейств"))
+            // Находим уровень с elevation = 0.0
+            Level baseLevel = new FilteredElementCollector(doc)
+                .OfClass(typeof(Level))
+                .Cast<Level>()
+                .FirstOrDefault(l => Math.Abs(l.Elevation - 0.0) < 0.0001); // Используем небольшую погрешность для сравнения
+
+            if (baseLevel == null)
+            {
+                message = "Не найден уровень с elevation = 0.0";
+                return Result.Failed;
+            }
+
+            using (Transaction trans = new Transaction(doc, "Копирование вложенных семейств с назначением базового уровня"))
             {
                 trans.Start();
 
@@ -46,7 +58,6 @@ namespace Strana.Revit.HoleTask.RevitCommands
                         FamilyInstance nestedInstance = doc.GetElement(id) as FamilyInstance;
                         if (nestedInstance != null && nestedFamilyNames.Contains(nestedInstance.Symbol.FamilyName))
                         {
-                            // Активируем символ семейства, если он не активен
                             if (!nestedInstance.Symbol.IsActive)
                             {
                                 nestedInstance.Symbol.Activate();
@@ -56,8 +67,8 @@ namespace Strana.Revit.HoleTask.RevitCommands
                             LocationPoint locationPoint = nestedInstance.Location as LocationPoint;
                             if (locationPoint != null)
                             {
-                                // Создание копии вложенного семейства в той же точке
-                                doc.Create.NewFamilyInstance(locationPoint.Point, nestedInstance.Symbol, StructuralType.NonStructural);
+                                // Создаем новый экземпляр семейства с назначением базового уровня
+                                doc.Create.NewFamilyInstance(locationPoint.Point, nestedInstance.Symbol, baseLevel, StructuralType.NonStructural);
                             }
                         }
                     }
