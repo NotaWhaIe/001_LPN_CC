@@ -28,21 +28,15 @@ namespace Strana.Revit.HoleTask.RevitCommands
         "(Отв_Задание)_Перекрытия_Прямоугольное"
     };
 
-            // Находим уровень с elevation = 0.0
-            Level baseLevel = new FilteredElementCollector(doc)
-                .OfClass(typeof(Level))
-                .Cast<Level>()
-                .FirstOrDefault(l => Math.Abs(l.Elevation - 0.0) < 0.0001); // Используем небольшую погрешность для сравнения
-
-            if (baseLevel == null)
-            {
-                message = "Не найден уровень с elevation = 0.0";
-                return Result.Failed;
-            }
-
-            using (Transaction trans = new Transaction(doc, "Копирование вложенных семейств с назначением базового уровня"))
+            using (Transaction trans = new Transaction(doc, "Копирование вложенных семейств с условным назначением уровня"))
             {
                 trans.Start();
+
+                List<Level> levels = new FilteredElementCollector(doc)
+                    .OfClass(typeof(Level))
+                    .Cast<Level>()
+                    .OrderBy(l => l.Elevation)
+                    .ToList();
 
                 var allInstances = new FilteredElementCollector(doc)
                     .OfClass(typeof(FamilyInstance))
@@ -67,8 +61,26 @@ namespace Strana.Revit.HoleTask.RevitCommands
                             LocationPoint locationPoint = nestedInstance.Location as LocationPoint;
                             if (locationPoint != null)
                             {
-                                // Создаем новый экземпляр семейства с назначением базового уровня
-                                doc.Create.NewFamilyInstance(locationPoint.Point, nestedInstance.Symbol, baseLevel, StructuralType.NonStructural);
+                                Level closestLevelBelow = levels.LastOrDefault(l => l.Elevation < locationPoint.Point.Z);
+                                Level closestLevelAbove = levels.FirstOrDefault(l => l.Elevation > locationPoint.Point.Z);
+
+                                // Определяем, какой уровень использовать
+                                Level chosenLevel = closestLevelBelow ?? closestLevelAbove;
+
+                                if (chosenLevel != null)
+                                {
+                                    // Вычисляем смещение от выбранного уровня
+                                    double offset = locationPoint.Point.Z - chosenLevel.Elevation;
+
+                                    // Создаем новый экземпляр семейства с назначением уровня и записываем смещение
+                                    FamilyInstance newInstance = doc.Create.NewFamilyInstance(locationPoint.Point, nestedInstance.Symbol, chosenLevel, StructuralType.NonStructural);
+
+                                    Parameter elevationParam = newInstance.get_Parameter(BuiltInParameter.INSTANCE_ELEVATION_PARAM);
+                                    if (elevationParam != null && elevationParam.IsReadOnly == false)
+                                    {
+                                        elevationParam.Set(offset);
+                                    }
+                                }
                             }
                         }
                     }
