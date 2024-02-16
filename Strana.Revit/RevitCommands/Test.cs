@@ -3,6 +3,7 @@ using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.DB.Structure;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
+using FirstRevitPlugin.FailuresProcessing;
 using Strana.Revit.HoleTask.Utils;
 using System;
 using System.Collections.Generic;
@@ -31,6 +32,7 @@ namespace Strana.Revit.HoleTask.RevitCommands
             using (Transaction trans = new Transaction(doc, "Копирование вложенных семейств с параметрами"))
             {
                 trans.Start();
+                TransactionHandler.SetWarningResolver(trans);
 
                 var levels = new FilteredElementCollector(doc)
                     .OfClass(typeof(Level))
