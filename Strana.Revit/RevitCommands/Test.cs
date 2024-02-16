@@ -23,16 +23,16 @@ namespace Strana.Revit.HoleTask.RevitCommands
             Document doc = commandData.Application.ActiveUIDocument.Document;
 
             var nestedFamilyNames = new List<string>
-    {
-        "(Отв_Задание)_Стены_Прямоугольное",
-        "(Отв_Задание)_Перекрытия_Прямоугольное"
-    };
+            {
+                "(Отв_Задание)_Стены_Прямоугольное",
+                "(Отв_Задание)_Перекрытия_Прямоугольное"
+            };
 
-            using (Transaction trans = new Transaction(doc, "Копирование вложенных семейств с условным назначением уровня"))
+            using (Transaction trans = new Transaction(doc, "Копирование вложенных семейств с параметрами"))
             {
                 trans.Start();
 
-                List<Level> levels = new FilteredElementCollector(doc)
+                var levels = new FilteredElementCollector(doc)
                     .OfClass(typeof(Level))
                     .Cast<Level>()
                     .OrderBy(l => l.Elevation)
@@ -52,34 +52,18 @@ namespace Strana.Revit.HoleTask.RevitCommands
                         FamilyInstance nestedInstance = doc.GetElement(id) as FamilyInstance;
                         if (nestedInstance != null && nestedFamilyNames.Contains(nestedInstance.Symbol.FamilyName))
                         {
-                            if (!nestedInstance.Symbol.IsActive)
-                            {
-                                nestedInstance.Symbol.Activate();
-                                doc.Regenerate();
-                            }
-
                             LocationPoint locationPoint = nestedInstance.Location as LocationPoint;
                             if (locationPoint != null)
                             {
-                                Level closestLevelBelow = levels.LastOrDefault(l => l.Elevation < locationPoint.Point.Z);
-                                Level closestLevelAbove = levels.FirstOrDefault(l => l.Elevation > locationPoint.Point.Z);
-
-                                // Определяем, какой уровень использовать
-                                Level chosenLevel = closestLevelBelow ?? closestLevelAbove;
+                                Level chosenLevel = ChooseLevel(levels, locationPoint.Point.Z);
 
                                 if (chosenLevel != null)
                                 {
-                                    // Вычисляем смещение от выбранного уровня
                                     double offset = locationPoint.Point.Z - chosenLevel.Elevation;
+                                    FamilyInstance newInstance = CreateFamilyInstanceWithLevel(doc, nestedInstance, locationPoint.Point, chosenLevel, offset);
 
-                                    // Создаем новый экземпляр семейства с назначением уровня и записываем смещение
-                                    FamilyInstance newInstance = doc.Create.NewFamilyInstance(locationPoint.Point, nestedInstance.Symbol, chosenLevel, StructuralType.NonStructural);
-
-                                    Parameter elevationParam = newInstance.get_Parameter(BuiltInParameter.INSTANCE_ELEVATION_PARAM);
-                                    if (elevationParam != null && elevationParam.IsReadOnly == false)
-                                    {
-                                        elevationParam.Set(offset);
-                                    }
+                                    // Копирование значений параметров
+                                    CopyParameters(nestedInstance, newInstance);
                                 }
                             }
                         }
@@ -90,6 +74,44 @@ namespace Strana.Revit.HoleTask.RevitCommands
             }
 
             return Result.Succeeded;
+        }
+
+        private Level ChooseLevel(List<Level> levels, double zPoint)
+        {
+            Level closestLevelBelow = levels.LastOrDefault(l => l.Elevation < zPoint);
+            Level closestLevelAbove = levels.FirstOrDefault(l => l.Elevation > zPoint);
+            return closestLevelBelow ?? closestLevelAbove;
+        }
+
+        private FamilyInstance CreateFamilyInstanceWithLevel(Document doc, FamilyInstance originalInstance, XYZ point, Level level, double offset)
+        {
+            FamilySymbol symbol = originalInstance.Symbol;
+            FamilyInstance newInstance = doc.Create.NewFamilyInstance(point, symbol, level, StructuralType.NonStructural);
+            Parameter elevationParam = newInstance.get_Parameter(BuiltInParameter.INSTANCE_ELEVATION_PARAM);
+            if (elevationParam != null && elevationParam.IsReadOnly == false)
+            {
+                elevationParam.Set(offset);
+            }
+            return newInstance;
+        }
+
+        private void CopyParameters(FamilyInstance originalInstance, FamilyInstance newInstance)
+        {
+            var parameterNames = new List<string> { "Глубина", "Ширина", "Высота" };
+
+            foreach (string paramName in parameterNames)
+            {
+                Parameter originalParam = originalInstance.LookupParameter(paramName);
+                Parameter newParam = newInstance.LookupParameter(paramName);
+
+                // Проверяем, существуют ли параметры и не является ли параметр нового экземпляра только для чтения
+                if (originalParam != null && newParam != null && !newParam.IsReadOnly)
+                {
+                    // Копируем значение из оригинального экземпляра в новый
+                    double value = originalParam.AsDouble();
+                    newParam.Set(value);
+                }
+            }
         }
     }
 }
