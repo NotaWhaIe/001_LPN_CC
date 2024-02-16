@@ -8,6 +8,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Controls;
 using Autodesk.Revit.DB;
+using FirstRevitPlugin.FailuresProcessing;
 using Strana.Revit.HoleTask.ElementCollections;
 using Strana.Revit.HoleTask.Extensions.RevitElement;
 using Strana.Revit.HoleTask.Utils;
@@ -20,6 +21,8 @@ namespace Strana.Revit.HoleTask.Extensions
         {
             using (var t = new Transaction(linkInstance.Document, "Create all instances of hole task"))
             {
+                TransactionHandler.SetWarningResolver(t);
+
                 t.Start();
                 Document linkDoc = linkInstance.GetLinkDocument();
                 Document doc = linkInstance.Document;

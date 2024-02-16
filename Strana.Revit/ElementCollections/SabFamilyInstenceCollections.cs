@@ -1,27 +1,20 @@
-﻿using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.Mechanical;
-using Autodesk.Revit.DB.Structure;
+﻿using Autodesk.Revit.DB.Structure;
+using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using Autodesk.Revit.UI.Selection;
 using FirstRevitPlugin.FailuresProcessing;
-using Strana.Revit.HoleTask.Utils;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Net;
-using System.Security.Cryptography;
-//using Autodesk.DesignScript.Geometry;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Strana.Revit.HoleTask.RevitCommands
+namespace Strana.Revit.HoleTask.ElementCollections
 {
-    [Autodesk.Revit.Attributes.TransactionAttribute(Autodesk.Revit.Attributes.TransactionMode.Manual)]
-    public class Test : IExternalCommand
+    public class SabFamilyInstenceCollections
     {
-        static AddInId addinId = new AddInId(new Guid("f64706dd-e8f6-4cbe-9cc6-a2910be5ad5a"));
-        public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
+        public static void GetFamilyInstenceCollections(Document doc)
         {
-            Document doc = commandData.Application.ActiveUIDocument.Document;
+            //Document doc = commandData.Application.ActiveUIDocument.Document;
 
             var nestedFamilyNames = new List<string>
             {
@@ -35,10 +28,10 @@ namespace Strana.Revit.HoleTask.RevitCommands
                 trans.Start();
 
                 var levels = new FilteredElementCollector(doc)
-                    .OfClass(typeof(Level))
-                    .Cast<Level>()
-                    .OrderBy(l => l.Elevation)
-                    .ToList();
+                .OfClass(typeof(Level))
+                .Cast<Level>()
+                .OrderBy(l => l.Elevation)
+                .ToList();
 
                 var allInstances = new FilteredElementCollector(doc)
                     .OfClass(typeof(FamilyInstance))
@@ -62,10 +55,14 @@ namespace Strana.Revit.HoleTask.RevitCommands
                                 if (chosenLevel != null)
                                 {
                                     double offset = locationPoint.Point.Z - chosenLevel.Elevation;
-                                    FamilyInstance newInstance = CreateFamilyInstanceWithLevel(doc, nestedInstance, locationPoint.Point, chosenLevel, offset);
 
-                                    // Копирование значений параметров
-                                    CopyParameters(nestedInstance, newInstance);
+
+                                    if (!DoesParentFamilyInstanceExistAtLocation(doc,locationPoint.Point, nestedFamilyNames))
+                                    {
+                                        FamilyInstance newInstance = CreateFamilyInstanceWithLevel(doc, nestedInstance, locationPoint.Point, chosenLevel, offset);
+                                        // Копирование значений параметров
+                                        CopyParameters(nestedInstance, newInstance);
+                                    }
                                 }
                             }
                         }
@@ -75,17 +72,15 @@ namespace Strana.Revit.HoleTask.RevitCommands
                 trans.Commit();
             }
 
-            return Result.Succeeded;
         }
-
-        private Level ChooseLevel(List<Level> levels, double zPoint)
+        public static Level ChooseLevel(List<Level> levels, double zPoint)
         {
             Level closestLevelBelow = levels.LastOrDefault(l => l.Elevation < zPoint);
             Level closestLevelAbove = levels.FirstOrDefault(l => l.Elevation > zPoint);
             return closestLevelBelow ?? closestLevelAbove;
         }
 
-        private FamilyInstance CreateFamilyInstanceWithLevel(Document doc, FamilyInstance originalInstance, XYZ point, Level level, double offset)
+        public static FamilyInstance CreateFamilyInstanceWithLevel(Document doc, FamilyInstance originalInstance, XYZ point, Level level, double offset)
         {
             FamilySymbol symbol = originalInstance.Symbol;
             FamilyInstance newInstance = doc.Create.NewFamilyInstance(point, symbol, level, StructuralType.NonStructural);
@@ -97,7 +92,28 @@ namespace Strana.Revit.HoleTask.RevitCommands
             return newInstance;
         }
 
-        private void CopyParameters(FamilyInstance originalInstance, FamilyInstance newInstance)
+        private static bool DoesParentFamilyInstanceExistAtLocation(Document doc, XYZ location, List<string> familyNames)
+        {
+            const double tolerance = 0.01; // Небольшой допуск для сравнения координат, около 3 мм
+
+            foreach (FamilyInstance fi in new FilteredElementCollector(doc)
+                                                .OfClass(typeof(FamilyInstance))
+                                                .WhereElementIsNotElementType()
+                                                .Cast<FamilyInstance>()
+                                                .Where(fi => familyNames.Contains(fi.Symbol.Family.Name)))
+            {
+                XYZ existingLocation = (fi.Location as LocationPoint)?.Point;
+
+                if (existingLocation != null && existingLocation.IsAlmostEqualTo(location, tolerance))
+                {
+                    return true; // Найден существующий экземпляр родительского семейства в заданных координатах
+                }
+            }
+
+            return false; // Родительское семейство в заданных координатах не найдено
+        }
+
+        public static void CopyParameters(FamilyInstance originalInstance, FamilyInstance newInstance)
         {
             var parameterNames = new List<string> { "Глубина", "Ширина", "Высота" };
 

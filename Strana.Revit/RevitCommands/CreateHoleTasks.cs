@@ -35,6 +35,8 @@ namespace Strana.Revit.HoleTask.RevitCommands
                 {
                     gt.Start();
 
+                    SabFamilyInstenceCollections.GetFamilyInstenceCollections(doc);
+
                     // Получаем ViewModel из DataContext
                     var viewModel = taskView.DataContext as HoleTaskViewModel;
                     if (viewModel != null)
@@ -63,6 +65,7 @@ namespace Strana.Revit.HoleTask.RevitCommands
                                 linkInstance.CreateHoleTasksByCurrentLink();
                             }
                         }
+
                     }
                     gt.Assimilate();
                 }
