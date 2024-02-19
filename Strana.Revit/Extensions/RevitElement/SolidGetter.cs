@@ -200,21 +200,5 @@ namespace Strana.Revit.HoleTask.Extension.RevitElement
             CurveLoop edgeMinCurvesLoop = CurveLoop.Create(curve);
             return edgeMinCurvesLoop;
         }
-        //private static CurveLoop GetSweepPath(Solid solid)
-        //{
-        //    Edge edgeMin = null;
-        //    var edges = solid.Edges;
-        //    foreach (Edge solidEdge in edges)
-        //    {
-        //        if (edgeMin == null || edgeMin.AsCurve().Length > solidEdge.AsCurve().Length)
-        //        {
-        //            edgeMin = solidEdge;
-        //        }
-        //    }
-
-        //    List<Curve> curve = [edgeMin?.AsCurve() ?? null];
-        //    CurveLoop edgeMinCurvesLoop = CurveLoop.Create(curve);
-        //    return edgeMinCurvesLoop;
-        //}
     }
 }

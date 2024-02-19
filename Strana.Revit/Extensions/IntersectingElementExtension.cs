@@ -38,9 +38,6 @@ namespace Strana.Revit.HoleTask.Extensions
                 Document linkDoc = linkInstance.GetLinkDocument();
 
                 IEnumerable<Element> mepElements = MepElementCollections.AllMepElementsByBBox(doc, intersectingElement, linkInstance.GetTotalTransform());
-                /// For test with only one pipe/duct/cable tray
-                //if (intersectingElement.Id.IntegerValue == 4040632)
-                //{
                 Solid floorWallSolid = intersectingElement.GetSolidWithoutHoles(linkInstance);
                 foreach (Element mepElement in mepElements)
                 {

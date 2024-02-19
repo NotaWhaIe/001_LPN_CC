@@ -8,6 +8,7 @@ using Autodesk.Revit.UI;
 using Strana.Revit.HoleTask.ElementCollections;
 using Strana.Revit.HoleTask.Extension.RevitElement;
 using Strana.Revit.HoleTask.Extensions;
+using Strana.Revit.HoleTask.Extensions.RevitElement;
 using Strana.Revit.HoleTask.Utils;
 using Strana.Revit.HoleTask.ViewModel;
 

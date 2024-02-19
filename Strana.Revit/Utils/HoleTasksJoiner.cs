@@ -39,12 +39,20 @@ namespace Strana.Revit.HoleTask.Utils
                 FamilySymbol holeFamilySymbol;
 
 
-                List<FamilyInstance> intersectionWallRectangularCombineList01 = allFamilyInstances00
-                    .Where(fi => fi.Name.ToString() == "(Отв_Задание)_Стены_Прямоугольное")
-                    .ToList();
-                List<FamilyInstance> intersectionFloorRectangularCombineList02 = allFamilyInstances00
-                    .Where(fi => fi.Name.ToString() == "(Отв_Задание)_Перекрытия_Прямоугольное")
-                    .ToList();
+                //List<FamilyInstance> intersectionWallRectangularCombineList01 = allFamilyInstances00
+                //      .Where(fi => fi.Symbol.FamilyName == "(Отв_Задание)_Стены_Прямоугольное" && !fi.GetSubComponentIds().Any())
+                //      .ToList();
+
+                //List<FamilyInstance> intersectionFloorRectangularCombineList02 = allFamilyInstances00
+                //    .Where(fi => fi.Symbol.FamilyName == "(Отв_Задание)_Перекрытия_Прямоугольное" && !fi.GetSubComponentIds().Any())
+                //    .ToList();
+
+                List<FamilyInstance> intersectionWallRectangularCombineList01 = new();
+                List<FamilyInstance> intersectionFloorRectangularCombineList02 = new();
+                HoleTasksGetter.AddFamilyInstancesToList(doc, "(Отв_Задание)_Стены_Прямоугольное", intersectionWallRectangularCombineList01);
+                HoleTasksGetter.AddFamilyInstancesToList(doc, "(Отв_Задание)_Перекрытия_Прямоугольное", intersectionFloorRectangularCombineList02);
+
+
 
                 Options opt = new();
                 opt.ComputeReferences = true;
@@ -300,8 +308,17 @@ namespace Strana.Revit.HoleTask.Utils
 
                         foreach (FamilyInstance forDel in intersectionWallRectangularSolidIntersectCombineList001)
                         {
+
+                            try
+                            {
                             doc.Delete(forDel.Id);
                             intersectionWallRectangularCombineList01.Remove(forDel);
+
+                            }
+                            catch (Exception)
+                            {
+
+                            }
                         }
                     }
                     else
@@ -545,8 +562,16 @@ namespace Strana.Revit.HoleTask.Utils
 
                         foreach (FamilyInstance forDel in intersectionFloorRectangularSolidIntersectCombineList002)
                         {
+                            try
+                            {
+
                             doc.Delete(forDel.Id);
                             intersectionFloorRectangularCombineList02.Remove(forDel);
+                            }
+                            catch (Exception)
+                            {
+
+                            }
                         }
                     }
                     else

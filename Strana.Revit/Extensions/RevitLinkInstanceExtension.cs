@@ -29,7 +29,7 @@ namespace Strana.Revit.HoleTask.Extensions
                 List<FamilyInstance> allHoleTaskByRevitLinkInstance = new();
                 HoleTasksGetter.AddFamilyInstancesToList(doc, "(Отв_Задание)_Стены_Прямоугольное", allHoleTaskByRevitLinkInstance);
                 HoleTasksGetter.AddFamilyInstancesToList(doc, "(Отв_Задание)_Перекрытия_Прямоугольное", allHoleTaskByRevitLinkInstance);
-
+                double debag = allHoleTaskByRevitLinkInstance.Count;
 
                 /// Take walls and floors
                 IEnumerable<Element> allIntersectingElements = CollectionsOfIntersectingElements.AllIntersectingElements(linkDoc);

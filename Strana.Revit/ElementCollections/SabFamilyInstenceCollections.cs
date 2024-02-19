@@ -57,7 +57,7 @@ namespace Strana.Revit.HoleTask.ElementCollections
                                     double offset = locationPoint.Point.Z - chosenLevel.Elevation;
 
 
-                                    if (!DoesParentFamilyInstanceExistAtLocation(doc,locationPoint.Point, nestedFamilyNames))
+                                    if (CanPlaceFamilyInstanceAtLocation(doc,locationPoint.Point, nestedFamilyNames))
                                     {
                                         FamilyInstance newInstance = CreateFamilyInstanceWithLevel(doc, nestedInstance, locationPoint.Point, chosenLevel, offset);
                                         // Копирование значений параметров
@@ -92,26 +92,43 @@ namespace Strana.Revit.HoleTask.ElementCollections
             return newInstance;
         }
 
-        private static bool DoesParentFamilyInstanceExistAtLocation(Document doc, XYZ location, List<string> familyNames)
+        public static bool CanPlaceFamilyInstanceAtLocation(Document doc, XYZ location, List<string> familyNames)
         {
-            const double tolerance = 0.01; // Небольшой допуск для сравнения координат, около 3 мм
+            const double tolerance = 0.01; // Небольшой допуск для сравнения координат
 
-            foreach (FamilyInstance fi in new FilteredElementCollector(doc)
-                                                .OfClass(typeof(FamilyInstance))
-                                                .WhereElementIsNotElementType()
-                                                .Cast<FamilyInstance>()
-                                                .Where(fi => familyNames.Contains(fi.Symbol.Family.Name)))
+            // Собираем все экземпляры семейств, которые не являются типами элементов
+            var collector = new FilteredElementCollector(doc)
+                .OfClass(typeof(FamilyInstance))
+                .WhereElementIsNotElementType()
+                .Cast<FamilyInstance>();
+
+            foreach (FamilyInstance fi in collector)
             {
                 XYZ existingLocation = (fi.Location as LocationPoint)?.Point;
 
+                // Проверяем, находится ли экземпляр семейства в заданных координатах с учетом допуска
                 if (existingLocation != null && existingLocation.IsAlmostEqualTo(location, tolerance))
                 {
-                    return true; // Найден существующий экземпляр родительского семейства в заданных координатах
+                    // Проверяем, соответствует ли имя семейства заданным именам и является ли семейство родительским
+                    if (familyNames.Contains(fi.Symbol.Family.Name) && fi.SuperComponent == null)
+                    {
+                        // Проверяем, имеет ли семейство вложенные компоненты
+                        var subComponentIds = fi.GetSubComponentIds();
+                        if (!subComponentIds.Any())
+                        {
+                            // Если у семейства нет вложенных компонентов, возвращаем false, 
+                            // т.к. семейство уже существует в заданных координатах
+                            return false;
+                        }
+                    }
                 }
             }
 
-            return false; // Родительское семейство в заданных координатах не найдено
+            // Если в указанных координатах нет семейства с заданным именем и без вложенных компонентов, возвращаем true
+            return true;
         }
+
+
 
         public static void CopyParameters(FamilyInstance originalInstance, FamilyInstance newInstance)
         {
