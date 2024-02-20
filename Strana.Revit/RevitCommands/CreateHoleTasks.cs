@@ -25,9 +25,12 @@ namespace Strana.Revit.HoleTask.RevitCommands
             UIDocument uidoc = commandData.Application.ActiveUIDocument;
             Document doc = uidoc.Document;
             docsaver.doc = doc;
+            string userName = commandData.Application.Application.Username;
+
 
             HoleTaskView taskView = new(doc);
             taskView.ShowDialog();
+
 
             // Проверка состояния выполнения после закрытия окна
             if (taskView.ShouldExecuteProgram)

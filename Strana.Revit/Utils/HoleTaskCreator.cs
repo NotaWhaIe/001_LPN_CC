@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Structure;
@@ -138,9 +139,14 @@ namespace Strana.Revit.HoleTask.Utils
                 double Oa = UnitUtils.ConvertToInternalUnits(delta.deltaGridLetter, UnitTypeId.Millimeters);
                 MoveFamilyInstance(holeTask, Oa, "Y");
 
+                string section = ExtractSectionNameOrFileNameWithoutExtension(doc.Title.ToString());
+                GlobalParameters.SectionName = section;
+                string linkName = EditFileNameWithoutExtension(linkInstance.Name.ToString());
+                GlobalParameters.LinkInfo = linkName;
 
-                holeTask.LookupParameter(":Назначение отверстия").Set(linkInstance.Name.ToString());
-                GlobalParameters.LinkInfo = linkInstance.Name.ToString();
+                holeTask.LookupParameter(":Назначение отверстия").Set(section);
+                holeTask.LookupParameter(":Примечание").Set(linkName);
+                holeTask.get_Parameter(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS).Set(GlobalParameters.Date);
 
                 return holeTask;
             }
@@ -148,6 +154,44 @@ namespace Strana.Revit.HoleTask.Utils
             {
                 return null;
             }
+        }
+        public static string ExtractSectionNameOrFileNameWithoutExtension(string fileName)
+        {
+            // Проверка на null или пустую строку
+            if (string.IsNullOrWhiteSpace(fileName))
+            {
+                return string.Empty;
+            }
+
+            // Разделение имени файла по символу '_'
+            string[] parts = fileName.Split('_');
+
+            // Если частей достаточно для извлечения имени раздела
+            if (parts.Length > 2)
+            {
+                // Возвращаем третью часть (если считать, что первая часть имеет индекс 0)
+                return parts[2];
+            }
+            else
+            {
+                // Если частей недостаточно, возвращаем имя файла без расширения
+                return Path.GetFileNameWithoutExtension(fileName);
+            }
+        }
+        public static string EditFileNameWithoutExtension(string fullFileName)
+        {
+            // Находим индекс окончания названия файла до расширения ".rvt"
+            int index = fullFileName.IndexOf(".rvt");
+
+            // Если индекс найден, возвращаем подстроку до ".rvt", не включая само расширение
+            if (index != -1)
+            {
+                return fullFileName.Substring(0, index);
+            }
+
+            // В случае, если ".rvt" не найдено, возвращаем исходную строку
+            // Можно добавить логику обработки ошибки или вернуть null, если предполагается, что строка всегда должна содержать ".rvt"
+            return fullFileName;
         }
         public static void MoveFamilyInstance(FamilyInstance familyInstance, double distanceInFeet, string direction)
         {
@@ -199,7 +243,6 @@ namespace Strana.Revit.HoleTask.Utils
             return false; // Экземпляр в заданных координатах не найден
         }
 
-        /// Перегрузка, проверка по габаритным размерам
         private bool DoesFamilyInstanceExistAtLocation(XYZ location, double roundHTThickness, double roundHTWidth, double roundHTHeight)
         {
             const double tolerance = 0.01; // Небольшой допуск для сравнения координат, около 3 мм

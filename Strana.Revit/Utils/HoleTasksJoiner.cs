@@ -305,7 +305,10 @@ namespace Strana.Revit.HoleTask.Utils
                         ///сдвинуть семейство по оси фУ в верх, от оси и А
                         HoleTaskCreator.MoveFamilyInstance(intersectionPoint, Oa, "Y");
 
-                        intersectionPoint.LookupParameter(":Назначение отверстия").Set(GlobalParameters.LinkInfo);
+                        intersectionPoint.LookupParameter(":Назначение отверстия").Set(GlobalParameters.SectionName);
+                        intersectionPoint.LookupParameter(":Примечание").Set(GlobalParameters.LinkInfo);
+                        intersectionPoint.get_Parameter(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS).Set(GlobalParameters.Date);
+
 
                         foreach (FamilyInstance forDel in intersectionWallRectangularSolidIntersectCombineList001)
                         {
@@ -561,7 +564,9 @@ namespace Strana.Revit.HoleTask.Utils
                         ///сдвинуть семейство по оси У в верх, от оси и А
                         HoleTaskCreator.MoveFamilyInstance(intersectionPoint, Oa, "Y");
 
-                        intersectionPoint.LookupParameter(":Назначение отверстия").Set(GlobalParameters.LinkInfo);
+                        intersectionPoint.LookupParameter(":Назначение отверстия").Set(GlobalParameters.SectionName);
+                        intersectionPoint.LookupParameter(":Примечание").Set(GlobalParameters.LinkInfo);
+                        intersectionPoint.get_Parameter(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS).Set(GlobalParameters.Date);
 
 
                         foreach (FamilyInstance forDel in intersectionFloorRectangularSolidIntersectCombineList002)
