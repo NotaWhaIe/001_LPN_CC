@@ -7,6 +7,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Strana.Revit.HoleTask.Utils;
+using System.Windows.Media.Media3D;
+using System.Windows;
 
 namespace Strana.Revit.HoleTask.ElementCollections
 {
@@ -48,6 +51,7 @@ namespace Strana.Revit.HoleTask.ElementCollections
                         if (nestedInstance != null && nestedFamilyNames.Contains(nestedInstance.Symbol.FamilyName))
                         {
                             LocationPoint locationPoint = nestedInstance.Location as LocationPoint;
+
                             if (locationPoint != null)
                             {
                                 Level chosenLevel = ChooseLevel(levels, locationPoint.Point.Z);
@@ -57,17 +61,30 @@ namespace Strana.Revit.HoleTask.ElementCollections
                                     double offset = locationPoint.Point.Z - chosenLevel.Elevation;
 
 
-                                    if (CanPlaceFamilyInstanceAtLocation(doc,locationPoint.Point, nestedFamilyNames))
+                                    if (CanPlaceFamilyInstanceAtLocation(doc, locationPoint.Point, nestedFamilyNames))
                                     {
                                         FamilyInstance newInstance = CreateFamilyInstanceWithLevel(doc, nestedInstance, locationPoint.Point, chosenLevel, offset);
                                         // Копирование значений параметров
                                         CopyParameters(nestedInstance, newInstance);
+
+                                        double thickness = nestedInstance.LookupParameter("Ширина").AsDouble();
+                                        double width = nestedInstance.LookupParameter("Глубина").AsDouble();
+
+                                        HoleTaskGridDelta delta = GridRoundUpDimension.DeltaHoleTaskToGrids(doc, locationPoint.Point, thickness, width, 0);
+                                        double O1 = UnitUtils.ConvertToInternalUnits(delta.DeltaGridNumber, UnitTypeId.Millimeters);
+                                        double Oa = UnitUtils.ConvertToInternalUnits(delta.deltaGridLetter, UnitTypeId.Millimeters);
+                                        HoleTaskCreator.MoveFamilyInstance(newInstance, O1, "X");
+                                        ///сдвинуть семейство по оси фУ в верх, от оси и А
+                                        HoleTaskCreator.MoveFamilyInstance(newInstance, Oa, "Y");
+
+                                        newInstance.LookupParameter(":Назначение отверстия").Set("Вложенное");
                                     }
                                 }
                             }
                         }
                     }
                 }
+
 
                 trans.Commit();
             }

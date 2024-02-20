@@ -114,10 +114,8 @@ namespace Strana.Revit.HoleTask.Utils
             double roundHTWidth = HoleTasksRoundUpDimension.RoundUpParameter(holeTaskWidthEX);
             double roundHTHeight = HoleTasksRoundUpDimension.RoundUpParameter(holeTaskHeightEX);
 
-            ///Добавить в метод чтоб при определении захватывало область вокрг точки вставки
             /// проверка есть ли в intersectionCurveCenter уже ЗНО с теми же геометрическими размерами и в том же месте
             if (!DoesFamilyInstanceExistAtLocation(intersectionCurveCenter, roundHTThickness, roundHTWidth, roundHTHeight))
-            //if (!DoesFamilyInstanceExistAtLocation(intersectionCurveCenter))
             {
                 holeTask = this.doc.Create.NewFamilyInstance(
                     intersectionCurveCenter,
