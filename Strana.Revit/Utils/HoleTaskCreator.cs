@@ -140,6 +140,7 @@ namespace Strana.Revit.HoleTask.Utils
 
 
                 holeTask.LookupParameter(":Назначение отверстия").Set(linkInstance.Name.ToString());
+                GlobalParameters.LinkInfo = linkInstance.Name.ToString();
 
                 return holeTask;
             }

@@ -305,6 +305,7 @@ namespace Strana.Revit.HoleTask.Utils
                         ///сдвинуть семейство по оси фУ в верх, от оси и А
                         HoleTaskCreator.MoveFamilyInstance(intersectionPoint, Oa, "Y");
 
+                        intersectionPoint.LookupParameter(":Назначение отверстия").Set(GlobalParameters.LinkInfo);
 
                         foreach (FamilyInstance forDel in intersectionWallRectangularSolidIntersectCombineList001)
                         {
@@ -559,6 +560,9 @@ namespace Strana.Revit.HoleTask.Utils
                         HoleTaskCreator.MoveFamilyInstance(intersectionPoint, O1, "X");
                         ///сдвинуть семейство по оси У в верх, от оси и А
                         HoleTaskCreator.MoveFamilyInstance(intersectionPoint, Oa, "Y");
+
+                        intersectionPoint.LookupParameter(":Назначение отверстия").Set(GlobalParameters.LinkInfo);
+
 
                         foreach (FamilyInstance forDel in intersectionFloorRectangularSolidIntersectCombineList002)
                         {
