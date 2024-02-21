@@ -147,7 +147,8 @@ namespace Strana.Revit.HoleTask.Utils
                 holeTask.LookupParameter(":Назначение отверстия").Set(section);
                 holeTask.LookupParameter(":Примечание").Set(linkName);
                 holeTask.get_Parameter(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS).Set(GlobalParameters.Date);
-
+                holeTask.LookupParameter("SD_Версия задания").Set(GlobalParameters.UserName);
+                
                 return holeTask;
             }
             else

@@ -10,6 +10,8 @@ namespace Strana.Revit.HoleTask.Utils
     {
         public static string LinkInfo { get; set; }
         public static string SectionName { get; set; }
+        public static string UserName { get; set; }
+
         public static string Date
         {
             get

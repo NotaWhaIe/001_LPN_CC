@@ -77,7 +77,10 @@ namespace Strana.Revit.HoleTask.ElementCollections
                                         ///сдвинуть семейство по оси фУ в верх, от оси и А
                                         HoleTaskCreator.MoveFamilyInstance(newInstance, Oa, "Y");
 
-                                        newInstance.LookupParameter(":Назначение отверстия").Set("Вложенное");
+                                        newInstance.LookupParameter(":Назначение отверстия").Set(nestedInstance.LookupParameter(":Назначение отверстия").AsString());
+                                        newInstance.LookupParameter(":Примечание").Set(nestedInstance.LookupParameter(":Примечание").AsString());
+                                        newInstance.get_Parameter(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS).Set(GlobalParameters.Date);
+                                        newInstance.LookupParameter("SD_Версия задания").Set(GlobalParameters.UserName);
                                     }
                                 }
                             }

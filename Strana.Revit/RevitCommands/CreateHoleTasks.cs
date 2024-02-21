@@ -25,7 +25,8 @@ namespace Strana.Revit.HoleTask.RevitCommands
             UIDocument uidoc = commandData.Application.ActiveUIDocument;
             Document doc = uidoc.Document;
             docsaver.doc = doc;
-            string userName = commandData.Application.Application.Username;
+            string userName = commandData.Application.Application.Username.ToString();
+            GlobalParameters.UserName=userName;
 
 
             HoleTaskView taskView = new(doc);

@@ -23,14 +23,6 @@ namespace Strana.Revit.HoleTask.Extensions
         {
             List<FamilyInstance> intersectedItemHoleTasks = new();
 
-            /// добавить
-    //        List<FamilyInstance> intersectionWallRectangularCombineList01 = allFamilyInstances00
-    //.Where(fi => fi.Name.ToString() == "(Отв_Задание)_Стены_Прямоугольное")
-    //.ToList();
-    //        List<FamilyInstance> intersectionFloorRectangularCombineList02 = allFamilyInstances00
-    //            .Where(fi => fi.Name.ToString() == "(Отв_Задание)_Перекрытия_Прямоугольное")
-    //            .ToList();
-
 
             if (intersectingElement.AreElementsHaveFaces())
             {
