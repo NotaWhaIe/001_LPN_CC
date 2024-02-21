@@ -56,7 +56,7 @@ namespace Strana.Revit.HoleTask.Utils
             RevitLinkInstance linkInstance)
         {
             linkInstance.Name.ToString();
-            
+
             ///Добавляю в список уже существующие задания на отверстия:
             HoleTasksGetter.AddFamilyInstancesToList(this.doc, "(Отв_Задание)_Стены_Прямоугольное", this.intersectionRectangularCombineList);
             HoleTasksGetter.AddFamilyInstancesToList(this.doc, "(Отв_Задание)_Перекрытия_Прямоугольное", this.intersectionRectangularCombineList);
@@ -67,6 +67,7 @@ namespace Strana.Revit.HoleTask.Utils
             HoleTaskFamilyLoader familyLoader = new(this.doc);
             Wall wall = intersectedElement as Wall;
             int tipe;
+
             if (intersectedElement != wall && orientation == OrientaionType.Vertical)
             {
                 holeFamilySymbol = familyLoader.FloorFamilySymbol;
@@ -83,18 +84,25 @@ namespace Strana.Revit.HoleTask.Utils
                 tipe = 2;
             }
 
-            double mepDiameter = mepElement.get_Parameter(BuiltInParameter.RBS_CURVE_DIAMETER_PARAM)?.AsDouble() ?? 0;
+            string mepCategory = mepElement.Category.Name.ToString();
+            double mepDiameter = mepElement.get_Parameter(BuiltInParameter.RBS_PIPE_OUTER_DIAMETER)?.AsDouble() ?? 0;
             double mepHeight;
             double mepWidth;
-            if (mepDiameter > 0)
+
+            if (mepCategory == "Pipes")
             {
                 mepHeight = mepDiameter;
                 mepWidth = mepDiameter;
             }
-            else
+            else if (mepCategory == "Ducts")
             {
                 mepHeight = mepElement.get_Parameter(BuiltInParameter.RBS_CURVE_HEIGHT_PARAM)?.AsDouble() ?? 0;
                 mepWidth = mepElement.get_Parameter(BuiltInParameter.RBS_CURVE_WIDTH_PARAM)?.AsDouble() ?? 0;
+            }
+            else
+            {
+                mepHeight = mepElement.get_Parameter(BuiltInParameter.RBS_CABLETRAY_HEIGHT_PARAM)?.AsDouble() ?? 0;
+                mepWidth = mepElement.get_Parameter(BuiltInParameter.RBS_CABLETRAY_WIDTH_PARAM)?.AsDouble() ?? 0;
             }
 
             FamilyInstance holeTask;
@@ -148,7 +156,7 @@ namespace Strana.Revit.HoleTask.Utils
                 holeTask.LookupParameter(":Примечание").Set(linkName);
                 holeTask.get_Parameter(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS).Set(GlobalParameters.Date);
                 holeTask.LookupParameter("SD_Версия задания").Set(GlobalParameters.UserName);
-                
+
                 return holeTask;
             }
             else
