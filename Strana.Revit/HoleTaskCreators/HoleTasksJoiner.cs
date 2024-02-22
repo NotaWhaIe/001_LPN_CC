@@ -309,6 +309,7 @@ namespace Strana.Revit.HoleTask.Utils
                         intersectionPoint.LookupParameter(":Примечание").Set(GlobalParameters.LinkInfo);
                         intersectionPoint.get_Parameter(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS).Set(GlobalParameters.Date);
                         intersectionPoint.LookupParameter("SD_Версия задания").Set(GlobalParameters.UserName);
+                        GlobalParameters.SetScriptCreationMethod(intersectionPoint);
 
 
                         foreach (FamilyInstance forDel in intersectionWallRectangularSolidIntersectCombineList001)
@@ -569,8 +570,7 @@ namespace Strana.Revit.HoleTask.Utils
                         intersectionPoint.LookupParameter(":Примечание").Set(GlobalParameters.LinkInfo);
                         intersectionPoint.get_Parameter(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS).Set(GlobalParameters.Date);
                         intersectionPoint.LookupParameter("SD_Версия задания").Set(GlobalParameters.UserName);
-
-
+                        GlobalParameters.SetScriptCreationMethod(intersectionPoint);
 
                         foreach (FamilyInstance forDel in intersectionFloorRectangularSolidIntersectCombineList002)
                         {

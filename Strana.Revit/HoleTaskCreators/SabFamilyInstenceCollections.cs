@@ -81,6 +81,7 @@ namespace Strana.Revit.HoleTask.ElementCollections
                                         newInstance.LookupParameter(":Примечание").Set(nestedInstance.LookupParameter(":Примечание").AsString());
                                         newInstance.get_Parameter(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS).Set(GlobalParameters.Date);
                                         newInstance.LookupParameter("SD_Версия задания").Set(GlobalParameters.UserName);
+                                        GlobalParameters.SetScriptCreationMethod(newInstance);
                                     }
                                 }
                             }
