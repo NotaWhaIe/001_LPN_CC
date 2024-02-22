@@ -7,7 +7,7 @@
              xmlns:core="clr-namespace:Strana.Revit.HoleTask.ViewModel;assembly=Strana.Revit.HoleTask"
              d:DataContext="{d:DesignInstance Type=core:HoleTaskViewModel}"
              mc:Ignorable="d"
-             Title="Задание на отверстия 1.0.0" 
+             Title="Задание на отверстия 1.0.1" 
              Closing="Window_Closing"
              d:Height="550" Width="700" MaxHeight="550" MaxWidth="700"
 

@@ -147,17 +147,16 @@ namespace Strana.Revit.HoleTask.Utils
                 double Oa = UnitUtils.ConvertToInternalUnits(delta.deltaGridLetter, UnitTypeId.Millimeters);
                 MoveFamilyInstance(holeTask, Oa, "Y");
 
-                string section = ExtractSectionNameOrFileNameWithoutExtension(doc.Title.ToString());
-                GlobalParameters.SectionName = section;
-                string linkName = EditFileNameWithoutExtension(linkInstance.Name.ToString());
+                string linkName = EditFileNameWithoutExtension(linkInstance.Name);
                 GlobalParameters.LinkInfo = linkName;
+                string section = ExtractSectionNameOrFileNameWithoutExtension(doc.Title);
+                GlobalParameters.SectionName = section;
 
-                holeTask.LookupParameter(":Назначение отверстия").Set(section);
-                holeTask.LookupParameter(":Примечание").Set(linkName);
+                holeTask.LookupParameter(":Назначение отверстия").Set(GlobalParameters.SectionName);
+                holeTask.LookupParameter(":Примечание").Set(GlobalParameters.LinkInfo);
                 holeTask.get_Parameter(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS).Set(GlobalParameters.Date);
                 holeTask.LookupParameter("SD_Версия задания").Set(GlobalParameters.UserName);
                 GlobalParameters.SetScriptCreationMethod(holeTask);
-
 
                 return holeTask;
             }
