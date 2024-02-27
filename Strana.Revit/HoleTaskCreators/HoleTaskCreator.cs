@@ -84,17 +84,17 @@ namespace Strana.Revit.HoleTask.Utils
                 tipe = 2;
             }
 
-            string mepCategory = mepElement.Category.Name.ToString();
-            double mepDiameter = mepElement.get_Parameter(BuiltInParameter.RBS_PIPE_OUTER_DIAMETER)?.AsDouble() ?? 0;
             double mepHeight;
             double mepWidth;
+            double mepDiameter = mepElement.get_Parameter(BuiltInParameter.RBS_PIPE_OUTER_DIAMETER)?.AsDouble() ?? 0;
+            double mepHeightDucts = mepElement.get_Parameter(BuiltInParameter.RBS_CURVE_HEIGHT_PARAM)?.AsDouble() ?? 0;
 
-            if (mepCategory == "Pipes")
+            if (mepDiameter > 0)
             {
                 mepHeight = mepDiameter;
                 mepWidth = mepDiameter;
             }
-            else if (mepCategory == "Ducts")
+            else if (mepHeightDucts > 0)
             {
                 mepHeight = mepElement.get_Parameter(BuiltInParameter.RBS_CURVE_HEIGHT_PARAM)?.AsDouble() ?? 0;
                 mepWidth = mepElement.get_Parameter(BuiltInParameter.RBS_CURVE_WIDTH_PARAM)?.AsDouble() ?? 0;
@@ -152,10 +152,10 @@ namespace Strana.Revit.HoleTask.Utils
                 string section = ExtractSectionNameOrFileNameWithoutExtension(doc.Title);
                 GlobalParameters.SectionName = section;
 
-                holeTask.LookupParameter(":Назначение отверстия").Set(GlobalParameters.SectionName);
-                holeTask.LookupParameter(":Примечание").Set(GlobalParameters.LinkInfo);
+                holeTask.LookupParameter(":Назначение отверстия")?.Set(GlobalParameters.SectionName);
+                holeTask.LookupParameter(":Примечание")?.Set(GlobalParameters.LinkInfo);
                 holeTask.get_Parameter(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS).Set(GlobalParameters.Date);
-                holeTask.LookupParameter("SD_Версия задания").Set(GlobalParameters.UserName);
+                holeTask.LookupParameter("SD_Версия задания")?.Set(GlobalParameters.UserName);
                 GlobalParameters.SetScriptCreationMethod(holeTask);
 
                 return holeTask;

@@ -40,7 +40,8 @@ namespace Strana.Revit.HoleTask.Utils
                     double zeroLevelElevation = DistanceFromZeroElevationLevelToFamilyInstance(doc, intersectionCurveCenter);
                     if (zeroLevelElevation != -1)
                     {
-                        holeTask.LookupParameter("ADSK_Отверстие_Отметка от нуля").Set(zeroLevelElevation);
+                        //holeTask.LookupParameter("ADSK_Отверстие_Отметка от нуля").Set(zeroLevelElevation);
+                        if (holeTask?.LookupParameter("ADSK_Отверстие_Отметка от нуля") is { IsReadOnly: false } parameter) parameter.Set(zeroLevelElevation);
                     }
                 }
             }

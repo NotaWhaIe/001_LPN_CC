@@ -305,10 +305,10 @@ namespace Strana.Revit.HoleTask.Utils
                         ///сдвинуть семейство по оси фУ в верх, от оси и А
                         HoleTaskCreator.MoveFamilyInstance(intersectionPoint, Oa, "Y");
 
-                        intersectionPoint.LookupParameter(":Назначение отверстия").Set(GlobalParameters.SectionName);
-                        intersectionPoint.LookupParameter(":Примечание").Set(GlobalParameters.LinkInfo);
+                        intersectionPoint.LookupParameter(":Назначение отверстия")?.Set(GlobalParameters.SectionName);
+                        intersectionPoint.LookupParameter(":Примечание")?.Set(GlobalParameters.LinkInfo);
                         intersectionPoint.get_Parameter(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS).Set(GlobalParameters.Date);
-                        intersectionPoint.LookupParameter("SD_Версия задания").Set(GlobalParameters.UserName);
+                        intersectionPoint.LookupParameter("SD_Версия задания")?.Set(GlobalParameters.UserName);
                         GlobalParameters.SetScriptCreationMethod(intersectionPoint);
 
 
@@ -566,10 +566,10 @@ namespace Strana.Revit.HoleTask.Utils
                         ///сдвинуть семейство по оси У в верх, от оси и А
                         HoleTaskCreator.MoveFamilyInstance(intersectionPoint, Oa, "Y");
 
-                        intersectionPoint.LookupParameter(":Назначение отверстия").Set(GlobalParameters.SectionName);
-                        intersectionPoint.LookupParameter(":Примечание").Set(GlobalParameters.LinkInfo);
+                        intersectionPoint.LookupParameter(":Назначение отверстия")?.Set(GlobalParameters.SectionName);
+                        intersectionPoint.LookupParameter(":Примечание")?.Set(GlobalParameters.LinkInfo);
                         intersectionPoint.get_Parameter(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS).Set(GlobalParameters.Date);
-                        intersectionPoint.LookupParameter("SD_Версия задания").Set(GlobalParameters.UserName);
+                        intersectionPoint.LookupParameter("SD_Версия задания")?.Set(GlobalParameters.UserName);
                         GlobalParameters.SetScriptCreationMethod(intersectionPoint);
 
                         foreach (FamilyInstance forDel in intersectionFloorRectangularSolidIntersectCombineList002)
