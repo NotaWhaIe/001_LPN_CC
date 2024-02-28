@@ -17,6 +17,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Strana.Revit.Extension;
+using System.Reflection;
 
 
 namespace Strana.Revit.HoleTask.ViewModel
@@ -42,10 +43,9 @@ namespace Strana.Revit.HoleTask.ViewModel
             LinkedFileData = new ObservableCollection<RevitLinkData>(GetLinkedFileNames());
         }
 
-        public  IEnumerable<RevitLinkData> GetSelectedLinks()
-        {
-            return LinkedFileData.Where(x => x.IsSelected);
-        }
+        public  IEnumerable<RevitLinkData> GetSelectedLinks() =>LinkedFileData.Where(x => x.IsSelected);
+
+        public string Version => Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
 
         public Document currentDocument { get; set; }

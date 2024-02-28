@@ -188,20 +188,17 @@ namespace Strana.Revit.HoleTask.Utils
                 return Path.GetFileNameWithoutExtension(fileName);
             }
         }
-        public static string EditFileNameWithoutExtension(string fullFileName)
+        public static string EditFileNameWithoutExtension(string input)
         {
-            // Находим индекс окончания названия файла до расширения ".rvt"
-            int index = fullFileName.IndexOf(".rvt");
-
-            // Если индекс найден, возвращаем подстроку до ".rvt", не включая само расширение
-            if (index != -1)
+            // Разбиваем входную строку на части
+            var parts = input.Split('_');
+            // Проверяем, достаточно ли частей для извлечения требуемой подстроки
+            if (parts.Length > 2) // Убедитесь, что есть как минимум три части, чтобы извлечь второй элемент
             {
-                return fullFileName.Substring(0, index);
+                return parts[2]; // Возвращаем подстроку, находящуюся на интересующей нас позиции
             }
-
-            // В случае, если ".rvt" не найдено, возвращаем исходную строку
-            // Можно добавить логику обработки ошибки или вернуть null, если предполагается, что строка всегда должна содержать ".rvt"
-            return fullFileName;
+            // Возвращаем исходную строку, если не удается найти подстроку на требуемой позиции
+            return input;
         }
         public static void MoveFamilyInstance(FamilyInstance familyInstance, double distanceInFeet, string direction)
         {

@@ -9,6 +9,7 @@ using Strana.Revit.HoleTask.ElementCollections;
 using Strana.Revit.HoleTask.Extension.RevitElement;
 using Strana.Revit.HoleTask.Extensions;
 using Strana.Revit.HoleTask.Extensions.RevitElement;
+using Strana.Revit.HoleTask.FailuresProcessing;
 using Strana.Revit.HoleTask.Utils;
 using Strana.Revit.HoleTask.ViewModel;
 
@@ -78,7 +79,12 @@ namespace Strana.Revit.HoleTask.RevitCommands
 
             stopwatch.Stop();
             TimeSpan elapsedTime = stopwatch.Elapsed;
-            TaskDialog.Show("Время работы", elapsedTime.TotalSeconds.ToString() + " сек.");
+            int createdTasks = 10; // Пример количества созданных заданий
+            int totalTasks = 50; // Пример общего количества заданий в проекте
+            int deletedTasks = 5; // Пример количества удалённых заданий
+            var taskStatistics = new TaskStatistics();
+            taskStatistics.ShowTaskStatistics(elapsedTime, createdTasks, totalTasks, deletedTasks);
+            //TaskDialog.Show("Время работы", elapsedTime.TotalSeconds.ToString() + " сек.");
 
             return Result.Succeeded;
         }
