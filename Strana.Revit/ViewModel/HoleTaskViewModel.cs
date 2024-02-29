@@ -84,7 +84,7 @@ namespace Strana.Revit.HoleTask.ViewModel
                     Confing.Default.roundHoleTaskInPlane = this.roundHoleTaskInPlane;
                     Confing.Default.Save();
                 }
-                OnPropertyChanged(nameof(RoundHoleTaskInPlane));
+                OnPropertyChanged(nameof(this.roundHoleTaskInPlane));
             }
         }
         public bool AreRoundHoleTaskDimensions
