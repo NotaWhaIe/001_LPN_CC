@@ -118,7 +118,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="RevitCommands\App.cs" />
-    <Compile Include="Utils\GlobalParameters.cs" />
+    <Compile Include="FailuresProcessing\GlobalParameters.cs" />
     <Compile Include="Utils\SphereByPoint.cs" />
     <Compile Include="Utils\HoleTaskGridDelta.cs" />
     <Compile Include="Utils\HoleTasksLineStretch.cs" />

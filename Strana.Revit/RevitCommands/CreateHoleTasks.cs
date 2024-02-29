@@ -83,7 +83,7 @@ namespace Strana.Revit.HoleTask.RevitCommands
             int totalTasks = 50; // Пример общего количества заданий в проекте
             int deletedTasks = 5; // Пример количества удалённых заданий
             var taskStatistics = new TaskStatistics();
-            taskStatistics.ShowTaskStatistics(elapsedTime, createdTasks, totalTasks, deletedTasks);
+            taskStatistics.ShowTaskStatistics(elapsedTime);
             //TaskDialog.Show("Время работы", elapsedTime.TotalSeconds.ToString() + " сек.");
 
             return Result.Succeeded;

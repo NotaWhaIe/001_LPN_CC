@@ -58,9 +58,14 @@ namespace Strana.Revit.HoleTask.Utils
             linkInstance.Name.ToString();
 
             ///Добавляю в список уже существующие задания на отверстия:
-            HoleTasksGetter.AddFamilyInstancesToList(this.doc, "(Отв_Задание)_Стены_Прямоугольное", this.intersectionRectangularCombineList);
-            HoleTasksGetter.AddFamilyInstancesToList(this.doc, "(Отв_Задание)_Перекрытия_Прямоугольное", this.intersectionRectangularCombineList);
-            int a = intersectionRectangularCombineList.Count;
+            List<FamilyInstance> intersectionRectangularWall = new();
+            List<FamilyInstance> intersectionRectangularFloor = new();
+            HoleTasksGetter.AddFamilyInstancesToList(this.doc, "(Отв_Задание)_Стены_Прямоугольное", intersectionRectangularWall);
+            HoleTasksGetter.AddFamilyInstancesToList(this.doc, "(Отв_Задание)_Перекрытия_Прямоугольное", intersectionRectangularFloor);
+            GlobalParameters.OldTasksWall = intersectionRectangularWall.Count.ToString();
+            GlobalParameters.OldTasksFloor = intersectionRectangularFloor.Count.ToString();
+            intersectionRectangularCombineList.AddRange(intersectionRectangularWall.Concat(intersectionRectangularFloor));
+
 
             OrientaionType orientation = this.GetElementOrientationType(mepElement);
             FamilySymbol holeFamilySymbol;
