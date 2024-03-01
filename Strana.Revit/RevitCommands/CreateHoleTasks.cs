@@ -27,11 +27,23 @@ namespace Strana.Revit.HoleTask.RevitCommands
             Document doc = uidoc.Document;
             docsaver.doc = doc;
             string userName = commandData.Application.Application.Username.ToString();
-            GlobalParameters.UserName=userName;
+            GlobalParameters.UserName = userName;
 
 
             HoleTaskView taskView = new(doc);
             taskView.ShowDialog();
+
+
+
+            List<FamilyInstance> intersectionRectangular = new();
+            List<FamilyInstance> intersectionRectangularWall = new();
+            List<FamilyInstance> intersectionRectangularFloor = new();
+            HoleTasksGetter.AddFamilyInstancesToList(doc, "(Отв_Задание)_Стены_Прямоугольное", intersectionRectangularWall);
+            HoleTasksGetter.AddFamilyInstancesToList(doc, "(Отв_Задание)_Перекрытия_Прямоугольное", intersectionRectangularFloor);
+            GlobalParameters.OldTasksWall = intersectionRectangularWall.Count.ToString();
+            GlobalParameters.OldTasksFloor = intersectionRectangularFloor.Count.ToString();
+            intersectionRectangular.AddRange(intersectionRectangularWall.Concat(intersectionRectangularFloor));
+
 
 
             // Проверка состояния выполнения после закрытия окна
@@ -39,6 +51,7 @@ namespace Strana.Revit.HoleTask.RevitCommands
             {
                 using (var gt = new TransactionGroup(doc, "HoleTasks"))
                 {
+
                     gt.Start();
 
                     SabFamilyInstenceCollections.GetFamilyInstenceCollections(doc);
@@ -77,14 +90,19 @@ namespace Strana.Revit.HoleTask.RevitCommands
                 }
             }
 
+            List<FamilyInstance> RectangularCombineList = new();
+            List<FamilyInstance> intersectionWallRectangularCombineList01 = new();
+            List<FamilyInstance> intersectionFloorRectangularCombineList02 = new();
+            HoleTasksGetter.AddFamilyInstancesToList(doc, "(Отв_Задание)_Стены_Прямоугольное", intersectionWallRectangularCombineList01);
+            HoleTasksGetter.AddFamilyInstancesToList(doc, "(Отв_Задание)_Перекрытия_Прямоугольное", intersectionFloorRectangularCombineList02);
+            GlobalParameters.СreatedTasksWall = (intersectionWallRectangularCombineList01.Count - intersectionRectangularWall.Count).ToString();
+            GlobalParameters.СreatedTasksFloor = (intersectionFloorRectangularCombineList02.Count - intersectionRectangularFloor.Count).ToString();
+            RectangularCombineList.AddRange(intersectionWallRectangularCombineList01.Concat(intersectionFloorRectangularCombineList02));
+
             stopwatch.Stop();
             TimeSpan elapsedTime = stopwatch.Elapsed;
-            int createdTasks = 10; // Пример количества созданных заданий
-            int totalTasks = 50; // Пример общего количества заданий в проекте
-            int deletedTasks = 5; // Пример количества удалённых заданий
             var taskStatistics = new TaskStatistics();
             taskStatistics.ShowTaskStatistics(elapsedTime);
-            //TaskDialog.Show("Время работы", elapsedTime.TotalSeconds.ToString() + " сек.");
 
             return Result.Succeeded;
         }

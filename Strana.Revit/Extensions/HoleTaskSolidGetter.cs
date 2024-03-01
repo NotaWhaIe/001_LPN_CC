@@ -132,9 +132,6 @@ namespace Strana.Revit.HoleTask.Extensions
             Transform translationTransform = Transform.CreateTranslation(translationVector);
             Solid movedSolid = SolidUtils.CreateTransformed(solidWithDelta, translationTransform);
 
-            // Create solid in the model by DirectShape
-            //directShape.SetShape(new GeometryObject[] { movedSolid });
-
             return movedSolid;
         }
     }

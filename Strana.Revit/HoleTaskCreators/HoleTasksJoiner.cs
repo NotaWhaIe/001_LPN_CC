@@ -26,6 +26,13 @@ namespace Strana.Revit.HoleTask.Utils
         /// <remark>Intersected volume don't calculeted corrected, that whay I used try-catch</remark>t
         internal List<FamilyInstance> JoinAllHoleTask(List<FamilyInstance> allFamilyInstances00)
         {
+            Document doc = allFamilyInstances00.First().Document;
+
+            List<FamilyInstance> intersectionWallRectangularCombineList01 = new();
+            List<FamilyInstance> intersectionFloorRectangularCombineList02 = new();
+            HoleTasksGetter.AddFamilyInstancesToList(doc, "(Отв_Задание)_Стены_Прямоугольное", intersectionWallRectangularCombineList01);
+            HoleTasksGetter.AddFamilyInstancesToList(doc, "(Отв_Задание)_Перекрытия_Прямоугольное", intersectionFloorRectangularCombineList02);
+
             if (!areJoin)
             {
                 return allFamilyInstances00;
@@ -34,23 +41,8 @@ namespace Strana.Revit.HoleTask.Utils
             List<FamilyInstance> copyOfAllFamilyInstances = new();
             if (allFamilyInstances00.Count != 0)
             {
-                Document doc = allFamilyInstances00.First().Document;
                 HoleTaskFamilyLoader familyLoader = new(doc);
                 FamilySymbol holeFamilySymbol;
-
-
-                //List<FamilyInstance> intersectionWallRectangularCombineList01 = allFamilyInstances00
-                //      .Where(fi => fi.Symbol.FamilyName == "(Отв_Задание)_Стены_Прямоугольное" && !fi.GetSubComponentIds().Any())
-                //      .ToList();
-
-                //List<FamilyInstance> intersectionFloorRectangularCombineList02 = allFamilyInstances00
-                //    .Where(fi => fi.Symbol.FamilyName == "(Отв_Задание)_Перекрытия_Прямоугольное" && !fi.GetSubComponentIds().Any())
-                //    .ToList();
-
-                List<FamilyInstance> intersectionWallRectangularCombineList01 = new();
-                List<FamilyInstance> intersectionFloorRectangularCombineList02 = new();
-                HoleTasksGetter.AddFamilyInstancesToList(doc, "(Отв_Задание)_Стены_Прямоугольное", intersectionWallRectangularCombineList01);
-                HoleTasksGetter.AddFamilyInstancesToList(doc, "(Отв_Задание)_Перекрытия_Прямоугольное", intersectionFloorRectangularCombineList02);
 
 
 
@@ -317,8 +309,8 @@ namespace Strana.Revit.HoleTask.Utils
 
                             try
                             {
-                            doc.Delete(forDel.Id);
-                            intersectionWallRectangularCombineList01.Remove(forDel);
+                                doc.Delete(forDel.Id);
+                                intersectionWallRectangularCombineList01.Remove(forDel);
 
                             }
                             catch (Exception)
@@ -577,8 +569,8 @@ namespace Strana.Revit.HoleTask.Utils
                             try
                             {
 
-                            doc.Delete(forDel.Id);
-                            intersectionFloorRectangularCombineList02.Remove(forDel);
+                                doc.Delete(forDel.Id);
+                                intersectionFloorRectangularCombineList02.Remove(forDel);
                             }
                             catch (Exception)
                             {
@@ -595,9 +587,11 @@ namespace Strana.Revit.HoleTask.Utils
                 .Concat(intersectionFloorRectangularCombineList02)
                 .ToList();
 
-                HoleTasksGetter.AddFamilyInstancesToList(doc, "(Отв_Задание)_Стены_Прямоугольное", copyOfAllFamilyInstances);
-                HoleTasksGetter.AddFamilyInstancesToList(doc, "(Отв_Задание)_Перекрытия_Прямоугольное", copyOfAllFamilyInstances);
-
+                List<FamilyInstance> copyOfAllFamilyInstancesWall = new();
+                List<FamilyInstance> copyOfAllFamilyInstancesFloor = new();
+                HoleTasksGetter.AddFamilyInstancesToList(doc, "(Отв_Задание)_Стены_Прямоугольное", copyOfAllFamilyInstancesWall);
+                HoleTasksGetter.AddFamilyInstancesToList(doc, "(Отв_Задание)_Перекрытия_Прямоугольное", copyOfAllFamilyInstancesFloor);
+                copyOfAllFamilyInstances.AddRange(copyOfAllFamilyInstancesWall.Concat(copyOfAllFamilyInstancesFloor));
 
             }
             return copyOfAllFamilyInstances;
