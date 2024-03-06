@@ -5,6 +5,7 @@
 
 using System.Collections.Generic;
 using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Mechanical;
 using Strana.Revit.HoleTask.ElementCollections;
 using Strana.Revit.HoleTask.Extension.RevitElement;
 using Strana.Revit.HoleTask.Utils;
@@ -19,20 +20,23 @@ namespace Strana.Revit.HoleTask.Extensions
         /// <param name="intersectingElement"><seealso cref="Autodesk.Revit.DB.Element"/></param>
         /// <param name="linkInstance"><seealso cref="RevitLinkInstance"/></param>
         /// <returns> list off holetasks items by intersected element (wall or floor).</returns>
-        public static List<FamilyInstance> CreateHoleTasksByIntersectedElements(this Element intersectingElement, RevitLinkInstance linkInstance)
+        public static List<FamilyInstance> CreateHoleTasksByIntersectedElements(RevitLinkInstance linkInstance)
         {
             List<FamilyInstance> intersectedItemHoleTasks = new();
+            Document doc = linkInstance.Document;
+            Document linkDoc = linkInstance.GetLinkDocument();
 
+            IEnumerable<Element> mepElements = new FilteredElementCollector(doc)
+                          .OfCategory(BuiltInCategory.OST_DuctCurves)
+                          .OfClass(typeof(Duct))
+                          .WhereElementIsNotElementType(); // список всех меп элементов либо список всех меп элементов выбранных пользователем.
 
-            if (intersectingElement.AreElementsHaveFaces())
+            foreach (Element mepElement in mepElements)
             {
-                Document doc = linkInstance.Document;
-                Document linkDoc = linkInstance.GetLinkDocument();
-
-                IEnumerable<Element> mepElements = MepElementCollections.AllMepElementsByBBox(doc, intersectingElement, linkInstance.GetTotalTransform());
-                Solid floorWallSolid = intersectingElement.GetSolidWithoutHoles(linkInstance);
-                foreach (Element mepElement in mepElements)
+                var wallAndFloorsInMepBBox = mepElement.AllElementsByMepBBox(doc, linkInstance.GetTotalTransform(), linkDoc);
+                foreach (Element intersectingElement in wallAndFloorsInMepBBox)
                 {
+                    Solid floorWallSolid = intersectingElement.GetSolidWithoutHoles(linkInstance);
                     Curve mepCurve = (mepElement.Location as LocationCurve).Curve;
                     SolidCurveIntersectionOptions defOptions = new();
                     SolidCurveIntersection solidCurve = floorWallSolid.IntersectWithCurve(mepCurve, defOptions);
@@ -46,8 +50,8 @@ namespace Strana.Revit.HoleTask.Extensions
                             intersectedItemHoleTasks.Add(createdHoleTask);
                         }
                     }
-                }
-            }
+                }             
+            }            
 
             return intersectedItemHoleTasks;
         }

@@ -79,6 +79,61 @@ namespace Strana.Revit.HoleTask.ElementCollections
             return d.Concat(p).Concat(c);
         }
 
+        public static IEnumerable<Element> AllElementsByMepBBox(this Element mepElement, Document doc, Transform transform, Document linkDoc)
+        {
+            BoundingBoxXYZ iEBB = mepElement.get_BoundingBox(null);
+            BoundingBoxXYZ transformedBoundingBox = mepElement.get_BoundingBox(null);
+
+            XYZ poinFirst = transform.OfPoint(iEBB.Min);
+            XYZ poinLast = transform.OfPoint(iEBB.Max);
+
+            double pointFirstX = poinFirst.X < poinLast.X ? poinFirst.X : poinLast.X;
+            double pointFirstY = poinFirst.Y < poinLast.Y ? poinFirst.Y : poinLast.Y;
+            double pointFirstZ = poinFirst.Z < poinLast.Z ? poinFirst.Z : poinLast.Z;
+            double poinLastX = poinFirst.X > poinLast.X ? poinFirst.X : poinLast.X;
+            double poinLastY = poinFirst.Y > poinLast.Y ? poinFirst.Y : poinLast.Y;
+            double poinLastZ = poinFirst.Z > poinLast.Z ? poinFirst.Z : poinLast.Z;
+            XYZ transformedMin = new XYZ(pointFirstX, pointFirstY, pointFirstZ);
+            XYZ transformedMax = new XYZ(poinLastX, poinLastY, poinLastZ);
+
+            transformedBoundingBox.Min = transformedMin;
+            transformedBoundingBox.Max = transformedMax;
+            List<XYZ> allBoundingBoxPoints =
+            [
+                transform.OfPoint(new XYZ(iEBB.Min.X, iEBB.Min.Y, iEBB.Max.Z)),
+                transform.OfPoint(new XYZ(iEBB.Min.X, iEBB.Max.Y, iEBB.Max.Z)),
+                transform.OfPoint(new XYZ(iEBB.Max.X, iEBB.Max.Y, iEBB.Min.Z)),
+                transform.OfPoint(new XYZ(iEBB.Max.X, iEBB.Min.Y, iEBB.Min.Z)),
+            ];
+
+            transformedBoundingBox.ExpandToContain(allBoundingBoxPoints);
+
+
+            Outline outline = new(transformedBoundingBox.Min, transformedBoundingBox.Max);
+
+            SphereByPoint.CreateSphereByPoint(transformedBoundingBox.Min, doc);
+            SphereByPoint.CreateSphereByPoint(transformedBoundingBox.Max, doc);
+
+            BoundingBoxIntersectsFilter filter = new(outline);
+            var c = new FilteredElementCollector(linkDoc)
+                        .OfCategory(BuiltInCategory.OST_Walls)
+                        .OfClass(typeof(Wall))
+                        .WhereElementIsNotElementType()
+                        .WherePasses(filter);
+
+            var c2 = new FilteredElementCollector(linkDoc)
+            .OfCategory(BuiltInCategory.OST_Floors)
+            .OfClass(typeof(Floor))
+            .WhereElementIsNotElementType()
+            .WherePasses(filter);
+
+            //return c.Concat(c2);
+            return new FilteredElementCollector(linkDoc)
+                        .OfCategory(BuiltInCategory.OST_Walls)
+                        .OfClass(typeof(Wall))
+                        .WhereElementIsNotElementType();
+        }
+
         /// <summary>
         ///     Expand the given bounding box to include
         ///     and contain the given point.

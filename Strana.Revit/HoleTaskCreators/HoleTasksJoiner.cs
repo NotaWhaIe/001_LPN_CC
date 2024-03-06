@@ -265,8 +265,10 @@ namespace Strana.Revit.HoleTask.Utils
                         double roundHTThickness = HoleTasksRoundUpDimension.RoundUpParameter(intersectionPointThickness);
                         double roundHTHeight = HoleTasksRoundUpDimension.RoundUpParameter(intersectionPointHeight);
 
-                        //if (DoesFamilyInstanceExistAtLocation(GlobalParameters.ЕxistingTaskFloor, newCenterPoint, roundHTThickness, roundHTWidth, roundHTHeight))
+                        //if (!FindMatchingInstance(GlobalParameters.ЕxistingTaskFloor, newCenterPoint, 0.03))
                         //{
+                        //    return intersectionWallRectangularCombineList01;
+                        //}
 
                         FamilyInstance intersectionPoint = doc.Create.NewFamilyInstance(
                         newCenterPoint,
@@ -529,8 +531,12 @@ namespace Strana.Revit.HoleTask.Utils
                         double roundHTThickness = HoleTasksRoundUpDimension.RoundUpParameter(intersectionPointThickness);
                         double roundHTHeight = HoleTasksRoundUpDimension.RoundUpParameter(intersectionPointHeight);
 
-                        //if (DoesFamilyInstanceExistAtLocation(GlobalParameters.ЕxistingTaskFloor, newCenterPoint, roundHTThickness, roundHTWidth, roundHTHeight))
+                        //if (!FindMatchingInstance(GlobalParameters.ЕxistingTaskFloor, newCenterPoint, 0.03))
                         //{
+                        //    return intersectionFloorRectangularCombineList02;
+
+                        //}
+
                         FamilyInstance intersectionPoint = doc.Create.NewFamilyInstance(
                             newCenterPoint,
                             holeFamilySymbol,
@@ -606,33 +612,27 @@ namespace Strana.Revit.HoleTask.Utils
             }
             return copyOfAllFamilyInstances;
         }
-        private bool DoesFamilyInstanceExistAtLocation(List<FamilyInstance> intersectionRectangularCombineList, XYZ location, double roundHTThickness, double roundHTWidth, double roundHTHeight)
+        public static bool FindMatchingInstance(
+        List<FamilyInstance> startHoleTask,
+        XYZ newCenterPoint,
+        double tolerance)
         {
-            const double tolerance = 0.01; // Небольшой допуск для сравнения координат, около 3 мм
-
-            // Предполагается, что roundHTThickness, roundHTWidth, и roundHTHeight уже в футах
-            double roundHT = roundHTThickness + roundHTWidth + roundHTHeight;
-
-            foreach (FamilyInstance fi in intersectionRectangularCombineList)
+            foreach (var instance in startHoleTask)
             {
-                XYZ existingLocation = (fi.Location as LocationPoint)?.Point;
-
-                double Thickness = fi.LookupParameter("Глубина")?.AsDouble() ?? 0;
-                double Width = fi.LookupParameter("Ширина")?.AsDouble() ?? 0;
-                double Height = fi.LookupParameter("Высота")?.AsDouble() ?? 0;
-                double round = Thickness + Width + Height;
-
-                // Точность сравнения суммарных размеров с учетом допуска
-                bool sizeMatches = Math.Abs(roundHT - round) < tolerance;
-
-                if (existingLocation != null && existingLocation.IsAlmostEqualTo(location, tolerance) && sizeMatches)
+                LocationPoint locationPoint = instance.Location as LocationPoint;
+                if (locationPoint != null)
                 {
-                    return true; // Найден существующий экземпляр в заданных координатах с соответствующими размерами
+                    // Вычисляем расстояние от центра экземпляра до новой точки центра
+                    double distance = (locationPoint.Point - newCenterPoint).GetLength();
+                    // Проверяем, находится ли расстояние в пределах допуска
+                    if (distance <= tolerance)
+                    {
+                        return true; // Найдено совпадение
+                    }
                 }
             }
 
-            return false; // Экземпляр в заданных координатах не найден
+            return false; // Совпадений не найдено
         }
-
     }
 }

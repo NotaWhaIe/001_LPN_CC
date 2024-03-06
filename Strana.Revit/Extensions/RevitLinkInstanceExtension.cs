@@ -31,25 +31,15 @@ namespace Strana.Revit.HoleTask.Extensions
                 HoleTasksGetter.AddFamilyInstancesToList(doc, "(Отв_Задание)_Перекрытия_Прямоугольное", allHoleTaskByRevitLinkInstance);
                 double debag = allHoleTaskByRevitLinkInstance.Count;
 
-                /// Take walls and floors
-                IEnumerable<Element> allIntersectingElements = CollectionsOfIntersectingElements.AllIntersectingElements(linkDoc);
+                allHoleTaskByRevitLinkInstance = allHoleTaskByRevitLinkInstance
+                    .Concat(IntersectingElementExtension.CreateHoleTasksByIntersectedElements(linkInstance))
+                    .ToList();
+                
 
-                ///метод округляет при задании геометрических размеров:
-                ///округлить геометрию заданий
-                ///округлить в плане
-
-                foreach (Element intersectingElement in allIntersectingElements)
-                {
-                    allHoleTaskByRevitLinkInstance = allHoleTaskByRevitLinkInstance
-                        .Concat(intersectingElement
-                        .CreateHoleTasksByIntersectedElements(linkInstance))
-                        .ToList();
-                }
-
-                /// HoleTasksJoiner 
+                // HoleTasksJoiner 
                 List<FamilyInstance> roundHoleTaskList = new HoleTasksJoiner().JoinAllHoleTask(allHoleTaskByRevitLinkInstance);
 
-                ///растянуть по высоте
+                // растянуть по высоте
                 new HoleTasksLineStretch().StretchLinesAllHoleTask(linkInstance);
                 t.Commit();
             }

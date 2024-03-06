@@ -131,7 +131,6 @@
     <Compile Include="Extensions\RevitDocumentExstensions.cs" />
     <Compile Include="Extensions\RevitElementExstensions.cs" />
     <Compile Include="Extensions\RevitLinkExstensions.cs" />
-    <Compile Include="ElementCollections\CollectionsOfIntersectingElements.cs" />
     <Compile Include="Extensions\RevitLinkInstanceExtension.cs" />
     <Compile Include="Extensions\IntersectingElementExtension.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
