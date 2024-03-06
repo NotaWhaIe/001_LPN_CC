@@ -44,7 +44,7 @@ namespace Strana.Revit.HoleTask.RevitCommands
             
             startHoleTask.AddRange(intersectionRectangularWall.Concat(intersectionRectangularFloor));
             List<ElementId> startHoleTaskID = GetFamilyInstanceIds(startHoleTask);
-            Log.SaveListToFile(@"C:\Users\nikiforov.n\Desktop\ids0.txt", startHoleTaskID);
+            //Log.SaveListToFile(@"C:\Users\nikiforov.n\Desktop\ids0.txt", startHoleTaskID);
 
             // Проверка состояния выполнения после закрытия окна
             if (taskView.ShouldExecuteProgram)
@@ -100,10 +100,10 @@ namespace Strana.Revit.HoleTask.RevitCommands
             finishHoleTask.AddRange(intersectionWallRectangularCombineList01.Concat(intersectionFloorRectangularCombineList02));
 
             List<ElementId> finishHoleTaskID = GetFamilyInstanceIds(finishHoleTask);
-            Log.SaveListToFile(@"C:\Users\nikiforov.n\Desktop\ids1.txt", finishHoleTaskID);
+            //Log.SaveListToFile(@"C:\Users\nikiforov.n\Desktop\ids1.txt", finishHoleTaskID);
 
             List<ElementId> resultIds = CompareAndFilterIds(startHoleTaskID, finishHoleTaskID);
-            Log.SaveListToFile(@"C:\Users\nikiforov.n\Desktop\resultIds.txt", resultIds);
+            //Log.SaveListToFile(@"C:\Users\nikiforov.n\Desktop\resultIds.txt", resultIds);
 
 
             List<ElementId> result = CompareAndFilterIds(startHoleTaskID, finishHoleTaskID);
