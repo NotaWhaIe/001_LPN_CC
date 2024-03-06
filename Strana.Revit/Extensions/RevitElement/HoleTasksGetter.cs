@@ -31,7 +31,7 @@ namespace Strana.Revit.HoleTask.Extensions.RevitElement
             var collector = new FilteredElementCollector(doc)
                 .OfClass(typeof(FamilyInstance))
                 .WhereElementIsNotElementType()
-                .ToElements();
+                .ToElements().ToList();
 
             foreach (FamilyInstance fi in collector)
             {

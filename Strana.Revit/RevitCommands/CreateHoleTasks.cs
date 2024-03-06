@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.ExtensibleStorage;
 using Autodesk.Revit.UI;
 using Strana.Revit.HoleTask.ElementCollections;
 using Strana.Revit.HoleTask.Extension.RevitElement;
@@ -20,6 +21,7 @@ namespace Strana.Revit.HoleTask.RevitCommands
     {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
+            GlobalParameters.ResetParameters();
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
@@ -37,6 +39,8 @@ namespace Strana.Revit.HoleTask.RevitCommands
             List<FamilyInstance> intersectionRectangularFloor = new();
             HoleTasksGetter.AddFamilyInstancesToList(doc, "(Отв_Задание)_Стены_Прямоугольное", intersectionRectangularWall);
             HoleTasksGetter.AddFamilyInstancesToList(doc, "(Отв_Задание)_Перекрытия_Прямоугольное", intersectionRectangularFloor);
+
+            
             GlobalParameters.ЕxistingTaskWall = intersectionRectangularWall;
             GlobalParameters.ЕxistingTaskFloor = intersectionRectangularFloor;
             GlobalParameters.OldTasksWall = intersectionRectangularWall.Count.ToString();
@@ -108,8 +112,8 @@ namespace Strana.Revit.HoleTask.RevitCommands
 
             List<ElementId> result = CompareAndFilterIds(startHoleTaskID, finishHoleTaskID);
 
-
-            GlobalParameters.DeletedTasks = resultIds.Count.ToString();
+            int matchCount = TaskProcessor.CountNonMatchingInsertionPoints(GlobalParameters.ЕxistingTask,finishHoleTask,resultIds);
+            GlobalParameters.DeletedTasks = matchCount.ToString();
 
 
             stopwatch.Stop();

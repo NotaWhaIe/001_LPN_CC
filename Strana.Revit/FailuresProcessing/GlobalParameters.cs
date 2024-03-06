@@ -17,6 +17,7 @@ namespace Strana.Revit.HoleTask.Utils
         public static string СreatedTasksWall { get; set; }
         public static string СreatedTasksFloor { get; set; }
         public static string DeletedTasks { get; set; }
+        public static List<FamilyInstance> ЕxistingTask { get; set; } = new List<FamilyInstance>();
         public static List<FamilyInstance> ЕxistingTaskWall { get; set; } = new List<FamilyInstance>();
         public static List<FamilyInstance> ЕxistingTaskFloor { get; set; } = new List<FamilyInstance>();
 
@@ -36,6 +37,19 @@ namespace Strana.Revit.HoleTask.Utils
                 return DateTime.Now.ToString("dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
             }
         }
-
+        public static void ResetParameters()
+        {
+            LinkInfo = null;
+            SectionName = null;
+            UserName = null;
+            OldTasksWall = null;
+            OldTasksFloor = null;
+            СreatedTasksWall = null;
+            СreatedTasksFloor = null;
+            DeletedTasks = null;
+            ЕxistingTask = new List<FamilyInstance>();
+            ЕxistingTaskWall = new List<FamilyInstance>();
+            ЕxistingTaskFloor = new List<FamilyInstance>();
+        }
     }
 }

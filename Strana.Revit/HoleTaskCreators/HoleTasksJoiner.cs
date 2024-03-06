@@ -261,11 +261,18 @@ namespace Strana.Revit.HoleTask.Utils
 
                         double intersectionPointHeight = maxZPoint.Z - minZPoint.Z;
                         XYZ newCenterPoint = new XYZ(centroidIntersectionPoint.X, centroidIntersectionPoint.Y, centroidIntersectionPoint.Z - (doc.GetElement(intersectionWallRectangularSolidIntersectCombineList001.First().LevelId) as Level).Elevation);
+                        double roundHTWidth = HoleTasksRoundUpDimension.RoundUpParameter(intersectionPointWidthCalculete);
+                        double roundHTThickness = HoleTasksRoundUpDimension.RoundUpParameter(intersectionPointThickness);
+                        double roundHTHeight = HoleTasksRoundUpDimension.RoundUpParameter(intersectionPointHeight);
+
+                        //if (DoesFamilyInstanceExistAtLocation(GlobalParameters.ЕxistingTaskFloor, newCenterPoint, roundHTThickness, roundHTWidth, roundHTHeight))
+                        //{
+
                         FamilyInstance intersectionPoint = doc.Create.NewFamilyInstance(
-                            newCenterPoint,
-                            holeFamilySymbol,
-                            doc.GetElement(intersectionWallRectangularSolidIntersectCombineList001
-                                .First().LevelId) as Level, StructuralType.NonStructural);
+                        newCenterPoint,
+                        holeFamilySymbol,
+                        doc.GetElement(intersectionWallRectangularSolidIntersectCombineList001
+                            .First().LevelId) as Level, StructuralType.NonStructural);
 
                         if (Math.Round(intersectionWallRectangularSolidIntersectCombineList001.First().FacingOrientation.AngleTo(intersectionPoint.FacingOrientation), 6) != 0)
                         {
@@ -278,9 +285,6 @@ namespace Strana.Revit.HoleTask.Utils
                                     .FacingOrientation.AngleTo(intersectionPoint.FacingOrientation));
                         }
 
-                        double roundHTWidth = HoleTasksRoundUpDimension.RoundUpParameter(intersectionPointWidthCalculete);
-                        double roundHTThickness = HoleTasksRoundUpDimension.RoundUpParameter(intersectionPointThickness);
-                        double roundHTHeight = HoleTasksRoundUpDimension.RoundUpParameter(intersectionPointHeight);
 
                         intersectionPoint.LookupParameter(holeTaskWidth).Set(roundHTWidth);
                         intersectionPoint.LookupParameter(holeTaskThickness).Set(roundHTThickness);
@@ -324,6 +328,7 @@ namespace Strana.Revit.HoleTask.Utils
                         intersectionWallRectangularCombineList01.Remove(intersectionWallRectangularSolidIntersectCombineList001[0]);
                     }
                 }
+                //}
 
 
 
@@ -514,19 +519,23 @@ namespace Strana.Revit.HoleTask.Utils
 
                         double intersectionPointHeight = maxUpDistance + maxDownDistance;
                         double intersectionPointWidth = maxLeftDistance + maxRightDistance;
+
                         XYZ newCenterPoint = new XYZ(
-                                centroidIntersectionPoint.X,
-                                centroidIntersectionPoint.Y,
-                                centroidIntersectionPoint.Z - pointLevelElevation);
+                            centroidIntersectionPoint.X,
+                            centroidIntersectionPoint.Y,
+                            centroidIntersectionPoint.Z - pointLevelElevation);
+
+                        double roundHTWidth = HoleTasksRoundUpDimension.RoundUpParameter(intersectionPointWidth);
+                        double roundHTThickness = HoleTasksRoundUpDimension.RoundUpParameter(intersectionPointThickness);
+                        double roundHTHeight = HoleTasksRoundUpDimension.RoundUpParameter(intersectionPointHeight);
+
+                        //if (DoesFamilyInstanceExistAtLocation(GlobalParameters.ЕxistingTaskFloor, newCenterPoint, roundHTThickness, roundHTWidth, roundHTHeight))
+                        //{
                         FamilyInstance intersectionPoint = doc.Create.NewFamilyInstance(
                             newCenterPoint,
                             holeFamilySymbol,
                             pointLevel,
                             StructuralType.NonStructural);
-
-                        double roundHTWidth = HoleTasksRoundUpDimension.RoundUpParameter(intersectionPointWidth);
-                        double roundHTThickness = HoleTasksRoundUpDimension.RoundUpParameter(intersectionPointThickness);
-                        double roundHTHeight = HoleTasksRoundUpDimension.RoundUpParameter(intersectionPointHeight);
 
                         intersectionPoint.LookupParameter(holeTaskWidth).Set(roundHTWidth);
                         intersectionPoint.LookupParameter(holeTaskThickness).Set(roundHTThickness);
@@ -583,6 +592,7 @@ namespace Strana.Revit.HoleTask.Utils
                         intersectionFloorRectangularCombineList02.Remove(intersectionFloorRectangularSolidIntersectCombineList002[0]);
                     }
                 }
+                //}
                 allFamilyInstances00 = intersectionWallRectangularCombineList01
                 .Concat(intersectionFloorRectangularCombineList02)
                 .ToList();
@@ -596,5 +606,33 @@ namespace Strana.Revit.HoleTask.Utils
             }
             return copyOfAllFamilyInstances;
         }
+        private bool DoesFamilyInstanceExistAtLocation(List<FamilyInstance> intersectionRectangularCombineList, XYZ location, double roundHTThickness, double roundHTWidth, double roundHTHeight)
+        {
+            const double tolerance = 0.01; // Небольшой допуск для сравнения координат, около 3 мм
+
+            // Предполагается, что roundHTThickness, roundHTWidth, и roundHTHeight уже в футах
+            double roundHT = roundHTThickness + roundHTWidth + roundHTHeight;
+
+            foreach (FamilyInstance fi in intersectionRectangularCombineList)
+            {
+                XYZ existingLocation = (fi.Location as LocationPoint)?.Point;
+
+                double Thickness = fi.LookupParameter("Глубина")?.AsDouble() ?? 0;
+                double Width = fi.LookupParameter("Ширина")?.AsDouble() ?? 0;
+                double Height = fi.LookupParameter("Высота")?.AsDouble() ?? 0;
+                double round = Thickness + Width + Height;
+
+                // Точность сравнения суммарных размеров с учетом допуска
+                bool sizeMatches = Math.Abs(roundHT - round) < tolerance;
+
+                if (existingLocation != null && existingLocation.IsAlmostEqualTo(location, tolerance) && sizeMatches)
+                {
+                    return true; // Найден существующий экземпляр в заданных координатах с соответствующими размерами
+                }
+            }
+
+            return false; // Экземпляр в заданных координатах не найден
+        }
+
     }
 }
