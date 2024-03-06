@@ -29,22 +29,22 @@ namespace Strana.Revit.HoleTask.RevitCommands
             string userName = commandData.Application.Application.Username.ToString();
             GlobalParameters.UserName = userName;
 
-
             HoleTaskView taskView = new(doc);
             taskView.ShowDialog();
 
-
-
-            List<FamilyInstance> intersectionRectangular = new();
+            List<FamilyInstance> startHoleTask = new();
             List<FamilyInstance> intersectionRectangularWall = new();
             List<FamilyInstance> intersectionRectangularFloor = new();
             HoleTasksGetter.AddFamilyInstancesToList(doc, "(Отв_Задание)_Стены_Прямоугольное", intersectionRectangularWall);
             HoleTasksGetter.AddFamilyInstancesToList(doc, "(Отв_Задание)_Перекрытия_Прямоугольное", intersectionRectangularFloor);
+            GlobalParameters.ЕxistingTaskWall = intersectionRectangularWall;
+            GlobalParameters.ЕxistingTaskFloor = intersectionRectangularFloor;
             GlobalParameters.OldTasksWall = intersectionRectangularWall.Count.ToString();
             GlobalParameters.OldTasksFloor = intersectionRectangularFloor.Count.ToString();
-            intersectionRectangular.AddRange(intersectionRectangularWall.Concat(intersectionRectangularFloor));
-
-
+            
+            startHoleTask.AddRange(intersectionRectangularWall.Concat(intersectionRectangularFloor));
+            List<ElementId> startHoleTaskID = GetFamilyInstanceIds(startHoleTask);
+            Log.SaveListToFile(@"C:\Users\nikiforov.n\Desktop\ids0.txt", startHoleTaskID);
 
             // Проверка состояния выполнения после закрытия окна
             if (taskView.ShouldExecuteProgram)
@@ -90,14 +90,27 @@ namespace Strana.Revit.HoleTask.RevitCommands
                 }
             }
 
-            List<FamilyInstance> RectangularCombineList = new();
+            List<FamilyInstance> finishHoleTask = new();
             List<FamilyInstance> intersectionWallRectangularCombineList01 = new();
             List<FamilyInstance> intersectionFloorRectangularCombineList02 = new();
             HoleTasksGetter.AddFamilyInstancesToList(doc, "(Отв_Задание)_Стены_Прямоугольное", intersectionWallRectangularCombineList01);
             HoleTasksGetter.AddFamilyInstancesToList(doc, "(Отв_Задание)_Перекрытия_Прямоугольное", intersectionFloorRectangularCombineList02);
             GlobalParameters.СreatedTasksWall = (intersectionWallRectangularCombineList01.Count - intersectionRectangularWall.Count).ToString();
             GlobalParameters.СreatedTasksFloor = (intersectionFloorRectangularCombineList02.Count - intersectionRectangularFloor.Count).ToString();
-            RectangularCombineList.AddRange(intersectionWallRectangularCombineList01.Concat(intersectionFloorRectangularCombineList02));
+            finishHoleTask.AddRange(intersectionWallRectangularCombineList01.Concat(intersectionFloorRectangularCombineList02));
+
+            List<ElementId> finishHoleTaskID = GetFamilyInstanceIds(finishHoleTask);
+            Log.SaveListToFile(@"C:\Users\nikiforov.n\Desktop\ids1.txt", finishHoleTaskID);
+
+            List<ElementId> resultIds = CompareAndFilterIds(startHoleTaskID, finishHoleTaskID);
+            Log.SaveListToFile(@"C:\Users\nikiforov.n\Desktop\resultIds.txt", resultIds);
+
+
+            List<ElementId> result = CompareAndFilterIds(startHoleTaskID, finishHoleTaskID);
+
+
+            GlobalParameters.DeletedTasks = resultIds.Count.ToString();
+
 
             stopwatch.Stop();
             TimeSpan elapsedTime = stopwatch.Elapsed;
@@ -105,6 +118,35 @@ namespace Strana.Revit.HoleTask.RevitCommands
             taskStatistics.ShowTaskStatistics(elapsedTime);
 
             return Result.Succeeded;
+        }
+        public static List<ElementId> GetFamilyInstanceIds(List<FamilyInstance> rectangularCombineList)
+        {
+            // Используем LINQ для выборки Id из каждого FamilyInstance и сортировки их по числовому значению
+            List<ElementId> sortedIds = rectangularCombineList
+                .Select(instance => instance.Id)
+                .OrderBy(id => id.IntegerValue) // Сортируем Id по их числовому значению
+                .ToList();
+
+            return sortedIds;
+        }
+        public static List<ElementId> CompareAndFilterIds(List<ElementId> ids0, List<ElementId> ids1)
+        {
+            if (ids0.Count == 0)
+            {
+                return new List<ElementId>(); // Возвращаем пустой список, если ids0 пуст
+            }
+
+            // Находим максимальное числовое значение среди ElementId в ids0
+            int maxIdValue = ids0.Max(id => id.IntegerValue);
+            ElementId maxIdInIds0 = new ElementId(maxIdValue);
+
+            // Удаляем из ids1 все элементы, чьё числовое значение больше максимального значения в ids0
+            ids1 = ids1.Where(id => id.IntegerValue <= maxIdInIds0.IntegerValue).ToList();
+
+            // Возвращаем элементы, которые есть в ids0, но отсутствуют в ids1
+            // Здесь нет необходимости изменять логику, так как Except использует Equals и GetHashCode методы ElementId,
+            // которые должны корректно обрабатываться даже без прямого сравнения IntegerValue
+            return ids0.Except(ids1).ToList();
         }
     }
 

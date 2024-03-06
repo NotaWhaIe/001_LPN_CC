@@ -125,8 +125,9 @@ namespace Strana.Revit.HoleTask.Utils
             double roundHTWidth = HoleTasksRoundUpDimension.RoundUpParameter(holeTaskWidthEX);
             double roundHTHeight = HoleTasksRoundUpDimension.RoundUpParameter(holeTaskHeightEX);
 
+            HoleTaskGridDelta delta0 = GridRoundUpDimension.DeltaHoleTaskToGrids(this.doc, intersectionCurveCenter, roundHTThickness, roundHTWidth, 0);
             /// проверка есть ли в intersectionCurveCenter уже ЗНО с теми же геометрическими размерами и в том же месте
-            if (!DoesFamilyInstanceExistAtLocation(intersectionCurveCenter, roundHTThickness, roundHTWidth, roundHTHeight))
+            if (!DoesFamilyInstanceExistAtLocation(intersectionRectangularCombineList, intersectionCurveCenter, roundHTThickness, roundHTWidth, roundHTHeight))
             {
                 holeTask = this.doc.Create.NewFamilyInstance(
                     intersectionCurveCenter,
@@ -143,11 +144,14 @@ namespace Strana.Revit.HoleTask.Utils
                 this.RotateHoleTask(mepElement, orientation, holeTask, intersection, intersectedElement, lvl, linkInstance);
 
                 HoleTaskGridDelta delta = GridRoundUpDimension.DeltaHoleTaskToGrids(this.doc, intersectionCurveCenter, roundHTThickness, roundHTWidth, holeTaskAngle);
-                double O1 = UnitUtils.ConvertToInternalUnits(delta.DeltaGridNumber, UnitTypeId.Millimeters);
-                MoveFamilyInstance(holeTask, O1, "X");
-                ///сдвинуть семейство по оси У в верх, от оси и А
-                double Oa = UnitUtils.ConvertToInternalUnits(delta.deltaGridLetter, UnitTypeId.Millimeters);
-                MoveFamilyInstance(holeTask, Oa, "Y");
+                if (delta.deltaGridLetter>0)
+                {
+                    double O1 = UnitUtils.ConvertToInternalUnits(delta.DeltaGridNumber, UnitTypeId.Millimeters);
+                    MoveFamilyInstance(holeTask, O1, "X");
+                    ///сдвинуть семейство по оси У в верх, от оси и А
+                    double Oa = UnitUtils.ConvertToInternalUnits(delta.deltaGridLetter, UnitTypeId.Millimeters);
+                    MoveFamilyInstance(holeTask, Oa, "Y");
+                }
 
                 string linkName = EditFileNameWithoutExtension(linkInstance.Name);
                 GlobalParameters.LinkInfo = linkName;
@@ -236,30 +240,15 @@ namespace Strana.Revit.HoleTask.Utils
             ElementTransformUtils.MoveElement(doc, familyInstance.Id, moveVector);
         }
 
-        private bool DoesFamilyInstanceExistAtLocation(XYZ location)
-        {
-            const double tolerance = 0.01; // Небольшой допуск для сравнения координат, около 3 мм
 
-            foreach (FamilyInstance fi in this.intersectionRectangularCombineList)
-            {
-                XYZ existingLocation = (fi.Location as LocationPoint)?.Point;
-                if (existingLocation != null && existingLocation.IsAlmostEqualTo(location, tolerance))
-                {
-                    return true; // Найден существующий экземпляр в заданных координатах
-                }
-            }
-
-            return false; // Экземпляр в заданных координатах не найден
-        }
-
-        private bool DoesFamilyInstanceExistAtLocation(XYZ location, double roundHTThickness, double roundHTWidth, double roundHTHeight)
+        public static bool DoesFamilyInstanceExistAtLocation(List<FamilyInstance> intersectionRectangularCombineList, XYZ location, double roundHTThickness, double roundHTWidth, double roundHTHeight)
         {
             const double tolerance = 0.01; // Небольшой допуск для сравнения координат, около 3 мм
 
             // Предполагается, что roundHTThickness, roundHTWidth, и roundHTHeight уже в футах
             double roundHT = roundHTThickness + roundHTWidth + roundHTHeight;
 
-            foreach (FamilyInstance fi in this.intersectionRectangularCombineList)
+            foreach (FamilyInstance fi in intersectionRectangularCombineList)
             {
                 XYZ existingLocation = (fi.Location as LocationPoint)?.Point;
 

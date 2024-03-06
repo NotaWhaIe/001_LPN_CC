@@ -16,7 +16,10 @@ namespace Strana.Revit.HoleTask.Utils
         public static string OldTasksFloor { get; set; }
         public static string СreatedTasksWall { get; set; }
         public static string СreatedTasksFloor { get; set; }
-        public static string DeletedTasksId { get; set; }
+        public static string DeletedTasks { get; set; }
+        public static List<FamilyInstance> ЕxistingTaskWall { get; set; } = new List<FamilyInstance>();
+        public static List<FamilyInstance> ЕxistingTaskFloor { get; set; } = new List<FamilyInstance>();
+
         public static void SetScriptCreationMethod(FamilyInstance instance)
         {
             Parameter param = instance.LookupParameter("SD_Способ создания задания");

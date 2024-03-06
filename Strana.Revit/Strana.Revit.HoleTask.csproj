@@ -107,6 +107,7 @@
     <Compile Include="ElementCollections\LinkInstanseCollections.cs" />
     <Compile Include="ElementCollections\MepElementCollections.cs" />
     <Compile Include="FailuresProcessing\DeletedHoleTasksId.cs" />
+    <Compile Include="FailuresProcessing\Log.cs" />
     <Compile Include="FailuresProcessing\TaskStatistics.cs" />
     <Compile Include="HoleTaskCreators\SabFamilyInstenceCollections.cs" />
     <Compile Include="Extensions\GetterElementThickness.cs" />
