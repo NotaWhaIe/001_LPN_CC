@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Autodesk.Revit.DB;
@@ -153,37 +154,66 @@ namespace Strana.Revit.HoleTask.Extension.RevitElement
             return faceMaxSquare;
         }
 
-        private static CurveLoop MainOuterContourFromFace(Face faceWithHoles)
+        //private static CurveLoop MainOuterContourFromFace(Face faceWithHoles)
+        //{
+        //    EdgeArrayArray allFaceEdges = faceWithHoles.EdgeLoops;
+
+        //    List<CurveLoop> currentUnitedCurveLoopList = new();
+        //    CurveLoop currentUnitedCurveLoop = null;
+
+        //    foreach (EdgeArray agesOfOneFace in allFaceEdges)
+        //    {
+        //        List<Curve> unitedCurve = new List<Curve>();
+
+        //        foreach (Edge item in agesOfOneFace)
+        //        {
+        //            var curve = item.AsCurve();
+        //            unitedCurve.Add(curve);
+        //        }
+
+        //        List<CurveLoop> curveLoopList = new();
+        //        CurveLoop curvesLoop = CurveLoop.Create(unitedCurve);
+        //        curveLoopList.Add(curvesLoop);
+        //        if (currentUnitedCurveLoop == null || ExporterIFCUtils
+        //            .ComputeAreaOfCurveLoops(curveLoopList) > ExporterIFCUtils
+        //            .ComputeAreaOfCurveLoops(currentUnitedCurveLoopList))
+        //        {
+        //            currentUnitedCurveLoop = curvesLoop;
+        //            currentUnitedCurveLoopList = [curvesLoop];
+        //        }
+        //    }
+
+        //    return currentUnitedCurveLoop;
+        //}
+        private static CurveLoop MainOuterContourFromFace(Face face)
         {
-            EdgeArrayArray allFaceEdges = faceWithHoles.EdgeLoops;
+            EdgeArrayArray edgeLoops = face.EdgeLoops;
+            CurveLoop largestLoop = null;
+            double largestLength = 0;
 
-            List<CurveLoop> currentUnitedCurveLoopList = new();
-            CurveLoop currentUnitedCurveLoop = null;
-
-            foreach (EdgeArray agesOfOneFace in allFaceEdges)
+            foreach (EdgeArray edges in edgeLoops)
             {
-                List<Curve> unitedCurve = new List<Curve>();
-
-                foreach (Edge item in agesOfOneFace)
+                CurveLoop loop = new CurveLoop();
+                foreach (Edge edge in edges)
                 {
-                    var curve = item.AsCurve();
-                    unitedCurve.Add(curve);
+                    loop.Append(edge.AsCurve());
                 }
 
-                List<CurveLoop> curveLoopList = new();
-                CurveLoop curvesLoop = CurveLoop.Create(unitedCurve);
-                curveLoopList.Add(curvesLoop);
-                if (currentUnitedCurveLoop == null || ExporterIFCUtils
-                    .ComputeAreaOfCurveLoops(curveLoopList) > ExporterIFCUtils
-                    .ComputeAreaOfCurveLoops(currentUnitedCurveLoopList))
+                // Простая проверка на замкнутость, основанная на совпадении точек начала и конца
+                if (loop.First().GetEndPoint(0).IsAlmostEqualTo(loop.Last().GetEndPoint(1)))
                 {
-                    currentUnitedCurveLoop = curvesLoop;
-                    currentUnitedCurveLoopList = [curvesLoop];
+                    double loopLength = loop.Sum(c => c.Length);
+                    if (loopLength > largestLength)
+                    {
+                        largestLength = loopLength;
+                        largestLoop = loop;
+                    }
                 }
             }
 
-            return currentUnitedCurveLoop;
+            return largestLoop;
         }
+
 
         private static CurveLoop GetSweepPath(Solid solid)
         {

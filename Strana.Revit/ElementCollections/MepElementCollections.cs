@@ -115,26 +115,13 @@ namespace Strana.Revit.HoleTask.ElementCollections
             SphereByPoint.CreateSphereByPoint(transformedBoundingBox.Max, doc);
 
             BoundingBoxIntersectsFilter filter = new(outline);
-            //var c = new FilteredElementCollector(linkDoc)
-            //           .OfCategory(BuiltInCategory.OST_Walls)
-            //           .OfClass(typeof(Wall))
-            //           .WhereElementIsNotElementType()
-            //           .WherePasses(filter);
-            // Создаем правило фильтра, исключающее витражные стены
-            ParameterValueProvider provider = new ParameterValueProvider(wallTypeId);
-            FilterNumericRuleEvaluator evaluator = new FilterNumericEquals();
-            FilterRule rule = new FilterElementIdRule(provider, evaluator, WallKind.Curtain);
-            ElementParameterFilter curtainWallFilter = new ElementParameterFilter(rule, true); // true для инверсии правила
-
-            // Фильтр для получения стен, исключая витражные
             var c = new FilteredElementCollector(linkDoc)
-                .OfCategory(BuiltInCategory.OST_Walls)
-                .OfClass(typeof(Wall))
-                .WhereElementIsNotElementType()
-                .WherePasses(filter) // Пользовательский фильтр
-                .WherePasses(curtainWallFilter); // Исключение витражных стен
+                       .OfCategory(BuiltInCategory.OST_Walls)
+                       .OfClass(typeof(Wall))
+                       .WhereElementIsNotElementType()
+                       .WherePasses(filter);
 
-            var c2 = new FilteredElementCollector(linkDoc)
+           var c2 = new FilteredElementCollector(linkDoc)
             .OfCategory(BuiltInCategory.OST_Floors)
             .OfClass(typeof(Floor))
             .WhereElementIsNotElementType()
