@@ -154,65 +154,65 @@ namespace Strana.Revit.HoleTask.Extension.RevitElement
             return faceMaxSquare;
         }
 
-        //private static CurveLoop MainOuterContourFromFace(Face faceWithHoles)
-        //{
-        //    EdgeArrayArray allFaceEdges = faceWithHoles.EdgeLoops;
-
-        //    List<CurveLoop> currentUnitedCurveLoopList = new();
-        //    CurveLoop currentUnitedCurveLoop = null;
-
-        //    foreach (EdgeArray agesOfOneFace in allFaceEdges)
-        //    {
-        //        List<Curve> unitedCurve = new List<Curve>();
-
-        //        foreach (Edge item in agesOfOneFace)
-        //        {
-        //            var curve = item.AsCurve();
-        //            unitedCurve.Add(curve);
-        //        }
-
-        //        List<CurveLoop> curveLoopList = new();
-        //        CurveLoop curvesLoop = CurveLoop.Create(unitedCurve);
-        //        curveLoopList.Add(curvesLoop);
-        //        if (currentUnitedCurveLoop == null || ExporterIFCUtils
-        //            .ComputeAreaOfCurveLoops(curveLoopList) > ExporterIFCUtils
-        //            .ComputeAreaOfCurveLoops(currentUnitedCurveLoopList))
-        //        {
-        //            currentUnitedCurveLoop = curvesLoop;
-        //            currentUnitedCurveLoopList = [curvesLoop];
-        //        }
-        //    }
-
-        //    return currentUnitedCurveLoop;
-        //}
-        private static CurveLoop MainOuterContourFromFace(Face face)
+        private static CurveLoop MainOuterContourFromFace(Face faceWithHoles)
         {
-            EdgeArrayArray edgeLoops = face.EdgeLoops;
-            CurveLoop largestLoop = null;
-            double largestLength = 0;
+            EdgeArrayArray allFaceEdges = faceWithHoles.EdgeLoops;
 
-            foreach (EdgeArray edges in edgeLoops)
+            List<CurveLoop> currentUnitedCurveLoopList = new();
+            CurveLoop currentUnitedCurveLoop = null;
+
+            foreach (EdgeArray agesOfOneFace in allFaceEdges)
             {
-                CurveLoop loop = new CurveLoop();
-                foreach (Edge edge in edges)
+                List<Curve> unitedCurve = new List<Curve>();
+
+                foreach (Edge item in agesOfOneFace)
                 {
-                    loop.Append(edge.AsCurve());
+                    var curve = item.AsCurve();
+                    unitedCurve.Add(curve);
                 }
 
-                // Простая проверка на замкнутость, основанная на совпадении точек начала и конца
-                if (loop.First().GetEndPoint(0).IsAlmostEqualTo(loop.Last().GetEndPoint(1)))
+                List<CurveLoop> curveLoopList = new();
+                CurveLoop curvesLoop = CurveLoop.Create(unitedCurve);
+                curveLoopList.Add(curvesLoop);
+                if (currentUnitedCurveLoop == null || ExporterIFCUtils
+                    .ComputeAreaOfCurveLoops(curveLoopList) > ExporterIFCUtils
+                    .ComputeAreaOfCurveLoops(currentUnitedCurveLoopList))
                 {
-                    double loopLength = loop.Sum(c => c.Length);
-                    if (loopLength > largestLength)
-                    {
-                        largestLength = loopLength;
-                        largestLoop = loop;
-                    }
+                    currentUnitedCurveLoop = curvesLoop;
+                    currentUnitedCurveLoopList = [curvesLoop];
                 }
             }
 
-            return largestLoop;
+            return currentUnitedCurveLoop;
         }
+        //private static CurveLoop MainOuterContourFromFace(Face face)
+        //{
+        //    EdgeArrayArray edgeLoops = face.EdgeLoops;
+        //    CurveLoop largestLoop = null;
+        //    double largestLength = 0;
+
+        //    foreach (EdgeArray edges in edgeLoops)
+        //    {
+        //        CurveLoop loop = new CurveLoop();
+        //        foreach (Edge edge in edges)
+        //        {
+        //            loop.Append(edge.AsCurve());
+        //        }
+
+        //        // Простая проверка на замкнутость, основанная на совпадении точек начала и конца
+        //        if (loop.First().GetEndPoint(0).IsAlmostEqualTo(loop.Last().GetEndPoint(1)))
+        //        {
+        //            double loopLength = loop.Sum(c => c.Length);
+        //            if (loopLength > largestLength)
+        //            {
+        //                largestLength = loopLength;
+        //                largestLoop = loop;
+        //            }
+        //        }
+        //    }
+
+        //    return largestLoop;
+        //}
 
 
         private static CurveLoop GetSweepPath(Solid solid)

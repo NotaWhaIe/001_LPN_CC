@@ -26,8 +26,16 @@ namespace Strana.Revit.HoleTask.Utils
         /// <remark>Intersected volume don't calculeted corrected, that whay I used try-catch</remark>t
         internal List<FamilyInstance> JoinAllHoleTask(List<FamilyInstance> allFamilyInstances00)
         {
-            Document doc = allFamilyInstances00.First().Document;
+            var firstInstance = allFamilyInstances00.FirstOrDefault();
 
+            // Если нет элементов или документ первого элемента равен null, возвращаем исходный список
+            if (firstInstance == null || firstInstance.Document == null)
+            {
+                return allFamilyInstances00;
+            }
+
+            // Теперь можно безопасно использовать документ, так как мы проверили его наличие
+            Document doc = firstInstance.Document;
             List<FamilyInstance> intersectionWallRectangularCombineList01 = new();
             List<FamilyInstance> intersectionFloorRectangularCombineList02 = new();
             HoleTasksGetter.AddFamilyInstancesToList(doc, "(Отв_Задание)_Стены_Прямоугольное", intersectionWallRectangularCombineList01);
