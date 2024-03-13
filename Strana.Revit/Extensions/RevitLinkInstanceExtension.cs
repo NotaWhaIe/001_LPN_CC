@@ -35,7 +35,6 @@ namespace Strana.Revit.HoleTask.Extensions
                     .Concat(IntersectingElementExtension.CreateHoleTasksByIntersectedElements(linkInstance))
                     .ToList();
                 
-
                 // HoleTasksJoiner 
                 List<FamilyInstance> roundHoleTaskList = new HoleTasksJoiner().JoinAllHoleTask(allHoleTaskByRevitLinkInstance);
 

@@ -28,11 +28,6 @@ namespace Strana.Revit.HoleTask.Extensions
 
             IEnumerable<Element> mepElements = MepElementSelector.GetSelectedOrAllMepElements();
 
-            //IEnumerable<Element> mepElements = new FilteredElementCollector(doc)
-            //             .OfCategory(BuiltInCategory.OST_DuctCurves)
-            //             .OfClass(typeof(Duct))
-            //             .WhereElementIsNotElementType(); // список всех меп элементов либо список всех меп элементов выбранных пользователем.
-
             foreach (Element mepElement in mepElements)
             {
                 var wallAndFloorsInMepBBox = mepElement.AllElementsByMepBBox(doc, linkInstance.GetTotalTransform(), linkDoc);

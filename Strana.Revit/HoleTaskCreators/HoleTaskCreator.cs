@@ -133,6 +133,7 @@ namespace Strana.Revit.HoleTask.Utils
                     holeFamilySymbol,
                     lvl,
                     StructuralType.NonStructural);
+                GlobalParameters.SetScriptCreationMethod(holeTask);
                 this.intersectionRectangularCombineList.Add(holeTask);
 
                 double holeTaskAngle = this.RotateHoleTaskAngle(mepElement, orientation, holeTask, intersection, intersectedElement, lvl, linkInstance);
@@ -158,7 +159,6 @@ namespace Strana.Revit.HoleTask.Utils
                 holeTask.LookupParameter(":Примечание")?.Set(GlobalParameters.LinkInfo);
                 holeTask.get_Parameter(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS).Set(GlobalParameters.Date);
                 holeTask.LookupParameter("SD_Версия задания")?.Set(GlobalParameters.UserName);
-                GlobalParameters.SetScriptCreationMethod(holeTask);
 
                 return holeTask;
             }
