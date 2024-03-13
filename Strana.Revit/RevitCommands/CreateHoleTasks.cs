@@ -26,6 +26,7 @@ namespace Strana.Revit.HoleTask.RevitCommands
             stopwatch.Start();
 
             UIDocument uidoc = commandData.Application.ActiveUIDocument;
+            MepElementSelector.UIDocument = uidoc;
             Document doc = uidoc.Document;
             docsaver.doc = doc;
             string userName = commandData.Application.Application.Username.ToString();

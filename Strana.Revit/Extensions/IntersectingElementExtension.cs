@@ -26,10 +26,12 @@ namespace Strana.Revit.HoleTask.Extensions
             Document doc = linkInstance.Document;
             Document linkDoc = linkInstance.GetLinkDocument();
 
-            IEnumerable<Element> mepElements = new FilteredElementCollector(doc)
-                          .OfCategory(BuiltInCategory.OST_DuctCurves)
-                          .OfClass(typeof(Duct))
-                          .WhereElementIsNotElementType(); // список всех меп элементов либо список всех меп элементов выбранных пользователем.
+            IEnumerable<Element> mepElements = MepElementSelector.GetSelectedOrAllMepElements();
+
+            //IEnumerable<Element> mepElements = new FilteredElementCollector(doc)
+            //             .OfCategory(BuiltInCategory.OST_DuctCurves)
+            //             .OfClass(typeof(Duct))
+            //             .WhereElementIsNotElementType(); // список всех меп элементов либо список всех меп элементов выбранных пользователем.
 
             foreach (Element mepElement in mepElements)
             {
