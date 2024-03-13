@@ -105,7 +105,7 @@
       <DependentUpon>Confing.settings</DependentUpon>
     </Compile>
     <Compile Include="ElementCollections\LinkInstanseCollections.cs" />
-    <Compile Include="ElementCollections\MepElementCollections.cs" />
+    <Compile Include="ElementCollections\WallFloorLinkElementCollections.cs" />
     <Compile Include="ElementCollections\MepElementSelector.cs" />
     <Compile Include="FailuresProcessing\DeletedHoleTasksId.cs" />
     <Compile Include="FailuresProcessing\Log.cs" />

@@ -17,7 +17,7 @@ namespace Strana.Revit.HoleTask.ElementCollections
     /// <summary>
     /// Class contains all mep elements in revit model.
     /// </summary>
-    public static class MepElementCollections
+    public static class WallFloorLinkElementCollections
     {/// <summary>
      /// Gets all cable trays to check intersecting + fastFilterBB.
      /// </summary>

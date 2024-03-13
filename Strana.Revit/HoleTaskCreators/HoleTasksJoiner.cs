@@ -34,12 +34,11 @@ namespace Strana.Revit.HoleTask.Utils
                 return allFamilyInstances00;
             }
 
-            // Теперь можно безопасно использовать документ, так как мы проверили его наличие
             Document doc = firstInstance.Document;
             List<FamilyInstance> intersectionWallRectangularCombineList01 = new();
             List<FamilyInstance> intersectionFloorRectangularCombineList02 = new();
-            HoleTasksGetter.AddFamilyInstancesToList(doc, "(Отв_Задание)_Стены_Прямоугольное", intersectionWallRectangularCombineList01);
-            HoleTasksGetter.AddFamilyInstancesToList(doc, "(Отв_Задание)_Перекрытия_Прямоугольное", intersectionFloorRectangularCombineList02);
+            HoleTasksGetter.AddFamilyInstancesToList(doc, "(Отв_Задание)_Стены_Прямоугольное", intersectionWallRectangularCombineList01, "SD_Способ создания задания", "СКРИПТ");
+            HoleTasksGetter.AddFamilyInstancesToList(doc, "(Отв_Задание)_Перекрытия_Прямоугольное", intersectionFloorRectangularCombineList02, "SD_Способ создания задания", "СКРИПТ");
 
             if (!areJoin)
             {
