@@ -12,11 +12,13 @@ namespace Strana.Revit.HoleTask.Utils
         public static string LinkInfo { get; set; }
         public static string SectionName { get; set; }
         public static string UserName { get; set; }
+
         public static string OldTasksWall { get; set; }
         public static string OldTasksFloor { get; set; }
         public static string СreatedTasksWall { get; set; }
         public static string СreatedTasksFloor { get; set; }
         public static string DeletedTasks { get; set; }
+
         public static List<FamilyInstance> ЕxistingTask { get; set; } = new List<FamilyInstance>();
         public static List<FamilyInstance> ЕxistingTaskWall { get; set; } = new List<FamilyInstance>();
         public static List<FamilyInstance> ЕxistingTaskFloor { get; set; } = new List<FamilyInstance>();

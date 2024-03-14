@@ -24,7 +24,7 @@ namespace Strana.Revit.HoleTask.FailuresProcessing
                              $"Новых заданий (стены): {GlobalParameters.СreatedTasksWall}\n" +
                              $"Было заданий (перекрытия): {GlobalParameters.OldTasksFloor}\n" +
                              $"Было заданий (стены): {GlobalParameters.OldTasksWall}\n" +
-                             $"Объединено заданий (удалено): {GlobalParameters.DeletedTasks}\n" +
+                             $"Удалено (после объединения): {GlobalParameters.DeletedTasks}\n" +
                              $"\nВремя работы: {elapsedTime.Seconds.ToString()} сек.";
 
             // Отображаем TaskDialog с сформированным сообщением
