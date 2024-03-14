@@ -12,7 +12,7 @@ namespace Strana.Revit.HoleTask {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.8.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.9.0.0")]
     internal sealed partial class Confing : global::System.Configuration.ApplicationSettingsBase {
         
         private static Confing defaultInstance = ((Confing)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Confing())));
@@ -166,6 +166,30 @@ namespace Strana.Revit.HoleTask {
             }
             set {
                 this["areRoundHoleTaskDimensions"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("30")]
+        public int minMepElementSize {
+            get {
+                return ((int)(this["minMepElementSize"]));
+            }
+            set {
+                this["minMepElementSize"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("50")]
+        public int minMepElementLength {
+            get {
+                return ((int)(this["minMepElementLength"]));
+            }
+            set {
+                this["minMepElementLength"] = value;
             }
         }
     }

@@ -31,8 +31,10 @@ namespace Strana.Revit.HoleTask.ViewModel
         private int offSetHoleTask = Confing.Default.offSetHoleTask;
         private bool areJoin = Confing.Default.areJoin;
         private int offSetJoin = Confing.Default.offSetJoin;
+        //private bool arePickUpElements = Confing.Default.arePickUpElements;    
         private bool arePlaceHoleTaskInOpenings = Confing.Default.arePlaceHoleTaskInOpenings;
-        private bool arePickUpElements = Confing.Default.arePickUpElements;
+        private int minMepElementSize = Confing.Default.minMepElementSize;    
+        private int minMepElementLength = Confing.Default.minMepElementLength;    
 
         public ObservableCollection<RevitLinkData> LinkedFileData { get; set; }
         
@@ -151,6 +153,17 @@ namespace Strana.Revit.HoleTask.ViewModel
                 OnPropertyChanged(nameof(this.offSetJoin));
             }
         }
+        //public bool ArePickUpElements
+        //{
+        //    get => this.arePickUpElements;
+        //    set
+        //    {
+        //        this.arePickUpElements = value;
+        //        Confing.Default.arePickUpElements = this.arePickUpElements;
+        //        Confing.Default.Save();
+        //        OnPropertyChanged(nameof(this.arePickUpElements));
+        //    }
+        //}
         public bool ArePlaceHoleTaskInOpenings
         {
             get => this.arePlaceHoleTaskInOpenings;
@@ -162,17 +175,35 @@ namespace Strana.Revit.HoleTask.ViewModel
                 OnPropertyChanged(nameof(this.arePlaceHoleTaskInOpenings));
             }
         }
-        public bool ArePickUpElements
+        public int MinMepElementSize
         {
-            get => this.arePickUpElements;
+            get => this.minMepElementSize;
             set
             {
-                this.arePickUpElements = value;
-                Confing.Default.arePickUpElements = this.arePickUpElements;
-                Confing.Default.Save();
-                OnPropertyChanged(nameof(this.arePickUpElements));
+                if (value is int)
+                {
+                    minMepElementSize = value;
+                    Confing.Default.minMepElementSize = this.minMepElementSize;
+                    Confing.Default.Save();
+                }
+                OnPropertyChanged(nameof(this.minMepElementSize));
             }
         }
+        public int MinMepElementLength
+        {
+            get => this.minMepElementLength;
+            set
+            {
+                if (value is int)
+                {
+                    minMepElementLength = value;
+                    Confing.Default.minMepElementLength = this.minMepElementLength;
+                    Confing.Default.Save();
+                }
+                OnPropertyChanged(nameof(this.minMepElementLength));
+            }
+        }
+
 
         ///test example
         public ICommand RunScriptCommand => new RouteCommands(() => this.runScript());

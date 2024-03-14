@@ -9,7 +9,7 @@
              mc:Ignorable="d"
               Title="{Binding Version, StringFormat='Задание на отверстия {0}'}"
              Closing="Window_Closing"
-             d:Height="550" Width="700" MaxHeight="550" MaxWidth="700"
+             d:Height="550" Width="740" MaxHeight="600" MaxWidth="740"
 
     xmlns:Behaviors="http://schemas.microsoft.com/xaml/behaviors"
 >
@@ -44,64 +44,70 @@
 
         <Grid Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" >
             <Grid.RowDefinitions>
-                <!-- Колонка 0 -->
+                <!-- строка 0 -->
                 <RowDefinition/>
-                <!-- Колонка 1 -->
+                <!-- строка 1 -->
                 <RowDefinition/>
-                <!-- Колонка 2 -->
+                <!-- строка 2 -->
                 <RowDefinition/>
-                <!-- Колонка 3 -->
+                <!-- строка 3 -->
                 <RowDefinition/>
-                <!-- Колонка 4 -->
+                <!-- строка 4 -->
                 <RowDefinition/>
-                <!-- Колонка 5 -->
+                <!-- строка 5 -->
                 <RowDefinition/>
-                <!-- Колонка 6 -->
+                <!-- строка 6 -->
                 <RowDefinition/>
-                <!-- Колонка 7 -->
+                <!-- строка 7 -->
+                <RowDefinition/>
+                <!-- строка 8 -->
                 <RowDefinition/>
             </Grid.RowDefinitions>
 
-            <Grid  Grid.Column="1" Grid.Row="0" HorizontalAlignment="Left">
-                <CheckBox Content="Округлить расстояния от заданий до оси в плане" VerticalAlignment="Top" IsChecked="{Binding Path=AreRoundHoleTaskInPlane,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Width="312"/>
+            <Grid Grid.Row="0" HorizontalAlignment="Left" Width="338">
+                <CheckBox Content="Округлить расстояния от заданий до оси в плане, мм" VerticalAlignment="Top" IsChecked="{Binding Path=AreRoundHoleTaskInPlane,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Width="322"/>
                 <TextBlock Text="Δ1 =                " HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 <TextBox Grid.Row="0" HorizontalAlignment="Center"  TextWrapping="Wrap" Text="{Binding Path=RoundHoleTaskInPlane}" VerticalAlignment="Center" Width="25"  Grid.RowSpan="2"/>
+                <!--<TextBox Grid.Row="0" HorizontalAlignment="Center"  TextWrapping="Wrap" Text="{Binding Path=RoundHoleTaskInPlane}" VerticalAlignment="Center" Width="25"  Grid.RowSpan="2"/>-->
             </Grid>
-
-            <Grid  Grid.Column="1" Grid.Row="1" HorizontalAlignment="Left">
-                <CheckBox Content="Округлить размеры заданий" VerticalAlignment="Top" IsChecked="{Binding Path=AreRoundHoleTaskDimensions,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Width="312" />
+            <Grid Grid.Row="1" HorizontalAlignment="Left" Width="338">
+                <CheckBox Content="Округлить размеры заданий, мм" VerticalAlignment="Top" IsChecked="{Binding Path=AreRoundHoleTaskDimensions,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Width="312" />
                 <TextBlock Text="Δ2 =                " HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                <TextBox Grid.Row="0" HorizontalAlignment="Center"  TextWrapping="Wrap" Text="{Binding Path=RoundHoleTaskDimensions}" VerticalAlignment="Center" Width="25"  Grid.RowSpan="2"/>
+                <TextBox HorizontalAlignment="Left"  TextWrapping="Wrap" Text="{Binding Path=RoundHoleTaskDimensions}" VerticalAlignment="Center" Width="26" Margin="156,0,0,0" RenderTransformOrigin="-0.354,0.622"/>
             </Grid>
-
-            <Grid  Grid.Column="1" Grid.Row="2" HorizontalAlignment="Left">
-                <TextBox HorizontalAlignment="Center"  TextWrapping="Wrap" Text="{Binding Path=OffSetHoleTask}" VerticalAlignment="Center" Width="26"/>
-                <TextBlock Text="Δ3 =" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="117,0,0,0"/>
-
-                <TextBlock Text="Расстояние между инженерной системой и заданием" HorizontalAlignment="Left" VerticalAlignment="Top" Width="312"/>
+            <Grid Grid.Row="2" HorizontalAlignment="Left" Width="338">
+                <TextBox HorizontalAlignment="Center"  TextWrapping="Wrap" Text="{Binding Path=OffSetHoleTask}" VerticalAlignment="Top" Width="26" Margin="0,16,0,0"/>
+                <TextBlock Text="Δ3 =" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="130,0,0,0"/>
+                <TextBlock Text="Расстояние между инженерной системой и заданием, мм" HorizontalAlignment="Left" VerticalAlignment="Top" Width="321"/>
             </Grid>
-
-            <Grid  Grid.Column="1" Grid.Row="3" HorizontalAlignment="Left">
-                <CheckBox Content="Объединять пересекающиеся задания" VerticalAlignment="Top" IsChecked="{Binding Path=AreJoin,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Width="312" />
+            <Grid Grid.Row="3" HorizontalAlignment="Left" Width="338">
+                <CheckBox Content="Объединять пересекающиеся задания, мм" VerticalAlignment="Top" IsChecked="{Binding Path=AreJoin,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Width="312" />
                 <TextBlock Text="Δ4 =                " HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                <TextBox Grid.Row="0" HorizontalAlignment="Center"  TextWrapping="Wrap" Text="{Binding Path=OffSetJoin}" VerticalAlignment="Center" Width="25"  Grid.RowSpan="2"/>
+                <TextBox HorizontalAlignment="Center"  TextWrapping="Wrap" Text="{Binding Path=OffSetJoin}" VerticalAlignment="Center" Width="25"/>
             </Grid>
-
-            <Grid  Grid.Column="1" Grid.Row="4" HorizontalAlignment="Left">
-                <!--<CheckBox Content="Размещать отверстия в проемах" VerticalAlignment="Top" IsChecked="{Binding Path=ArePlaceHoleTaskInOpenings,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Width="312"/>
-                <CheckBox Content="Выбрать отдельные MEP элементы" VerticalAlignment="Center" IsChecked="{Binding Path=ArePickUpElements,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Width="312" />-->
+            <Grid Grid.Row="4" HorizontalAlignment="Left" Width="338">
+                <TextBox HorizontalAlignment="Center"  TextWrapping="Wrap" Text="{Binding Path=MinMepElementSize}" VerticalAlignment="Center" Width="26"/>
+                <TextBlock Text="от =" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="130,0,0,0"/>
+                <TextBlock Text="Минимальный габарит инженерной системы, мм" HorizontalAlignment="Left" VerticalAlignment="Top" Width="321"/>
+            </Grid>
+            <Grid Grid.Row="5" HorizontalAlignment="Left" Width="338">
+                <TextBox HorizontalAlignment="Center"  TextWrapping="Wrap" Text="{Binding Path=MinMepElementLength}" VerticalAlignment="Top" Width="26" Margin="0,16,0,0" RenderTransformOrigin="0.723,0.695"/>
+                <TextBlock Text="от =" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="130,0,0,0"/>
+                <TextBlock Text="Минимальная длина участка инженерной системы, мм" HorizontalAlignment="Left" VerticalAlignment="Top" Width="321"/>
+            </Grid>
+            <Grid  Grid.Column="1" Grid.Row="6" HorizontalAlignment="Left">
+                <!--<CheckBox Content="Размещать отверстия в проемах" VerticalAlignment="Top" IsChecked="{Binding Path=ArePlaceHoleTaskInOpenings,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Width="312"/>-->
+                <!--<CheckBox Content="Выбрать " VerticalAlignment="Center" IsChecked="{Binding Path=ArePickUpElements,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Width="312" />-->
                 <TextBlock Text="Выберите связанный файл (несколько):" HorizontalAlignment="Left" VerticalAlignment="Bottom"  Width="312"/>
             </Grid>
-
-
-            <Grid Grid.Column="1" Grid.Row="5" HorizontalAlignment="Left" Grid.RowSpan="6">
+            <Grid Grid.Column="1" Grid.Row="7" HorizontalAlignment="Left" Grid.RowSpan="8">
                 <!-- Элемент в колонке 5 и 6, который занимает одну колонку -->
                 <ListBox x:Name="listBox_RevitLinkInstance" 
                      ItemsSource="{Binding Path= LinkedFileData}" 
                      SelectionMode="Extended" 
-                     Height="147" 
+                     Height="78" 
                      VerticalAlignment="Top" 
-                     HorizontalAlignment="Left"
+                     HorizontalAlignment="Center"
                      Width="312">
                     <ListBox.ItemContainerStyle>
                         <Style TargetType="{x:Type ListBoxItem}">
@@ -110,7 +116,6 @@
                     </ListBox.ItemContainerStyle>
 
                     <ListBox.ItemTemplate>
-
                         <DataTemplate>
                             <TextBlock Text="{Binding Path=Name}" TextWrapping="Wrap" MaxWidth="290" FontSize ="11"/>
                         </DataTemplate>
@@ -121,8 +126,8 @@
             <!--<Grid  Grid.Column="1" Grid.Row="6" HorizontalAlignment="Left">
             </Grid>-->
 
-            <Button Grid.Column="1" Grid.Row="7" Opacity ="1" Content="Запустить" MinWidth="130" Click="RunProgram"
-                    Margin="6,0,6,0" Padding="-10"
+            <Button Grid.Row="8" Opacity ="1" Content="Запустить" MinWidth="130" Click="RunProgram"
+                    Margin="6,22,36,5" Padding="-10"
                     Cursor="Hand">
 
                 <Button.ToolTip>
