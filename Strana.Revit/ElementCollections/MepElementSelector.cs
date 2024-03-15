@@ -11,8 +11,8 @@ namespace Strana.Revit.HoleTask.ElementCollections
     public static class MepElementSelector
     {
         public static UIDocument UIDocument { get; set; }
-        private static readonly double minMepElementLength = Confing.Default.minMepElementLength;
-        private static readonly double minMepElementSize = Confing.Default.minMepElementSize;
+        private static readonly double minMepElementLength = (Confing.Default.minMepElementLength);
+        private static readonly double minMepElementSize = (Confing.Default.minMepElementSize);
 
         public static IEnumerable<Element> GetSelectedOrAllMepElements()
         {

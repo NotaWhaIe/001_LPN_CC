@@ -68,7 +68,6 @@
                 <CheckBox Content="Округлить расстояния от заданий до оси в плане, мм" VerticalAlignment="Top" IsChecked="{Binding Path=AreRoundHoleTaskInPlane,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Width="322"/>
                 <TextBlock Text="Δ1 =                " HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 <TextBox Grid.Row="0" HorizontalAlignment="Center"  TextWrapping="Wrap" Text="{Binding Path=RoundHoleTaskInPlane}" VerticalAlignment="Center" Width="25"  Grid.RowSpan="2"/>
-                <!--<TextBox Grid.Row="0" HorizontalAlignment="Center"  TextWrapping="Wrap" Text="{Binding Path=RoundHoleTaskInPlane}" VerticalAlignment="Center" Width="25"  Grid.RowSpan="2"/>-->
             </Grid>
             <Grid Grid.Row="1" HorizontalAlignment="Left" Width="338">
                 <CheckBox Content="Округлить размеры заданий, мм" VerticalAlignment="Top" IsChecked="{Binding Path=AreRoundHoleTaskDimensions,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Width="312" />
@@ -96,12 +95,10 @@
                 <TextBlock Text="Минимальная длина участка инженерной системы, мм" HorizontalAlignment="Left" VerticalAlignment="Top" Width="321"/>
             </Grid>
             <Grid  Grid.Column="1" Grid.Row="6" HorizontalAlignment="Left">
-                <!--<CheckBox Content="Размещать отверстия в проемах" VerticalAlignment="Top" IsChecked="{Binding Path=ArePlaceHoleTaskInOpenings,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Width="312"/>-->
-                <!--<CheckBox Content="Выбрать " VerticalAlignment="Center" IsChecked="{Binding Path=ArePickUpElements,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Width="312" />-->
+                <CheckBox Content="Размещать отверстия в проемах" VerticalAlignment="Top" IsChecked="{Binding Path=ArePlaceHoleTaskInOpenings,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Width="312"/>
                 <TextBlock Text="Выберите связанный файл (несколько):" HorizontalAlignment="Left" VerticalAlignment="Bottom"  Width="312"/>
             </Grid>
             <Grid Grid.Column="1" Grid.Row="7" HorizontalAlignment="Left" Grid.RowSpan="8">
-                <!-- Элемент в колонке 5 и 6, который занимает одну колонку -->
                 <ListBox x:Name="listBox_RevitLinkInstance" 
                      ItemsSource="{Binding Path= LinkedFileData}" 
                      SelectionMode="Extended" 
@@ -122,9 +119,6 @@
                     </ListBox.ItemTemplate>
                 </ListBox>
             </Grid>
-
-            <!--<Grid  Grid.Column="1" Grid.Row="6" HorizontalAlignment="Left">
-            </Grid>-->
 
             <Button Grid.Row="8" Opacity ="1" Content="Запустить" MinWidth="130" Click="RunProgram"
                     Margin="6,22,36,5" Padding="-10"

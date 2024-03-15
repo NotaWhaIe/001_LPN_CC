@@ -31,7 +31,7 @@ namespace Strana.Revit.HoleTask.ViewModel
         private int offSetHoleTask = Confing.Default.offSetHoleTask;
         private bool areJoin = Confing.Default.areJoin;
         private int offSetJoin = Confing.Default.offSetJoin;
-        //private bool arePickUpElements = Confing.Default.arePickUpElements;    
+        private bool arePickUpElements = Confing.Default.arePickUpElements;
         private bool arePlaceHoleTaskInOpenings = Confing.Default.arePlaceHoleTaskInOpenings;
         private int minMepElementSize = Confing.Default.minMepElementSize;    
         private int minMepElementLength = Confing.Default.minMepElementLength;    

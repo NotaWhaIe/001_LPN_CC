@@ -20,13 +20,14 @@ namespace Strana.Revit.HoleTask.Extension.RevitElement
     /// <summary>
     /// This extension for getting element solids.
     /// </summary>
-    public static class SolidGetter
+    public static class WallFloorSolidGetter
     {
         private static readonly Options Opt = new()
         {
             ComputeReferences = true,
             DetailLevel = ViewDetailLevel.Fine,
         };
+        private static bool arePlaceHoleTaskInOpenings => Confing.Default.arePlaceHoleTaskInOpenings;
 
         /// <summary>
         /// Get from wall and floor solid without holes.
@@ -37,41 +38,33 @@ namespace Strana.Revit.HoleTask.Extension.RevitElement
         /// <remarks>now return solid with holes.</remarks>
         public static Solid GetSolidWithoutHoles(this Element element, RevitLinkInstance revitLink)
         {
+            Transform transform = revitLink.GetTotalTransform();
+            Solid solidWithHoles = element.GetSolidWithHoles();
+            if (!arePlaceHoleTaskInOpenings)
+            {
+                return SolidUtils.CreateTransformed(solidWithHoles, transform);
+            }
             try
             {
-                Transform transform = revitLink.GetTotalTransform();
-                Solid solidWithHoles = element.GetSolidWithHoles();
                 Face solidFacade = GetSolidMainFace(solidWithHoles);
-
-
-                /// фикс получения солида. беру нормль от фейс.
                 XYZ solidFacadeNormal = solidFacade.ComputeNormal(new UV(0, 0));
-
-                CurveLoop outerСontour = MainOuterContourFromFace(solidFacade); // внешний контур
+                CurveLoop outerСontour = MainOuterContourFromFace(solidFacade); 
                 List<CurveLoop> outerLoops = [outerСontour];
-
-                /// получаем длину в дабл от кёрв лууп
                 double GetCurveLoopLength(CurveLoop curveLoop)
                 {
                     double totalLength = 0.0;
-
                     foreach (Curve curve in curveLoop)
                     {
                         totalLength += curve.Length;
                     }
-
                     return totalLength;
                 }
-                double sweepPathLenght=element.GetInterctedElementThickness();
+                double sweepPathLenght = element.GetInterctedElementThickness();
                 XYZ start_point = outerСontour.GetCurveLoopIterator().Current.GetEndPoint(0);
                 XYZ end_point = start_point - sweepPathLenght * solidFacadeNormal.Normalize();
-
-                // Создаем кривую на основе точек начала и конца
                 Curve curve = Line.CreateBound(start_point, end_point);
-
                 List<Curve> curvel = [curve];
                 CurveLoop edgeMinCurvesLoop = CurveLoop.Create(curvel);
-
                 Solid solidWithoutHoles = GeometryCreationUtilities
                     .CreateSweptGeometry(edgeMinCurvesLoop, 0, 0, outerLoops);
 
@@ -79,32 +72,9 @@ namespace Strana.Revit.HoleTask.Extension.RevitElement
             }
             catch
             {
-                Transform transform = revitLink.GetTotalTransform();
-                Solid solidWithHoles = element.GetSolidWithHoles();
                 return SolidUtils.CreateTransformed(solidWithHoles, transform);
             }
         }
-        /// <summary>
-        /// bool give information are need see collision by this element.
-        /// </summary>
-        /// <param name="element">floor or wall.</param>
-        /// <returns> are need create hole task by current element.</returns>
-        public static bool AreElementsHaveFaces(this Element element)
-        {
-            Solid solid = element.GetSolidWithHoles();
-            if (solid == null)
-            {
-                return false;
-            }
-
-            foreach (var face in solid.Faces)
-            {
-                return true;
-            }
-
-            return false;
-        }
-
         public static Solid GetSolidWithHoles(this Element element)
         {
             GeometryElement geometryElement = element.get_Geometry(Opt);
@@ -122,7 +92,6 @@ namespace Strana.Revit.HoleTask.Extension.RevitElement
 
             return largestSolid;
         }
-
         /// <summary>
         /// return element façade face.
         /// </summary>
@@ -153,7 +122,6 @@ namespace Strana.Revit.HoleTask.Extension.RevitElement
 
             return faceMaxSquare;
         }
-
         private static CurveLoop MainOuterContourFromFace(Face faceWithHoles)
         {
             EdgeArrayArray allFaceEdges = faceWithHoles.EdgeLoops;
@@ -184,52 +152,6 @@ namespace Strana.Revit.HoleTask.Extension.RevitElement
             }
 
             return currentUnitedCurveLoop;
-        }
-        //private static CurveLoop MainOuterContourFromFace(Face face)
-        //{
-        //    EdgeArrayArray edgeLoops = face.EdgeLoops;
-        //    CurveLoop largestLoop = null;
-        //    double largestLength = 0;
-
-        //    foreach (EdgeArray edges in edgeLoops)
-        //    {
-        //        CurveLoop loop = new CurveLoop();
-        //        foreach (Edge edge in edges)
-        //        {
-        //            loop.Append(edge.AsCurve());
-        //        }
-
-        //        // Простая проверка на замкнутость, основанная на совпадении точек начала и конца
-        //        if (loop.First().GetEndPoint(0).IsAlmostEqualTo(loop.Last().GetEndPoint(1)))
-        //        {
-        //            double loopLength = loop.Sum(c => c.Length);
-        //            if (loopLength > largestLength)
-        //            {
-        //                largestLength = loopLength;
-        //                largestLoop = loop;
-        //            }
-        //        }
-        //    }
-
-        //    return largestLoop;
-        //}
-
-
-        private static CurveLoop GetSweepPath(Solid solid)
-        {
-            Edge edgeMin = null;
-            var edges = solid.Edges;
-            foreach (Edge solidEdge in edges)
-            {
-                if (edgeMin == null || edgeMin.AsCurve().Length > solidEdge.AsCurve().Length)
-                {
-                    edgeMin = solidEdge;
-                }
-            }
-
-            List<Curve> curve = [edgeMin?.AsCurve() ?? null];
-            CurveLoop edgeMinCurvesLoop = CurveLoop.Create(curve);
-            return edgeMinCurvesLoop;
         }
     }
 }
