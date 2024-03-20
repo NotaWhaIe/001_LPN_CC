@@ -152,6 +152,7 @@
     <Compile Include="ViewModel\HoleTaskViewModel.cs" />
     <Compile Include="ViewModel\RelayCommand.cs" />
     <Compile Include="ViewModel\RevitLinkData.cs" />
+    <Compile Include="ViewModel\WpfSettings.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.editorconfig">
