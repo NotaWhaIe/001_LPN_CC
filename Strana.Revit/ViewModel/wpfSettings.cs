@@ -8,27 +8,29 @@ namespace Strana.Revit.HoleTask.ViewModel
 {
     public static class WpfSettings
     {
-        public static int MinMepElementLength
+        /// пподключить везде где используется
+        /// булевые тоже добавить
+        public static double MinMepElementLength
         {
             get { return Confing.Default.minMepElementLength; }
         }
-        public static int MinMepElementSize
+        public static double MinMepElementSize
         {
             get { return Confing.Default.minMepElementSize; }
         }
-        public static int OffSetJoin
+        public static double OffSetJoin
         {
             get { return Confing.Default.offSetJoin; }
         }
-        public static int OffSetHoleTask
+        public static double OffSetHoleTask
         {
             get { return Confing.Default.offSetHoleTask; }
         }
-        public static int RoundHoleTaskDimensions
+        public static double RoundHoleTaskDimensions
         {
             get { return Confing.Default.roundHoleTaskDimensions; }
         }
-        public static int RoundHoleTaskInPlane
+        public static double RoundHoleTaskInPlane
         {
             get { return Confing.Default.roundHoleTaskInPlane; }
         }

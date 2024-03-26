@@ -47,8 +47,8 @@ namespace Strana.Revit.HoleTask.Extensions
                             intersectedItemHoleTasks.Add(createdHoleTask);
                         }
                     }
-                }             
-            }            
+                }
+            }
 
             return intersectedItemHoleTasks;
         }

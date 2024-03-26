@@ -22,7 +22,7 @@ namespace Strana.Revit.HoleTask.RevitCommands
         public RibbonPanel CreateRibbonPanel(UIControlledApplication application, string tabName = "Strana")
         {
             RibbonPanel ribbonPanel = application.CreateRibbonPanel(tabName, "ИОС");
-            AddPushButton(ribbonPanel, "Задание на отверстия", Assembly.GetExecutingAssembly().Location, "Strana.Revit.HoleTask.RevitCommands.CreateHoleTasks", "Разместить задания на отверстия");
+            AddPushButton(ribbonPanel, "Задание\nна отверстия", Assembly.GetExecutingAssembly().Location, "Strana.Revit.HoleTask.RevitCommands.CreateHoleTasks", "Разместить задания на отверстия");
             return ribbonPanel;
         }
 

@@ -13,6 +13,7 @@ using Autodesk.Revit.UI;
 using Strana.Revit.HoleTask.Extensions;
 using Strana.Revit.HoleTask.Extensions.RevitElement;
 using Strana.Revit.HoleTask.RevitCommands;
+using Strana.Revit.HoleTask.ViewModel;
 
 namespace Strana.Revit.HoleTask.Utils
 {
@@ -22,8 +23,6 @@ namespace Strana.Revit.HoleTask.Utils
     {
         private readonly Document doc;
         private readonly List<FamilyInstance> intersectionRectangularCombineList = new List<FamilyInstance>();
-        private static double clearance => (Confing.Default.offSetHoleTask / 304.8) * 2;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="HoleTaskCreator"/> class.
         /// Create families into a Revit document.
@@ -55,15 +54,17 @@ namespace Strana.Revit.HoleTask.Utils
             Document linkDoc,
             RevitLinkInstance linkInstance)
         {
-            linkInstance.Name.ToString();
-
             ///Добавляю в список уже существующие задания на отверстия:
-            List<FamilyInstance> intersectionRectangularWall = new();
-            List<FamilyInstance> intersectionRectangularFloor = new();
-            HoleTasksGetter.AddFamilyInstancesToList(this.doc, "(Отв_Задание)_Стены_Прямоугольное", intersectionRectangularWall, "SD_Способ создания задания", "СКРИПТ");
-            HoleTasksGetter.AddFamilyInstancesToList(this.doc, "(Отв_Задание)_Перекрытия_Прямоугольное", intersectionRectangularFloor, "SD_Способ создания задания", "СКРИПТ");
-            intersectionRectangularCombineList.AddRange(intersectionRectangularWall.Concat(intersectionRectangularFloor));
+            //List<FamilyInstance> intersectionRectangularWall = new();
+            //List<FamilyInstance> intersectionRectangularFloor = new();
+            //HoleTasksGetter.AddFamilyInstancesToList(this.doc, "(Отв_Задание)_Стены_Прямоугольное", intersectionRectangularWall, "SD_Способ создания задания", "СКРИПТ");
+            //HoleTasksGetter.AddFamilyInstancesToList(this.doc, "(Отв_Задание)_Перекрытия_Прямоугольное", intersectionRectangularFloor, "SD_Способ создания задания", "СКРИПТ");
+            //intersectionRectangularCombineList.AddRange(intersectionRectangularWall.Concat(intersectionRectangularFloor));
 
+            IEnumerable<Element> existHoleTasksInProject = GetElementsWithTwoFamilyNames("(Отв_Задание)_Стены_Прямоугольное", "(Отв_Задание)_Перекрытия_Прямоугольное");
+
+            double offSetHoleTaskInFeet = UnitUtils.ConvertToInternalUnits(WpfSettings.OffSetHoleTask, UnitTypeId.Millimeters);
+            double clearance = offSetHoleTaskInFeet * 2;
             OrientaionType orientation = this.GetElementOrientationType(mepElement);
             FamilySymbol holeFamilySymbol;
             HoleTaskFamilyLoader familyLoader = new(this.doc);
@@ -116,6 +117,7 @@ namespace Strana.Revit.HoleTask.Utils
 
             Level lvl = GetClosestFloorLevel(docLvlList, linkDoc, intersectedElement);
             XYZ intersectionCurveCenter = this.GetIntersectionCurveCenter(intersection);
+
             intersectionCurveCenter = new XYZ(intersectionCurveCenter.X, intersectionCurveCenter.Y, intersectionCurveCenter.Z - lvl.ProjectElevation);
 
             double holeTaskWidthEX = this.ExchangeParameters(orientation, holeTaskWidth, holeTaskHeight);
@@ -126,7 +128,7 @@ namespace Strana.Revit.HoleTask.Utils
             double roundHTHeight = HoleTasksRoundUpDimension.RoundUpParameter(holeTaskHeightEX);
 
             /// проверка есть ли в intersectionCurveCenter уже ЗНО с теми же геометрическими размерами и в том же месте
-            if (!DoesFamilyInstanceExistAtLocation(intersectionCurveCenter, roundHTThickness, roundHTWidth, roundHTHeight))
+            if (!DoesFamilyInstanceExistAtLocation(intersectionCurveCenter, existHoleTasksInProject, roundHTThickness, roundHTWidth, roundHTHeight))
             {
                 holeTask = this.doc.Create.NewFamilyInstance(
                     intersectionCurveCenter,
@@ -236,30 +238,56 @@ namespace Strana.Revit.HoleTask.Utils
             ElementTransformUtils.MoveElement(doc, familyInstance.Id, moveVector);
         }
 
-        private bool DoesFamilyInstanceExistAtLocation(XYZ location)
+        public IEnumerable<Element> GetElementsWithTwoFamilyNames(string taskFamilyName1, string taskFamilyName2)
         {
-            const double tolerance = 0.01; // Небольшой допуск для сравнения координат, около 3 мм
+            // Собираем экземпляры первого семейства
+            var collector1 = new FilteredElementCollector(this.doc)
+                .OfClass(typeof(FamilyInstance))
+                .WhereElementIsNotElementType()
+                .Where(x => x.get_Parameter(BuiltInParameter.SYMBOL_NAME_PARAM).AsString() == taskFamilyName1)
+                .ToList();
 
-            foreach (FamilyInstance fi in this.intersectionRectangularCombineList)
+            // Собираем экземпляры второго семейства
+            var collector2 = new FilteredElementCollector(this.doc)
+                .OfClass(typeof(FamilyInstance))
+                .WhereElementIsNotElementType()
+                .Where(x => x.get_Parameter(BuiltInParameter.SYMBOL_NAME_PARAM).AsString() == taskFamilyName2)
+                .ToList();
+
+            // Объединяем результаты и возвращаем уникальные элементы
+            return collector1.Union(collector2).Distinct();
+        }
+
+        private bool DoesFamilyInstanceExistAtLocation( XYZ location, IEnumerable<Element> elements)
+        {
+            // Преобразуем допуск во внутренние единицы Revit, если это необходимо
+            double tolerance = 0.01;
+            tolerance = UnitUtils.ConvertToInternalUnits(tolerance, UnitTypeId.Millimeters);
+
+            foreach (FamilyInstance fi in elements)
             {
-                XYZ existingLocation = (fi.Location as LocationPoint)?.Point;
-                if (existingLocation != null && existingLocation.IsAlmostEqualTo(location, tolerance))
+                LocationPoint locPoint = fi.Location as LocationPoint;
+                if (locPoint != null)
                 {
-                    return true; // Найден существующий экземпляр в заданных координатах
+                    // Сравниваем расположение с заданным расположением с учетом допуска
+                    if (locPoint.Point.IsAlmostEqualTo(location, tolerance))
+                    {
+                        return true; // Задание найдено в заданном расположении
+                    }
                 }
             }
 
-            return false; // Экземпляр в заданных координатах не найден
+            return false; // Задание в заданном расположении не найдено
         }
 
-        private bool DoesFamilyInstanceExistAtLocation(XYZ location, double roundHTThickness, double roundHTWidth, double roundHTHeight)
+        private bool DoesFamilyInstanceExistAtLocation(XYZ location, IEnumerable<Element> elements, double roundHTThickness, double roundHTWidth, double roundHTHeight)
         {
             const double tolerance = 0.01; // Небольшой допуск для сравнения координат, около 3 мм
 
             // Предполагается, что roundHTThickness, roundHTWidth, и roundHTHeight уже в футах
             double roundHT = roundHTThickness + roundHTWidth + roundHTHeight;
 
-            foreach (FamilyInstance fi in this.intersectionRectangularCombineList)
+            foreach (FamilyInstance fi in elements)
             {
                 XYZ existingLocation = (fi.Location as LocationPoint)?.Point;
 
@@ -274,6 +302,7 @@ namespace Strana.Revit.HoleTask.Utils
                 if (existingLocation != null && existingLocation.IsAlmostEqualTo(location, tolerance) && sizeMatches)
                 {
                     return true; // Найден существующий экземпляр в заданных координатах с соответствующими размерами
+
                 }
             }
 

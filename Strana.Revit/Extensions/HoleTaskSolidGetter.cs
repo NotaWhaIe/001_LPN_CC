@@ -8,6 +8,7 @@ using System.Linq;
 using System.Xml.Linq;
 using Autodesk.Revit.DB;
 using Strana.Revit.HoleTask.Utils;
+using Strana.Revit.HoleTask.ViewModel;
 
 namespace Strana.Revit.HoleTask.Extensions
 {
@@ -16,7 +17,7 @@ namespace Strana.Revit.HoleTask.Extensions
     /// </summary>
     public static class HoleTaskSolidGetter
     {
-        public static double delta => Confing.Default.offSetJoin / 304.8;
+        //public static double delta => Confing.Default.offSetJoin / 304.8;
         public static bool areJoin => Confing.Default.areJoin;
         public static Solid GetHoleTaskSolidWithDelta(this FamilyInstance holeTaskItem)
         {
@@ -25,6 +26,7 @@ namespace Strana.Revit.HoleTask.Extensions
             Solid largestSolid = null;
             GeometryElement geometryElement = holeTaskItem.get_Geometry(options);
             DirectShape directShape = DirectShape.CreateElement(doc, new ElementId(BuiltInCategory.OST_Furniture));
+            double delta = UnitUtils.ConvertToInternalUnits(WpfSettings.OffSetJoin, UnitTypeId.Millimeters);
 
             foreach (GeometryObject geometry in geometryElement)
             {
@@ -66,7 +68,6 @@ namespace Strana.Revit.HoleTask.Extensions
                         }
                     }
                 }
-
                 return null;
             }
             CurveLoop curveLoopSolid = GetCurveLoopFromSolid(largestSolid);

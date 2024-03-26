@@ -1,5 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 using Strana.Revit.HoleTask.Extensions.RevitElement;
+using Strana.Revit.HoleTask.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
@@ -12,7 +13,7 @@ namespace Strana.Revit.HoleTask.Utils
     internal class GridRoundUpDimension
     {
         private static bool areRoundHoleTaskInPlane => Confing.Default.areRoundHoleTaskInPlane;
-        private static int roundHoleTaskInPlane => Confing.Default.roundHoleTaskInPlane;
+        //private static int roundHoleTaskInPlane => Confing.Default.roundHoleTaskInPlane;
 
         internal static HoleTaskGridDelta DeltaHoleTaskToGrids(Document doc, XYZ intersectionCenter, double thickness, double width, double angle)
         {
@@ -20,18 +21,19 @@ namespace Strana.Revit.HoleTask.Utils
             {
                 return new HoleTaskGridDelta(0, 0, 0);
             }
+            double roundHoleTaskInPlane =WpfSettings.RoundHoleTaskInPlane;
 
             double toGrid1 = MeasureDistanceToGrid(doc, intersectionCenter, "1");
             double toGridA = MeasureDistanceToGrid(doc, intersectionCenter, "А");
 
             double thickness0 = ExchangeParametersAngles(angle, thickness, width);
-            double width0     = ExchangeParametersAngles(angle, width, thickness); 
+            double width0 = ExchangeParametersAngles(angle, width, thickness);
 
             double thickness00 = UnitUtils.ConvertFromInternalUnits(thickness, UnitTypeId.Millimeters);
-            double width00     = UnitUtils.ConvertFromInternalUnits(width, UnitTypeId.Millimeters); 
+            double width00 = UnitUtils.ConvertFromInternalUnits(width, UnitTypeId.Millimeters);
 
             ///насколько нужно сместить семейство
-            double delta1 = Math.Ceiling((toGrid1 - width00 / 2    ) / roundHoleTaskInPlane) * roundHoleTaskInPlane - (toGrid1 - width00     / 2);
+            double delta1 = Math.Ceiling((toGrid1 - width00 / 2) / roundHoleTaskInPlane) * roundHoleTaskInPlane - (toGrid1 - width00 / 2);
             double deltaA = Math.Ceiling((toGridA - thickness00 / 2) / roundHoleTaskInPlane) * roundHoleTaskInPlane - (toGridA - thickness00 / 2);
 
             ///насколько нужно увеличить семейство

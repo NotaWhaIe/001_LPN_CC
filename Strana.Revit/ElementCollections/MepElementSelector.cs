@@ -12,9 +12,6 @@ namespace Strana.Revit.HoleTask.ElementCollections
     public static class MepElementSelector
     {
         public static UIDocument UIDocument { get; set; }
-        //private static readonly double minMepElementLength = (Confing.Default.minMepElementLength);
-        //private static readonly double minMepElementSize = (Confing.Default.minMepElementSize);
-
         public static IEnumerable<Element> GetSelectedOrAllMepElements()
         {
             Document doc = UIDocument.Document;
@@ -26,26 +23,11 @@ namespace Strana.Revit.HoleTask.ElementCollections
             if (selectedIds.Count > 0)
             {
                 mepElements = selectedIds.Select(id => doc.GetElement(id))
-                                         .Where(elem => elem is Duct || elem is Pipe || elem is CableTray)
-                                         .ToList();
+                             .Where(elem => elem is Duct || elem is Pipe || elem is CableTray)
+                             .ToList();
             }
             else
             {
-                //var ducts = new FilteredElementCollector(doc)
-                //            .OfClass(typeof(Duct))
-                //            .WhereElementIsNotElementType()
-                //            .Cast<Element>();
-
-                //var pipes = new FilteredElementCollector(doc)
-                //            .OfClass(typeof(Pipe))
-                //            .WhereElementIsNotElementType()
-                //            .Cast<Element>();
-
-                //var cableTrays = new FilteredElementCollector(doc)
-                //             .OfClass(typeof(CableTray))
-                //             .WhereElementIsNotElementType()
-                //             .Cast<Element>();
-
                 var pipes = new FilteredElementCollector(doc)
                             .OfClass(typeof(Pipe))
                             .WhereElementIsNotElementType()
@@ -85,27 +67,27 @@ namespace Strana.Revit.HoleTask.ElementCollections
                             .Cast<Element>();
 
                 var cableTrays = new FilteredElementCollector(doc)
-                    .OfClass(typeof(CableTray))
-                    .WhereElementIsNotElementType()
-                    .Where(tray =>
-                    {
-                        Parameter heightParam = tray.get_Parameter(BuiltInParameter.RBS_CABLETRAY_HEIGHT_PARAM);
-                        Parameter widthParam = tray.get_Parameter(BuiltInParameter.RBS_CABLETRAY_WIDTH_PARAM);
-                        double heightInMm = 0, widthInMm = 0;
-
-                        if (heightParam != null && heightParam.StorageType == StorageType.Double)
-                        {
-                            heightInMm = UnitUtils.ConvertFromInternalUnits(heightParam.AsDouble(), UnitTypeId.Millimeters);
-                        }
-
-                        if (widthParam != null && widthParam.StorageType == StorageType.Double)
-                        {
-                            widthInMm = UnitUtils.ConvertFromInternalUnits(widthParam.AsDouble(), UnitTypeId.Millimeters);
-                        }
-
-                        return heightInMm >= minMepElementSize || widthInMm >= minMepElementSize;
-                    })
-                    .Cast<Element>();
+                           .OfClass(typeof(CableTray))
+                           .WhereElementIsNotElementType()
+                           .Where(tray =>
+                           {
+                               Parameter heightParam = tray.get_Parameter(BuiltInParameter.RBS_CABLETRAY_HEIGHT_PARAM);
+                               Parameter widthParam = tray.get_Parameter(BuiltInParameter.RBS_CABLETRAY_WIDTH_PARAM);
+                               double heightInMm = 0, widthInMm = 0;
+                       
+                               if (heightParam != null && heightParam.StorageType == StorageType.Double)
+                               {
+                                   heightInMm = UnitUtils.ConvertFromInternalUnits(heightParam.AsDouble(), UnitTypeId.Millimeters);
+                               }
+                       
+                               if (widthParam != null && widthParam.StorageType == StorageType.Double)
+                               {
+                                   widthInMm = UnitUtils.ConvertFromInternalUnits(widthParam.AsDouble(), UnitTypeId.Millimeters);
+                               }
+                       
+                               return heightInMm >= minMepElementSize || widthInMm >= minMepElementSize;
+                           })
+                           .Cast<Element>();
 
                 //IEnumerable<Element> filteredPipes = FilterElementsByDiameter(pipes, minMepElementSize);
                 //int debagPipes = filteredPipes.Count();
