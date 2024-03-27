@@ -63,7 +63,6 @@ namespace Strana.Revit.HoleTask.Utils
             //intersectionRectangularCombineList.AddRange(intersectionRectangularWall.Concat(intersectionRectangularFloor));
 
             IEnumerable<FamilyInstance> existHoleTasksInProject = GetElementsWithTwoFamilyNames("(Отв_Задание)_Стены_Прямоугольное", "(Отв_Задание)_Перекрытия_Прямоугольное");
-            //double debag = existHoleTasksInProject.Count();
 
             double offSetHoleTaskInFeet = UnitUtils.ConvertToInternalUnits(WpfSettings.OffSetHoleTask, UnitTypeId.Millimeters);
             double clearance = offSetHoleTaskInFeet * 2;
@@ -131,8 +130,7 @@ namespace Strana.Revit.HoleTask.Utils
             double roundHTHeight = HoleTasksRoundUpDimension.RoundUpParameter(holeTaskHeightEX);
 
             /// проверка есть ли в intersectionCurveCenter уже ЗНО с теми же геометрическими размерами и в том же месте
-            //if (!DoesFamilyInstanceExistAtLocation(intersectionCurveCenter, existHoleTasksInProject, roundHTThickness, roundHTWidth, roundHTHeight))
-            if (!DoesFamilyInstanceExistAtLocation(intersectionCurveCenter, "(Отв_Задание)_Стены_Прямоугольное", "(Отв_Задание)_Перекрытия_Прямоугольное", existHoleTasksInProject))
+            if (!DoesFamilyInstanceExistAtLocation(intersectionCurveCenter, existHoleTasksInProject, roundHTThickness, roundHTWidth, roundHTHeight))
             {
                 holeTask = this.doc.Create.NewFamilyInstance(
                     new XYZ(intersectionCurveCenter.X, intersectionCurveCenter.Y, intersectionCurveCenter.Z - lvl.ProjectElevation),
@@ -255,52 +253,6 @@ namespace Strana.Revit.HoleTask.Utils
 
             return collector;
         }
-        private bool DoesFamilyInstanceExistAtLocation(XYZ location, string taskFamilyName1, string taskFamilyName2, IEnumerable<FamilyInstance> collector)
-        {
-            double tolerance = 10 / 304.8;
-            double debug;
-            foreach (FamilyInstance fi in collector)
-            {
-                LocationPoint locPoint = fi.Location as LocationPoint;
-                if (locPoint != null)
-                {
-                    debug = locPoint.Point.DistanceTo(location);
-                    // Сравниваем расположение с заданным расположением с учетом допуска
-                    if (debug <= tolerance)
-                    //if (locPoint.Point.IsAlmostEqualTo(location, tolerance))
-                    {
-                        return true; // Задание найдено в заданном расположении
-                    }
-                }
-            }
-
-            //SphereByPoint.CreateSphereByPoint(location, this.doc);
-            return false; // Задание в заданном расположении не найдено
-        }
-
-        private bool DoesFamilyInstanceExistAtLocation(XYZ location, IEnumerable<Element> elements)
-        {
-            // Преобразуем допуск во внутренние единицы Revit, если это необходимо
-            double tolerance = 0.01;
-            tolerance = UnitUtils.ConvertToInternalUnits(tolerance, UnitTypeId.Millimeters);
-
-            foreach (FamilyInstance fi in elements)
-            {
-                LocationPoint locPoint = fi.Location as LocationPoint;
-                if (locPoint != null)
-                {
-                    // Сравниваем расположение с заданным расположением с учетом допуска
-                    if (locPoint.Point.IsAlmostEqualTo(location, tolerance))
-                    {
-                        return true; // Задание найдено в заданном расположении
-                    }
-                }
-            }
-
-            return false; // Задание в заданном расположении не найдено
-        }
-
-
         private bool DoesFamilyInstanceExistAtLocation(XYZ location, IEnumerable<Element> elements, double roundHTThickness, double roundHTWidth, double roundHTHeight)
         {
             double tolerance = 10 / 304.8;
@@ -330,8 +282,6 @@ namespace Strana.Revit.HoleTask.Utils
 
             return false; // Экземпляр в заданных координатах не найден
         }
-
-
         /// <summary>
         /// Gets the closest floor level from the list of document levels based on the elevation of the linked floor.
         /// </summary>
