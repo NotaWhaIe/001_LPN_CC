@@ -120,7 +120,7 @@ namespace Strana.Revit.HoleTask.Utils
             XYZ intersectionCurveCenter = this.GetIntersectionCurveCenter(intersection);
 
             intersectionCurveCenter = new XYZ(intersectionCurveCenter.X, intersectionCurveCenter.Y, intersectionCurveCenter.Z /*- lvl.ProjectElevation*/);
-            SphereByPoint.CreateSphereByPoint(intersectionCurveCenter, this.doc);
+            //SphereByPoint.CreateSphereByPoint(intersectionCurveCenter, this.doc);
 
             double holeTaskWidthEX = this.ExchangeParameters(orientation, holeTaskWidth, holeTaskHeight);
             double holeTaskHeightEX = this.ExchangeParameters(orientation, holeTaskHeight, holeTaskWidth);
