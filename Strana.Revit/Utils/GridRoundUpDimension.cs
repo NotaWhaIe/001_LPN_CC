@@ -21,10 +21,12 @@ namespace Strana.Revit.HoleTask.Utils
             {
                 return new HoleTaskGridDelta(0, 0, 0);
             }
-            double roundHoleTaskInPlane =WpfSettings.RoundHoleTaskInPlane;
+            double roundHoleTaskInPlane = WpfSettings.RoundHoleTaskInPlane;
 
-            double toGrid1 = MeasureDistanceToGrid(doc, intersectionCenter, "1");
-            double toGridA = MeasureDistanceToGrid(doc, intersectionCenter, "А");
+            XYZ leftBottomIntersection = FindLeftBottomIntersection(doc);
+
+            double toGrid1 = UnitUtils.ConvertFromInternalUnits(intersectionCenter.X - leftBottomIntersection.X, UnitTypeId.Millimeters);
+            double toGridA = UnitUtils.ConvertFromInternalUnits(intersectionCenter.Y - leftBottomIntersection.Y, UnitTypeId.Millimeters);
 
             double thickness0 = ExchangeParametersAngles(angle, thickness, width);
             double width0 = ExchangeParametersAngles(angle, width, thickness);
@@ -66,6 +68,20 @@ namespace Strana.Revit.HoleTask.Utils
             }
         }
 
+        //public static double MeasureDistanceToGridY(XYZ intersectionCurveCenter, XYZ leftBottomIntersection)
+        //{
+
+
+        //    XYZ pointInXYPlane = new XYZ(intersectionCurveCenter.X, intersectionCurveCenter.Y, gridLine.GetEndPoint(0).Z);
+        //    //SphereByPoint.CreateSphereByPoint(pointInXYPlane);
+        //    //SphereByPoint.CreateSphereByPoint(gridLine.GetEndPoint(0));
+        //    //SphereByPoint.CreateSphereByPoint(gridLine.GetEndPoint(1));
+
+        //    var distance = gridLine.Distance(pointInXYPlane);
+        //    // Вычисление горизонтального расстояния и конвертация из футов в миллиметры
+        //    return UnitUtils.ConvertFromInternalUnits(distance, UnitTypeId.Millimeters);
+        //    //return pointInXYPlane.DistanceTo(closestPoint);
+        //}
         public static double MeasureDistanceToGrid(Document doc, XYZ intersectionCurveCenter, string gridName)
         {
 
@@ -91,6 +107,46 @@ namespace Strana.Revit.HoleTask.Utils
             return UnitUtils.ConvertFromInternalUnits(distance, UnitTypeId.Millimeters);
             //return pointInXYPlane.DistanceTo(closestPoint);
         }
+
+        public static XYZ FindLeftBottomIntersection(Document doc)
+        {
+            var grids = new FilteredElementCollector(doc)
+                        .OfClass(typeof(Grid))
+                        .Cast<Grid>()
+                        .ToList();
+
+            List<XYZ> intersectionPoints = new List<XYZ>();
+
+            for (int i = 0; i < grids.Count; i++)
+            {
+                var curve1 = grids[i].Curve;
+
+                for (int j = i + 1; j < grids.Count; j++)
+                {
+                    var curve2 = grids[j].Curve;
+
+                    IntersectionResultArray results;
+                    SetComparisonResult result = curve1.Intersect(curve2, out results);
+
+                    if (result == SetComparisonResult.Overlap && results != null)
+                    {
+                        foreach (IntersectionResult ir in results)
+                        {
+                            intersectionPoints.Add(ir.XYZPoint);
+                        }
+                    }
+                }
+            }
+
+            // Находим точку с минимальными X и Y среди всех точек пересечения
+            if (intersectionPoints.Count == 0)
+            {
+                return null; // Нет пересечений
+            }
+
+            return intersectionPoints.OrderBy(p => p.X).ThenBy(p => p.Y).FirstOrDefault();
+        }
+
     }
 }
 

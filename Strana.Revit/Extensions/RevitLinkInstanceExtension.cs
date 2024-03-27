@@ -40,8 +40,10 @@ namespace Strana.Revit.HoleTask.Extensions
 
                 // растянуть по высоте
                 new HoleTasksLineStretch().StretchLinesAllHoleTask(linkInstance);
+
                 t.Commit();
             }
+
         }
     }
 }

@@ -484,7 +484,6 @@ namespace Strana.Revit.HoleTask.Utils
 
             return rotationAngle;
         }
-
     }
 
 }
