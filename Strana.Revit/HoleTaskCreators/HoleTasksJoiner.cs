@@ -39,6 +39,11 @@ namespace Strana.Revit.HoleTask.Utils
             List<FamilyInstance> intersectionFloorRectangularCombineList02 = new();
             HoleTasksGetter.AddFamilyInstancesToList(doc, "(Отв_Задание)_Стены_Прямоугольное", intersectionWallRectangularCombineList01, "SD_Способ создания задания", "СКРИПТ");
             HoleTasksGetter.AddFamilyInstancesToList(doc, "(Отв_Задание)_Перекрытия_Прямоугольное", intersectionFloorRectangularCombineList02, "SD_Способ создания задания", "СКРИПТ");
+           
+            
+            double debag1 = intersectionFloorRectangularCombineList02.Count;
+
+
 
             if (!areJoin)
             {

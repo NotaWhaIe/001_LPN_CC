@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Autodesk.Revit.DB;
@@ -61,7 +62,8 @@ namespace Strana.Revit.HoleTask.Utils
             //HoleTasksGetter.AddFamilyInstancesToList(this.doc, "(Отв_Задание)_Перекрытия_Прямоугольное", intersectionRectangularFloor, "SD_Способ создания задания", "СКРИПТ");
             //intersectionRectangularCombineList.AddRange(intersectionRectangularWall.Concat(intersectionRectangularFloor));
 
-            IEnumerable<Element> existHoleTasksInProject = GetElementsWithTwoFamilyNames("(Отв_Задание)_Стены_Прямоугольное", "(Отв_Задание)_Перекрытия_Прямоугольное");
+            IEnumerable<FamilyInstance> existHoleTasksInProject = GetElementsWithTwoFamilyNames("(Отв_Задание)_Стены_Прямоугольное", "(Отв_Задание)_Перекрытия_Прямоугольное");
+            //double debag = existHoleTasksInProject.Count();
 
             double offSetHoleTaskInFeet = UnitUtils.ConvertToInternalUnits(WpfSettings.OffSetHoleTask, UnitTypeId.Millimeters);
             double clearance = offSetHoleTaskInFeet * 2;
@@ -100,12 +102,12 @@ namespace Strana.Revit.HoleTask.Utils
             else if (mepHeightDucts > 0)
             {
                 mepHeight = mepElement.get_Parameter(BuiltInParameter.RBS_CURVE_HEIGHT_PARAM)?.AsDouble() ?? 0;
-                mepWidth  = mepElement.get_Parameter(BuiltInParameter.RBS_CURVE_WIDTH_PARAM)?.AsDouble() ?? 0;
+                mepWidth = mepElement.get_Parameter(BuiltInParameter.RBS_CURVE_WIDTH_PARAM)?.AsDouble() ?? 0;
             }
             else
             {
                 mepHeight = mepElement.get_Parameter(BuiltInParameter.RBS_CABLETRAY_HEIGHT_PARAM)?.AsDouble() ?? 0;
-                mepWidth  = mepElement.get_Parameter(BuiltInParameter.RBS_CABLETRAY_WIDTH_PARAM)?.AsDouble() ?? 0;
+                mepWidth = mepElement.get_Parameter(BuiltInParameter.RBS_CABLETRAY_WIDTH_PARAM)?.AsDouble() ?? 0;
             }
 
             FamilyInstance holeTask;
@@ -118,7 +120,8 @@ namespace Strana.Revit.HoleTask.Utils
             Level lvl = GetClosestFloorLevel(docLvlList, linkDoc, intersectedElement);
             XYZ intersectionCurveCenter = this.GetIntersectionCurveCenter(intersection);
 
-            intersectionCurveCenter = new XYZ(intersectionCurveCenter.X, intersectionCurveCenter.Y, intersectionCurveCenter.Z - lvl.ProjectElevation);
+            intersectionCurveCenter = new XYZ(intersectionCurveCenter.X, intersectionCurveCenter.Y, intersectionCurveCenter.Z /*- lvl.ProjectElevation*/);
+            SphereByPoint.CreateSphereByPoint(intersectionCurveCenter, this.doc);
 
             double holeTaskWidthEX = this.ExchangeParameters(orientation, holeTaskWidth, holeTaskHeight);
             double holeTaskHeightEX = this.ExchangeParameters(orientation, holeTaskHeight, holeTaskWidth);
@@ -128,10 +131,11 @@ namespace Strana.Revit.HoleTask.Utils
             double roundHTHeight = HoleTasksRoundUpDimension.RoundUpParameter(holeTaskHeightEX);
 
             /// проверка есть ли в intersectionCurveCenter уже ЗНО с теми же геометрическими размерами и в том же месте
-            if (!DoesFamilyInstanceExistAtLocation(intersectionCurveCenter, existHoleTasksInProject, roundHTThickness, roundHTWidth, roundHTHeight))
+            //if (!DoesFamilyInstanceExistAtLocation(intersectionCurveCenter, existHoleTasksInProject, roundHTThickness, roundHTWidth, roundHTHeight))
+            if (!DoesFamilyInstanceExistAtLocation(intersectionCurveCenter, "(Отв_Задание)_Стены_Прямоугольное", "(Отв_Задание)_Перекрытия_Прямоугольное", existHoleTasksInProject))
             {
                 holeTask = this.doc.Create.NewFamilyInstance(
-                    intersectionCurveCenter,
+                    new XYZ(intersectionCurveCenter.X, intersectionCurveCenter.Y, intersectionCurveCenter.Z - lvl.ProjectElevation),
                     holeFamilySymbol,
                     lvl,
                     StructuralType.NonStructural);
@@ -238,27 +242,43 @@ namespace Strana.Revit.HoleTask.Utils
             ElementTransformUtils.MoveElement(doc, familyInstance.Id, moveVector);
         }
 
-        public IEnumerable<Element> GetElementsWithTwoFamilyNames(string taskFamilyName1, string taskFamilyName2)
+        public IEnumerable<FamilyInstance> GetElementsWithTwoFamilyNames(string taskFamilyName1, string taskFamilyName2)
         {
-            // Собираем экземпляры первого семейства
-            var collector1 = new FilteredElementCollector(this.doc)
+            // Создаем коллектор для поиска экземпляров семейств по двум именам семейств
+            var collector = new FilteredElementCollector(doc)
                 .OfClass(typeof(FamilyInstance))
                 .WhereElementIsNotElementType()
-                .Where(x => x.get_Parameter(BuiltInParameter.SYMBOL_NAME_PARAM).AsString() == taskFamilyName1)
-                .ToList();
+                .Cast<FamilyInstance>() // Приводим результаты к типу FamilyInstance
+                .Where(fi =>
+                    fi.Symbol.FamilyName == taskFamilyName1 ||
+                    fi.Symbol.FamilyName == taskFamilyName2);
 
-            // Собираем экземпляры второго семейства
-            var collector2 = new FilteredElementCollector(this.doc)
-                .OfClass(typeof(FamilyInstance))
-                .WhereElementIsNotElementType()
-                .Where(x => x.get_Parameter(BuiltInParameter.SYMBOL_NAME_PARAM).AsString() == taskFamilyName2)
-                .ToList();
+            return collector;
+        }
+        private bool DoesFamilyInstanceExistAtLocation(XYZ location, string taskFamilyName1, string taskFamilyName2, IEnumerable<FamilyInstance> collector)
+        {
+            double tolerance = 10 / 304.8;
+            double debug;
+            foreach (FamilyInstance fi in collector)
+            {
+                LocationPoint locPoint = fi.Location as LocationPoint;
+                if (locPoint != null)
+                {
+                    debug = locPoint.Point.DistanceTo(location);
+                    // Сравниваем расположение с заданным расположением с учетом допуска
+                    if (debug <= tolerance)
+                    //if (locPoint.Point.IsAlmostEqualTo(location, tolerance))
+                    {
+                        return true; // Задание найдено в заданном расположении
+                    }
+                }
+            }
 
-            // Объединяем результаты и возвращаем уникальные элементы
-            return collector1.Union(collector2).Distinct();
+            //SphereByPoint.CreateSphereByPoint(location, this.doc);
+            return false; // Задание в заданном расположении не найдено
         }
 
-        private bool DoesFamilyInstanceExistAtLocation( XYZ location, IEnumerable<Element> elements)
+        private bool DoesFamilyInstanceExistAtLocation(XYZ location, IEnumerable<Element> elements)
         {
             // Преобразуем допуск во внутренние единицы Revit, если это необходимо
             double tolerance = 0.01;
@@ -280,9 +300,10 @@ namespace Strana.Revit.HoleTask.Utils
             return false; // Задание в заданном расположении не найдено
         }
 
+
         private bool DoesFamilyInstanceExistAtLocation(XYZ location, IEnumerable<Element> elements, double roundHTThickness, double roundHTWidth, double roundHTHeight)
         {
-            const double tolerance = 0.01; // Небольшой допуск для сравнения координат, около 3 мм
+            double tolerance = 10 / 304.8;
 
             // Предполагается, что roundHTThickness, roundHTWidth, и roundHTHeight уже в футах
             double roundHT = roundHTThickness + roundHTWidth + roundHTHeight;
@@ -299,7 +320,8 @@ namespace Strana.Revit.HoleTask.Utils
                 // Точность сравнения суммарных размеров с учетом допуска
                 bool sizeMatches = Math.Abs(roundHT - round) < tolerance;
 
-                if (existingLocation != null && existingLocation.IsAlmostEqualTo(location, tolerance) && sizeMatches)
+                if (existingLocation != null && existingLocation.DistanceTo(location) <= tolerance && sizeMatches)
+                //if (existingLocation != null && existingLocation.IsAlmostEqualTo(location, tolerance) && sizeMatches)
                 {
                     return true; // Найден существующий экземпляр в заданных координатах с соответствующими размерами
 
