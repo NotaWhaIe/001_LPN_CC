@@ -7,7 +7,7 @@
              xmlns:core="clr-namespace:Strana.Revit.HoleTask.ViewModel;assembly=Strana.Revit.HoleTask"
              d:DataContext="{d:DesignInstance Type=core:HoleTaskViewModel}"
              mc:Ignorable="d"
-              Title="{Binding Version, StringFormat='Задание на отверстия {0}                                              от t.me/NotaWhaie '}"
+              Title="{Binding Version, StringFormat='Задание на отверстия {0}                                              автор: t.me/NotaWhaie '}"
              Closing="Window_Closing"
              d:Height="550" Width="740" MaxHeight="600" MaxWidth="740"
 
@@ -29,20 +29,20 @@
             <ColumnDefinition Width="47*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="75*"/>
-            <RowDefinition Height="25*"/>
+            <RowDefinition Height="169*"/>
+            <RowDefinition Height="98*"/>
         </Grid.RowDefinitions>
         <Image 
             x:Name="image0" 
             Source="/Strana.Revit.HoleTask;component/Resources/holeTask.png" 
-            Grid.Row="0" Grid.Column="0" RenderOptions.BitmapScalingMode="Fant" HorizontalAlignment="Left"/>
+            Grid.Row="0" Grid.Column="0" RenderOptions.BitmapScalingMode="Fant" HorizontalAlignment="Left" Width="379"/>
         <Image 
             x:Name="image1" 
             Source="/Strana.Revit.HoleTask;component/Resources/holeTaskLegend.png" 
-            Grid.Row="1" Grid.Column="0" RenderOptions.BitmapScalingMode="Fant" HorizontalAlignment="Center"/>
+            Grid.Row="1" RenderOptions.BitmapScalingMode="Fant" HorizontalAlignment="Left" Margin="26,11,0,10" Width="240"/>
 
 
-        <Grid Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" >
+        <Grid Grid.Row="0" Grid.RowSpan="2" Grid.ColumnSpan="2" Margin="392,0,0,0" >
             <Grid.RowDefinitions>
                 <!-- строка 0 -->
                 <RowDefinition/>

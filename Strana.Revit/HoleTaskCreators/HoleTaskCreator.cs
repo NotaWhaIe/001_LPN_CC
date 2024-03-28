@@ -88,26 +88,66 @@ namespace Strana.Revit.HoleTask.Utils
                 tipe = 2;
             }
 
-            double mepHeight;
-            double mepWidth;
-            double mepDiameter = mepElement.get_Parameter(BuiltInParameter.RBS_PIPE_OUTER_DIAMETER)?.AsDouble() ?? 0;
-            double mepHeightDucts = mepElement.get_Parameter(BuiltInParameter.RBS_CURVE_HEIGHT_PARAM)?.AsDouble() ?? 0;
 
-            if (mepDiameter > 0)
+            // Получаем категорию MEP элемента
+            Category mepCategory = mepElement.Category;
+            double mepHeight = 0;
+            double mepWidth = 0;
+
+            // Проверяем категорию элемента и выставляем соответствующие параметры
+            if (mepCategory.Id.IntegerValue == (int)BuiltInCategory.OST_PipeCurves)
             {
-                mepHeight = mepDiameter;
-                mepWidth = mepDiameter;
+                // Трубы
+                double mepDiameter = mepElement.get_Parameter(BuiltInParameter.RBS_PIPE_OUTER_DIAMETER)?.AsDouble() ?? 0;
+                if (mepDiameter > 0)
+                {
+                    mepHeight = mepDiameter;
+                    mepWidth = mepDiameter;
+                }
             }
-            else if (mepHeightDucts > 0)
+            else if (mepCategory.Id.IntegerValue == (int)BuiltInCategory.OST_DuctCurves)
             {
-                mepHeight = mepElement.get_Parameter(BuiltInParameter.RBS_CURVE_HEIGHT_PARAM)?.AsDouble() ?? 0;
-                mepWidth = mepElement.get_Parameter(BuiltInParameter.RBS_CURVE_WIDTH_PARAM)?.AsDouble() ?? 0;
+                // Воздуховоды
+                double mepDiameter = mepElement.get_Parameter(BuiltInParameter.RBS_CURVE_DIAMETER_PARAM)?.AsDouble() ?? 0;
+                if (mepDiameter > 0) // Если диаметр больше нуля, устанавливаем высоту и ширину равными диаметру
+                {
+                    mepHeight = mepDiameter;
+                    mepWidth = mepDiameter;
+                }
+                else // Иначе, берем высоту и ширину из других параметров
+                {
+                    mepHeight = mepElement.get_Parameter(BuiltInParameter.RBS_CURVE_HEIGHT_PARAM)?.AsDouble() ?? 0;
+                    mepWidth = mepElement.get_Parameter(BuiltInParameter.RBS_CURVE_WIDTH_PARAM)?.AsDouble() ?? 0;
+                }
             }
-            else
+            else if (mepCategory.Id.IntegerValue == (int)BuiltInCategory.OST_CableTray)
             {
+                // Кабельные лотки
                 mepHeight = mepElement.get_Parameter(BuiltInParameter.RBS_CABLETRAY_HEIGHT_PARAM)?.AsDouble() ?? 0;
                 mepWidth = mepElement.get_Parameter(BuiltInParameter.RBS_CABLETRAY_WIDTH_PARAM)?.AsDouble() ?? 0;
             }
+
+
+            //var mepCategory = mepElement.Category;
+            //double mepDiameter = mepElement.get_Parameter(BuiltInParameter.RBS_PIPE_OUTER_DIAMETER)?.AsDouble() ?? 0;
+            //double mepHeightDucts = mepElement.get_Parameter(BuiltInParameter.RBS_CURVE_HEIGHT_PARAM)?.AsDouble() ?? 0;
+
+
+            //if (mepDiameter > 0)
+            //{
+            //    mepHeight = mepDiameter;
+            //    mepWidth = mepDiameter;
+            //}
+            //else if (mepHeightDucts > 0)
+            //{
+            //    mepHeight = mepElement.get_Parameter(BuiltInParameter.RBS_CURVE_HEIGHT_PARAM)?.AsDouble() ?? 0;
+            //    mepWidth = mepElement.get_Parameter(BuiltInParameter.RBS_CURVE_WIDTH_PARAM)?.AsDouble() ?? 0;
+            //}
+            //else
+            //{
+            //    mepHeight = mepElement.get_Parameter(BuiltInParameter.RBS_CABLETRAY_HEIGHT_PARAM)?.AsDouble() ?? 0;
+            //    mepWidth = mepElement.get_Parameter(BuiltInParameter.RBS_CABLETRAY_WIDTH_PARAM)?.AsDouble() ?? 0;
+            //}
 
             FamilyInstance holeTask;
             IEnumerable<Level> docLvlList = this.GetDocumentLevels(this.doc);
