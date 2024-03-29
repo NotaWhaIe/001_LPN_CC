@@ -22,29 +22,32 @@ namespace Strana.Revit.HoleTask.Extensions
         /// <returns> list off holetasks items by intersected element (wall or floor).</returns>
         public static List<FamilyInstance> CreateHoleTasksByIntersectedElements(RevitLinkInstance linkInstance)
         {
-            List<FamilyInstance> intersectedItemHoleTasks = new();
+            List<FamilyInstance> intersectedItemHoleTasks = new List<FamilyInstance>();
             Document doc = linkInstance.Document;
             Document linkDoc = linkInstance.GetLinkDocument();
 
-            IEnumerable<Element> mepElements = MepElementSelector.GetSelectedOrAllMepElements();
+            // Assuming MepElementSelector.GetSelectedOrAllMepElements() now correctly takes Document, ensure the method exists and works as expected.
+            IEnumerable<Element> mepElements = MepElementSelector.GetSelectedOrAllMepElements(); // Assuming this method exists and works correctly
 
             foreach (Element mepElement in mepElements)
             {
                 var wallAndFloorsInMepBBox = mepElement.AllElementsByMepBBox(doc, linkInstance.GetTotalTransform(), linkDoc);
                 foreach (Element intersectingElement in wallAndFloorsInMepBBox)
                 {
-                    Solid floorWallSolid = intersectingElement.GetSolidWithoutHoles(linkInstance);
-                    Curve mepCurve = (mepElement.Location as LocationCurve).Curve;
-                    SolidCurveIntersectionOptions defOptions = new();
-                    SolidCurveIntersection solidCurve = floorWallSolid.IntersectWithCurve(mepCurve, defOptions);
-
-                    if (solidCurve != null && solidCurve.SegmentCount > 0)
+                    if (intersectingElement.GetSolidWithoutHoles(linkInstance) is { } floorWallSolid &&
+                        mepElement.Location as LocationCurve is { Curve: { } mepCurve })
                     {
-                        HoleTaskCreator holeTaskCreator = new(doc);
-                        FamilyInstance createdHoleTask = holeTaskCreator.PlaceHoleTaskFamilyInstance(mepElement, solidCurve, intersectingElement, linkDoc, linkInstance);
-                        if (createdHoleTask is not null)
+                        SolidCurveIntersectionOptions defOptions = new SolidCurveIntersectionOptions();
+                        SolidCurveIntersection solidCurve = floorWallSolid.IntersectWithCurve(mepCurve, defOptions);
+
+                        if (solidCurve?.SegmentCount > 0)
                         {
-                            intersectedItemHoleTasks.Add(createdHoleTask);
+                            HoleTaskCreator holeTaskCreator = new HoleTaskCreator(doc);
+                            FamilyInstance createdHoleTask = holeTaskCreator.PlaceHoleTaskFamilyInstance(mepElement, solidCurve, intersectingElement, linkDoc, linkInstance);
+                            if (createdHoleTask != null)
+                            {
+                                intersectedItemHoleTasks.Add(createdHoleTask);
+                            }
                         }
                     }
                 }
@@ -52,5 +55,38 @@ namespace Strana.Revit.HoleTask.Extensions
 
             return intersectedItemHoleTasks;
         }
+
+        //public static List<FamilyInstance> CreateHoleTasksByIntersectedElements(RevitLinkInstance linkInstance)
+        //{
+        //    List<FamilyInstance> intersectedItemHoleTasks = new();
+        //    Document doc = linkInstance.Document;
+        //    Document linkDoc = linkInstance.GetLinkDocument();
+
+        //    IEnumerable<Element> mepElements = MepElementSelector.GetSelectedOrAllMepElements();
+
+        //    foreach (Element mepElement in mepElements)
+        //    {
+        //        var wallAndFloorsInMepBBox = mepElement.AllElementsByMepBBox(doc, linkInstance.GetTotalTransform(), linkDoc);
+        //        foreach (Element intersectingElement in wallAndFloorsInMepBBox)
+        //        {
+        //            Solid floorWallSolid = intersectingElement.GetSolidWithoutHoles(linkInstance);
+        //            Curve mepCurve = (mepElement.Location as LocationCurve).Curve;
+        //            SolidCurveIntersectionOptions defOptions = new();
+        //            SolidCurveIntersection solidCurve = floorWallSolid.IntersectWithCurve(mepCurve, defOptions);
+
+        //            if (solidCurve != null && solidCurve.SegmentCount > 0)
+        //            {
+        //                HoleTaskCreator holeTaskCreator = new(doc);
+        //                FamilyInstance createdHoleTask = holeTaskCreator.PlaceHoleTaskFamilyInstance(mepElement, solidCurve, intersectingElement, linkDoc, linkInstance);
+        //                if (createdHoleTask is not null)
+        //                {
+        //                    intersectedItemHoleTasks.Add(createdHoleTask);
+        //                }
+        //            }
+        //        }
+        //    }
+
+        //    return intersectedItemHoleTasks;
+        //}
     }
 }

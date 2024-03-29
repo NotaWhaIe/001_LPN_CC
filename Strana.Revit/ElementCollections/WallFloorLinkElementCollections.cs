@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Electrical;
@@ -34,9 +35,11 @@ namespace Strana.Revit.HoleTask.ElementCollections
             {
                 return Enumerable.Empty<Element>();
             }
+            XYZ transformedMin = mepBoundingBox.Min;
+            XYZ transformedMax = mepBoundingBox.Max;
+            //SphereByPoint.CreateSphereByPoint(transformedMin, doc);
+            //SphereByPoint.CreateSphereByPoint(transformedMax, doc);
 
-            XYZ transformedMin = mepBoundingBox.Min ;
-            XYZ transformedMax = mepBoundingBox.Max ;
             Outline mepOutline = new Outline(transformedMin, transformedMax);
             BoundingBoxIntersectsFilter mepFilter = new BoundingBoxIntersectsFilter(mepOutline);
 
@@ -53,8 +56,32 @@ namespace Strana.Revit.HoleTask.ElementCollections
                   .OfClass(typeof(Floor))
                   .WhereElementIsNotElementType()
                   .WherePasses(mepFilter);
-            int debag = c2.Count();
+
+            int debag = c1.Count();
+            if (debag <= 0)
+            {
+                c1 = new FilteredElementCollector(linkDoc)
+                      .OfCategory(BuiltInCategory.OST_Walls)
+                      .OfClass(typeof(Wall))
+                      .WhereElementIsNotElementType()
+                      .Cast<Wall>()
+                      .Where(w => w.WallType.Kind != WallKind.Curtain);
+            }
+
+            int debagа = c2.Count();
+            if (debagа <= 0)
+            {
+                c2 = new FilteredElementCollector(linkDoc)
+                      .OfCategory(BuiltInCategory.OST_Floors)
+                      .OfClass(typeof(Floor))
+                      .WhereElementIsNotElementType();
+            }
+            //SphereByPoint.CreateSphereByPoint(c2.FirstElement().get_BoundingBox(null).Max, doc);
+            //SphereByPoint.CreateSphereByPoint(c2.FirstElement().get_BoundingBox(null).Min, doc);
+
+            int debag0 = c2.Count();
             return c1.Concat(c2);
         }
     }
 }
+

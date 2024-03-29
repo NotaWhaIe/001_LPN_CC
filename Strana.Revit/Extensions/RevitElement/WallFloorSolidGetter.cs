@@ -44,30 +44,32 @@ namespace Strana.Revit.HoleTask.Extension.RevitElement
             {
                 return SolidUtils.CreateTransformed(solidWithHoles, transform);
             }
+
             try
             {
                 Face solidFacade = GetSolidMainFace(solidWithHoles);
-                XYZ solidFacadeNormal = solidFacade.ComputeNormal(new UV(0, 0));
-                CurveLoop outerСontour = MainOuterContourFromFace(solidFacade); 
-                List<CurveLoop> outerLoops = [outerСontour];
-                double GetCurveLoopLength(CurveLoop curveLoop)
+                if (solidFacade == null)
                 {
-                    double totalLength = 0.0;
-                    foreach (Curve curve in curveLoop)
-                    {
-                        totalLength += curve.Length;
-                    }
-                    return totalLength;
+                    return null;
                 }
-                double sweepPathLenght = element.GetInterctedElementThickness();
-                XYZ start_point = outerСontour.GetCurveLoopIterator().Current.GetEndPoint(0);
-                XYZ end_point = start_point - sweepPathLenght * solidFacadeNormal.Normalize();
-                Curve curve = Line.CreateBound(start_point, end_point);
-                List<Curve> curvel = [curve];
-                CurveLoop edgeMinCurvesLoop = CurveLoop.Create(curvel);
-                Solid solidWithoutHoles = GeometryCreationUtilities
-                    .CreateSweptGeometry(edgeMinCurvesLoop, 0, 0, outerLoops);
 
+                XYZ solidFacadeNormal = solidFacade.ComputeNormal(new UV(0, 0));
+                CurveLoop outerContour = MainOuterContourFromFace(solidFacade);
+                if (outerContour == null)
+                {
+                    return null;
+                }
+
+                List<CurveLoop> outerLoops = new List<CurveLoop> { outerContour };
+
+                double sweepPathLenght = element.GetInterctedElementThickness();
+                XYZ startPoint = outerContour.GetCurveLoopIterator().Current.GetEndPoint(0);
+                XYZ endPoint = startPoint - sweepPathLenght * solidFacadeNormal.Normalize();
+
+                Curve sweepPath = Line.CreateBound(startPoint, endPoint);
+                CurveLoop sweepPathLoop = CurveLoop.Create(new List<Curve> { sweepPath });
+
+                Solid solidWithoutHoles = GeometryCreationUtilities.CreateSweptGeometry(sweepPathLoop, 0, 0, outerLoops);
                 return SolidUtils.CreateTransformed(solidWithoutHoles, transform);
             }
             catch
@@ -75,6 +77,50 @@ namespace Strana.Revit.HoleTask.Extension.RevitElement
                 return SolidUtils.CreateTransformed(solidWithHoles, transform);
             }
         }
+
+        //public static Solid GetSolidWithoutHoles(this Element element, RevitLinkInstance revitLink)
+        //{
+        //    Transform transform = revitLink.GetTotalTransform();
+        //    Solid solidWithHoles = element.GetSolidWithHoles();
+        //    if (!arePlaceHoleTaskInOpenings)
+        //    {
+        //        return SolidUtils.CreateTransformed(solidWithHoles, transform);
+        //    }
+        //    try
+        //    {
+        //        Face solidFacade = GetSolidMainFace(solidWithHoles);
+        //        if (solidFacade != null)
+        //        {
+        //            XYZ solidFacadeNormal = solidFacade.ComputeNormal(new UV(0, 0));
+        //        }
+        //        //XYZ solidFacadeNormal = solidFacade.ComputeNormal(new UV(0, 0));
+        //        CurveLoop outerСontour = MainOuterContourFromFace(solidFacade);
+        //        List<CurveLoop> outerLoops = [outerСontour];
+        //        double GetCurveLoopLength(CurveLoop curveLoop)
+        //        {
+        //            double totalLength = 0.0;
+        //            foreach (Curve curve in curveLoop)
+        //            {
+        //                totalLength += curve.Length;
+        //            }
+        //            return totalLength;
+        //        }
+        //        double sweepPathLenght = element.GetInterctedElementThickness();
+        //        XYZ start_point = outerСontour.GetCurveLoopIterator().Current.GetEndPoint(0);
+        //        XYZ end_point = start_point - sweepPathLenght * solidFacadeNormal.Normalize();
+        //        Curve curve = Line.CreateBound(start_point, end_point);
+        //        List<Curve> curvel = [curve];
+        //        CurveLoop edgeMinCurvesLoop = CurveLoop.Create(curvel);
+        //        Solid solidWithoutHoles = GeometryCreationUtilities
+        //            .CreateSweptGeometry(edgeMinCurvesLoop, 0, 0, outerLoops);
+
+        //        return SolidUtils.CreateTransformed(solidWithoutHoles, transform);
+        //    }
+        //    catch
+        //    {
+        //        return SolidUtils.CreateTransformed(solidWithHoles, transform);
+        //    }
+        //}
         public static Solid GetSolidWithHoles(this Element element)
         {
             GeometryElement geometryElement = element.get_Geometry(Opt);
@@ -99,29 +145,52 @@ namespace Strana.Revit.HoleTask.Extension.RevitElement
         /// <returns>façade face. <seealso cref="Face"/></returns>
         private static Face GetSolidMainFace(Solid solid)
         {
-            Face faceMaxSquare = null;
-            var faces = solid.Faces;
-            foreach (Face solidFace in faces)
+            // Проверяем, не равен ли solid null
+            if (solid == null || solid.Faces == null || solid.Faces.Size == 0)
             {
+                return null;
+            }
+
+            Face faceMaxSquare = null;
+
+            foreach (Face solidFace in solid.Faces)
+            {
+                // Условие на null для faceMaxSquare не требуется, так как оно проверяется в условии ниже
                 if (faceMaxSquare == null || faceMaxSquare.Area < solidFace.Area)
                 {
                     faceMaxSquare = solidFace;
                 }
             }
 
-            if (faceMaxSquare == null)
-            {
-                foreach (Face solidFace in faces)
-                {
-                    if (faceMaxSquare == null || faceMaxSquare.Area < solidFace.Area)
-                    {
-                        faceMaxSquare = solidFace;
-                    }
-                }
-            }
-
             return faceMaxSquare;
         }
+
+        //private static Face GetSolidMainFace(Solid solid)
+        //{
+        //    Face faceMaxSquare = null;
+
+        //    var faces = solid.Faces;
+        //    foreach (Face solidFace in faces)
+        //    {
+        //        if (faceMaxSquare == null || faceMaxSquare.Area < solidFace.Area)
+        //        {
+        //            faceMaxSquare = solidFace;
+        //        }
+        //    }
+
+        //    if (faceMaxSquare == null)
+        //    {
+        //        foreach (Face solidFace in faces)
+        //        {
+        //            if (faceMaxSquare == null || faceMaxSquare.Area < solidFace.Area)
+        //            {
+        //                faceMaxSquare = solidFace;
+        //            }
+        //        }
+        //    }
+
+        //    return faceMaxSquare;
+        //}
         private static CurveLoop MainOuterContourFromFace(Face faceWithHoles)
         {
             EdgeArrayArray allFaceEdges = faceWithHoles.EdgeLoops;
