@@ -31,7 +31,7 @@ namespace Strana.Revit.HoleTask.Extensions
 
             foreach (Element mepElement in mepElements)
             {
-                var wallAndFloorsInMepBBox = mepElement.AllElementsByMepBBox(doc, linkInstance.GetTotalTransform(), linkDoc);
+                var wallAndFloorsInMepBBox = mepElement.AllElementsByMepBBox(doc, linkInstance.GetTransform(), linkDoc) ;
                 foreach (Element intersectingElement in wallAndFloorsInMepBBox)
                 {
                     if (intersectingElement.GetSolidWithoutHoles(linkInstance) is { } floorWallSolid &&
