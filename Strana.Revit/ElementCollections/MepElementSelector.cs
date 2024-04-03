@@ -17,8 +17,8 @@ namespace Strana.Revit.HoleTask.ElementCollections
             Document doc = UIDocument.Document;
             ICollection<ElementId> selectedIds = UIDocument.Selection.GetElementIds();
             IEnumerable<Element> mepElements;
-            double minMepElementLength = WpfSettings.MinMepElementLength;
-            double minMepElementSize = WpfSettings.MinMepElementSize;
+            double minMepElementLength = UnitUtils.ConvertToInternalUnits(WpfSettings.MinMepElementLength, DisplayUnitType.DUT_MILLIMETERS);
+            double minMepElementSizeOrDiametor = UnitUtils.ConvertToInternalUnits(WpfSettings.MinMepElementSize, DisplayUnitType.DUT_MILLIMETERS);
 
             if (selectedIds.Count > 0)
             {
@@ -36,8 +36,8 @@ namespace Strana.Revit.HoleTask.ElementCollections
                                 Parameter outerDiameterParam = pipe.get_Parameter(BuiltInParameter.RBS_PIPE_OUTER_DIAMETER);
                                 if (outerDiameterParam != null && outerDiameterParam.StorageType == StorageType.Double)
                                 {
-                                    double outerDiameterInMm = UnitUtils.ConvertFromInternalUnits(outerDiameterParam.AsDouble(), UnitTypeId.Millimeters);
-                                    return outerDiameterInMm >= minMepElementSize;
+                                    double outerDiameterInMm = outerDiameterParam.AsDouble();
+                                    return outerDiameterInMm >= minMepElementSizeOrDiametor;
                                 }
                                 return false;
                             })
@@ -50,20 +50,24 @@ namespace Strana.Revit.HoleTask.ElementCollections
                             {
                                 Parameter heightParam = duct.get_Parameter(BuiltInParameter.RBS_CURVE_HEIGHT_PARAM);
                                 Parameter widthParam = duct.get_Parameter(BuiltInParameter.RBS_CURVE_WIDTH_PARAM);
-                                double heightInMm = 0, widthInMm = 0;
+                                Parameter diameterParam = duct.get_Parameter(BuiltInParameter.RBS_CURVE_DIAMETER_PARAM);
+                                double heightInMm = 0, widthInMm = 0, diameterInMm = 0;
 
                                 if (heightParam != null && heightParam.StorageType == StorageType.Double)
                                 {
-                                    heightInMm = UnitUtils.ConvertFromInternalUnits(heightParam.AsDouble(), UnitTypeId.Millimeters);
+                                    heightInMm = heightParam.AsDouble();
                                 }
 
                                 if (widthParam != null && widthParam.StorageType == StorageType.Double)
                                 {
-                                    widthInMm = UnitUtils.ConvertFromInternalUnits(widthParam.AsDouble(), UnitTypeId.Millimeters);
+                                    widthInMm = widthParam.AsDouble();
                                 }
-
-                                return heightInMm >= minMepElementSize || widthInMm >= minMepElementSize;
-                            })
+                                if (diameterParam != null && diameterParam.StorageType == StorageType.Double)
+                                {
+                                    diameterInMm = diameterParam.AsDouble();
+                                }
+                                return heightInMm >= minMepElementSizeOrDiametor || widthInMm >= minMepElementSizeOrDiametor || diameterInMm >= minMepElementSizeOrDiametor;
+                            })                          
                             .Cast<Element>();
 
                 var cableTrays = new FilteredElementCollector(doc)
@@ -77,20 +81,18 @@ namespace Strana.Revit.HoleTask.ElementCollections
                        
                                if (heightParam != null && heightParam.StorageType == StorageType.Double)
                                {
-                                   heightInMm = UnitUtils.ConvertFromInternalUnits(heightParam.AsDouble(), UnitTypeId.Millimeters);
+                                   heightInMm = heightParam.AsDouble();
                                }
                        
                                if (widthParam != null && widthParam.StorageType == StorageType.Double)
                                {
-                                   widthInMm = UnitUtils.ConvertFromInternalUnits(widthParam.AsDouble(), UnitTypeId.Millimeters);
+                                   widthInMm = widthParam.AsDouble();
                                }
                        
-                               return heightInMm >= minMepElementSize || widthInMm >= minMepElementSize;
+                               return heightInMm >= minMepElementSizeOrDiametor || widthInMm >= minMepElementSizeOrDiametor;
                            })
                            .Cast<Element>();
 
-                //IEnumerable<Element> filteredPipes = FilterElementsByDiameter(pipes, minMepElementSize);
-                //int debagPipes = filteredPipes.Count();
                 mepElements = ducts.Concat(pipes).Concat(cableTrays).ToList();
                 int debagg = mepElements.Count();
 
@@ -99,19 +101,6 @@ namespace Strana.Revit.HoleTask.ElementCollections
             int debag = mepElementsFilterByLength.Count();
             return mepElementsFilterByLength;
         }
-        //private static IEnumerable<Element> FilterElementsByDiameter(IEnumerable<Element> elements, double minMepElementSizeInMm)
-        //{
-        //    return elements.Where(element =>
-        //    {
-        //        Parameter outerDiameterParam = element.get_Parameter(BuiltInParameter.RBS_PIPE_OUTER_DIAMETER);
-        //        if (outerDiameterParam != null && outerDiameterParam.StorageType == StorageType.Double)
-        //        {
-        //            double outerDiameterInMm = UnitUtils.ConvertFromInternalUnits(outerDiameterParam.AsDouble(), UnitTypeId.Millimeters);
-        //            return outerDiameterInMm >= minMepElementSizeInMm;
-        //        }
-        //        return false;
-        //    });
-        //}
 
         private static IEnumerable<Element> FilterElementsByLength(IEnumerable<Element> elements, double lengthInMM)
         {
@@ -120,8 +109,7 @@ namespace Strana.Revit.HoleTask.ElementCollections
                 Parameter lengthParam = e.get_Parameter(BuiltInParameter.CURVE_ELEM_LENGTH);
                 if (lengthParam != null)
                 {
-                    double lengthInInternalUnits = lengthParam.AsDouble();
-                    var a = UnitUtils.ConvertFromInternalUnits(lengthInInternalUnits, UnitTypeId.Millimeters);
+                    var a = lengthParam.AsDouble();
                     var b = a >= lengthInMM;
                     return b;
                 }

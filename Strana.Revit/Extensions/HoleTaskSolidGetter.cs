@@ -45,6 +45,7 @@ namespace Strana.Revit.HoleTask.Extensions
                     }
                 }
             }
+            
 
             if (delta == 0 || !areJoin)
             {
@@ -125,15 +126,25 @@ namespace Strana.Revit.HoleTask.Extensions
             }
             CurveLoop sweepPath = GetSweepPathOfSolid(largestSolid);
 
-            // Create geomentry by sweep
-            Solid solidWithDelta = GeometryCreationUtilities.CreateSweptGeometry(sweepPath, 0, 0, curveLoopOffsetСontour);
+            try
+            {
+                if (largestSolid.Volume <=(0.001*35.3147))
+                {
+                    return largestSolid;
+                }
+                // Create geomentry by sweep
+                Solid solidWithDelta = GeometryCreationUtilities.CreateSweptGeometry(sweepPath, 0, 0, curveLoopOffsetСontour);
+                // Move solid on the Z axis to the delta
+                XYZ translationVector = new XYZ(0, 0, delta);
+                Transform translationTransform = Transform.CreateTranslation(translationVector);
+                Solid movedSolid = SolidUtils.CreateTransformed(solidWithDelta, translationTransform);
 
-            // Move solid on the Z axis to the delta
-            XYZ translationVector = new XYZ(0, 0, delta);
-            Transform translationTransform = Transform.CreateTranslation(translationVector);
-            Solid movedSolid = SolidUtils.CreateTransformed(solidWithDelta, translationTransform);
-
-            return movedSolid;
+                return movedSolid;
+            }
+            catch
+            {
+                return largestSolid;
+            }
         }
     }
 }

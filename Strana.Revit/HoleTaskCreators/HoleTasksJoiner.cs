@@ -39,11 +39,6 @@ namespace Strana.Revit.HoleTask.Utils
             List<FamilyInstance> intersectionFloorRectangularCombineList02 = new();
             HoleTasksGetter.AddFamilyInstancesToList(doc, "(Отв_Задание)_Стены_Прямоугольное", intersectionWallRectangularCombineList01, "SD_Способ создания задания", "СКРИПТ");
             HoleTasksGetter.AddFamilyInstancesToList(doc, "(Отв_Задание)_Перекрытия_Прямоугольное", intersectionFloorRectangularCombineList02, "SD_Способ создания задания", "СКРИПТ");
-           
-            
-            double debag1 = intersectionFloorRectangularCombineList02.Count;
-
-
 
             if (!areJoin)
             {
@@ -56,14 +51,10 @@ namespace Strana.Revit.HoleTask.Utils
                 HoleTaskFamilyLoader familyLoader = new(doc);
                 FamilySymbol holeFamilySymbol;
 
-
-
                 Options opt = new();
                 opt.ComputeReferences = true;
                 opt.DetailLevel = ViewDetailLevel.Fine;
                 string info;
-
-
 
                 while (intersectionWallRectangularCombineList01.Count != 0)
                 {
@@ -277,11 +268,6 @@ namespace Strana.Revit.HoleTask.Utils
                         double roundHTThickness = HoleTasksRoundUpDimension.RoundUpParameter(intersectionPointThickness);
                         double roundHTHeight = HoleTasksRoundUpDimension.RoundUpParameter(intersectionPointHeight);
 
-                        //if (!FindMatchingInstance(GlobalParameters.ЕxistingTaskFloor, newCenterPoint, 0.03))
-                        //{
-                        //    return intersectionWallRectangularCombineList01;
-                        //}
-
                         FamilyInstance intersectionPoint = doc.Create.NewFamilyInstance(
                         newCenterPoint,
                         holeFamilySymbol,
@@ -340,7 +326,6 @@ namespace Strana.Revit.HoleTask.Utils
                         intersectionWallRectangularCombineList01.Remove(intersectionWallRectangularSolidIntersectCombineList001[0]);
                     }
                 }
-
 
                 while (intersectionFloorRectangularCombineList02.Count != 0)
                 {
@@ -538,12 +523,6 @@ namespace Strana.Revit.HoleTask.Utils
                         double roundHTThickness = HoleTasksRoundUpDimension.RoundUpParameter(intersectionPointThickness);
                         double roundHTHeight = HoleTasksRoundUpDimension.RoundUpParameter(intersectionPointHeight);
 
-                        //if (!FindMatchingInstance(GlobalParameters.ЕxistingTaskFloor, newCenterPoint, 0.03))
-                        //{
-                        //    return intersectionFloorRectangularCombineList02;
-
-                        //}
-
                         FamilyInstance intersectionPoint = doc.Create.NewFamilyInstance(
                             newCenterPoint,
                             holeFamilySymbol,
@@ -613,7 +592,8 @@ namespace Strana.Revit.HoleTask.Utils
             }
             return allFamilyInstances00;
         }
-        public static bool FindMatchingInstance(
+
+       public static bool FindMatchingInstance(
         List<FamilyInstance> startHoleTask,
         XYZ newCenterPoint,
         double tolerance)

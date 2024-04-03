@@ -14,10 +14,7 @@ namespace Strana.Revit.HoleTask.Extensions
 {
     public static class IntersectingElementExtension
     {
-        /// <summary>
-        /// Create hole tasks by all intersected element off RevitLinkInstance.
-        /// </summary>
-        /// <param name="intersectingElement"><seealso cref="Autodesk.Revit.DB.Element"/></param>
+        /// <summary> Create hole tasks by all intersected element off RevitLinkInstance. </summary>
         /// <param name="linkInstance"><seealso cref="RevitLinkInstance"/></param>
         /// <returns> list off holetasks items by intersected element (wall or floor).</returns>
         public static List<FamilyInstance> CreateHoleTasksByIntersectedElements(RevitLinkInstance linkInstance)
@@ -26,12 +23,11 @@ namespace Strana.Revit.HoleTask.Extensions
             Document doc = linkInstance.Document;
             Document linkDoc = linkInstance.GetLinkDocument();
 
-            // Assuming MepElementSelector.GetSelectedOrAllMepElements() now correctly takes Document, ensure the method exists and works as expected.
-            IEnumerable<Element> mepElements = MepElementSelector.GetSelectedOrAllMepElements(); // Assuming this method exists and works correctly
+            IEnumerable<Element> mepElements = MepElementSelector.GetSelectedOrAllMepElements();
 
             foreach (Element mepElement in mepElements)
             {
-                var wallAndFloorsInMepBBox = mepElement.AllElementsByMepBBox(doc, linkInstance.GetTransform(), linkDoc) ;
+                var wallAndFloorsInMepBBox = mepElement.AllElementsByMepBBox(linkInstance);
                 foreach (Element intersectingElement in wallAndFloorsInMepBBox)
                 {
                     if (intersectingElement.GetSolidWithoutHoles(linkInstance) is { } floorWallSolid &&
@@ -55,38 +51,5 @@ namespace Strana.Revit.HoleTask.Extensions
 
             return intersectedItemHoleTasks;
         }
-
-        //public static List<FamilyInstance> CreateHoleTasksByIntersectedElements(RevitLinkInstance linkInstance)
-        //{
-        //    List<FamilyInstance> intersectedItemHoleTasks = new();
-        //    Document doc = linkInstance.Document;
-        //    Document linkDoc = linkInstance.GetLinkDocument();
-
-        //    IEnumerable<Element> mepElements = MepElementSelector.GetSelectedOrAllMepElements();
-
-        //    foreach (Element mepElement in mepElements)
-        //    {
-        //        var wallAndFloorsInMepBBox = mepElement.AllElementsByMepBBox(doc, linkInstance.GetTotalTransform(), linkDoc);
-        //        foreach (Element intersectingElement in wallAndFloorsInMepBBox)
-        //        {
-        //            Solid floorWallSolid = intersectingElement.GetSolidWithoutHoles(linkInstance);
-        //            Curve mepCurve = (mepElement.Location as LocationCurve).Curve;
-        //            SolidCurveIntersectionOptions defOptions = new();
-        //            SolidCurveIntersection solidCurve = floorWallSolid.IntersectWithCurve(mepCurve, defOptions);
-
-        //            if (solidCurve != null && solidCurve.SegmentCount > 0)
-        //            {
-        //                HoleTaskCreator holeTaskCreator = new(doc);
-        //                FamilyInstance createdHoleTask = holeTaskCreator.PlaceHoleTaskFamilyInstance(mepElement, solidCurve, intersectingElement, linkDoc, linkInstance);
-        //                if (createdHoleTask is not null)
-        //                {
-        //                    intersectedItemHoleTasks.Add(createdHoleTask);
-        //                }
-        //            }
-        //        }
-        //    }
-
-        //    return intersectedItemHoleTasks;
-        //}
     }
 }

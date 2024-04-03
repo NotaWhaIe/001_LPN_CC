@@ -55,15 +55,7 @@ namespace Strana.Revit.HoleTask.Utils
             Document linkDoc,
             RevitLinkInstance linkInstance)
         {
-            ///Добавляю в список уже существующие задания на отверстия:
-            //List<FamilyInstance> intersectionRectangularWall = new();
-            //List<FamilyInstance> intersectionRectangularFloor = new();
-            //HoleTasksGetter.AddFamilyInstancesToList(this.doc, "(Отв_Задание)_Стены_Прямоугольное", intersectionRectangularWall, "SD_Способ создания задания", "СКРИПТ");
-            //HoleTasksGetter.AddFamilyInstancesToList(this.doc, "(Отв_Задание)_Перекрытия_Прямоугольное", intersectionRectangularFloor, "SD_Способ создания задания", "СКРИПТ");
-            //intersectionRectangularCombineList.AddRange(intersectionRectangularWall.Concat(intersectionRectangularFloor));
-
             IEnumerable<FamilyInstance> existHoleTasksInProject = GetElementsWithTwoFamilyNames("(Отв_Задание)_Стены_Прямоугольное", "(Отв_Задание)_Перекрытия_Прямоугольное");
-
             double offSetHoleTaskInFeet = UnitUtils.ConvertToInternalUnits(WpfSettings.OffSetHoleTask, UnitTypeId.Millimeters);
             double clearance = offSetHoleTaskInFeet * 2;
             OrientaionType orientation = this.GetElementOrientationType(mepElement);
@@ -77,7 +69,9 @@ namespace Strana.Revit.HoleTask.Utils
                 holeFamilySymbol = familyLoader.FloorFamilySymbol;
                 tipe = 0;
             }
-            else if (intersectedElement != wall && orientation == OrientaionType.Horizontal)// Horizontal == Inclined
+            else if (intersectedElement != wall && orientation == OrientaionType.Horizontal)
+                // Horizontal == Inclined
+
             {
                 holeFamilySymbol = familyLoader.FloorFamilySymbol;
                 tipe = 1;
@@ -126,28 +120,6 @@ namespace Strana.Revit.HoleTask.Utils
                 mepHeight = mepElement.get_Parameter(BuiltInParameter.RBS_CABLETRAY_HEIGHT_PARAM)?.AsDouble() ?? 0;
                 mepWidth = mepElement.get_Parameter(BuiltInParameter.RBS_CABLETRAY_WIDTH_PARAM)?.AsDouble() ?? 0;
             }
-
-
-            //var mepCategory = mepElement.Category;
-            //double mepDiameter = mepElement.get_Parameter(BuiltInParameter.RBS_PIPE_OUTER_DIAMETER)?.AsDouble() ?? 0;
-            //double mepHeightDucts = mepElement.get_Parameter(BuiltInParameter.RBS_CURVE_HEIGHT_PARAM)?.AsDouble() ?? 0;
-
-
-            //if (mepDiameter > 0)
-            //{
-            //    mepHeight = mepDiameter;
-            //    mepWidth = mepDiameter;
-            //}
-            //else if (mepHeightDucts > 0)
-            //{
-            //    mepHeight = mepElement.get_Parameter(BuiltInParameter.RBS_CURVE_HEIGHT_PARAM)?.AsDouble() ?? 0;
-            //    mepWidth = mepElement.get_Parameter(BuiltInParameter.RBS_CURVE_WIDTH_PARAM)?.AsDouble() ?? 0;
-            //}
-            //else
-            //{
-            //    mepHeight = mepElement.get_Parameter(BuiltInParameter.RBS_CABLETRAY_HEIGHT_PARAM)?.AsDouble() ?? 0;
-            //    mepWidth = mepElement.get_Parameter(BuiltInParameter.RBS_CABLETRAY_WIDTH_PARAM)?.AsDouble() ?? 0;
-            //}
 
             FamilyInstance holeTask;
             IEnumerable<Level> docLvlList = this.GetDocumentLevels(this.doc);
