@@ -16,7 +16,7 @@ namespace Strana.Revit.HoleTask.Utils
         /// </summary>
         /// <param name="doc"><seealso cref="Document"/></param>
         /// <param name="center"><seealso cref="XYZ"/></param>
-        public static void CreateSphereByPoint(XYZ center, Document doc)
+        public static void CreateSphereByPoint(XYZ center, Document doc, string comment)
         {
 
             List<Curve> profile = [];
@@ -45,6 +45,7 @@ namespace Strana.Revit.HoleTask.Utils
                 ds.ApplicationId = "Application id";
                 ds.ApplicationDataId = "Geometry object id";
                 ds.SetShape(new GeometryObject[] { sphere });
+                ds.get_Parameter(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS).Set(comment);
                 //t.Commit();
                 //}
             }
