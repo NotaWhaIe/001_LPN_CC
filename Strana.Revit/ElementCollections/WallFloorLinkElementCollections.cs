@@ -24,7 +24,6 @@ namespace Strana.Revit.HoleTask.ElementCollections
     {
         public static IEnumerable<Element> AllElementsByMepBBox(this Element mepElement, RevitLinkInstance linkInstance)
         {
-            Document doc = linkInstance.Document;
             Document linkDoc = linkInstance.GetLinkDocument();
             Transform linkTransform = linkInstance.GetTransform();
 
@@ -34,28 +33,30 @@ namespace Strana.Revit.HoleTask.ElementCollections
                 return Enumerable.Empty<Element>();
             }
 
-            IEnumerable<Element> walls = new FilteredElementCollector(linkDoc)
-                .OfClass(typeof(Wall))
-                .WhereElementIsNotElementType()
-                .Cast<Wall>()
+            // Использование LogicalAndFilter для оптимизации фильтрации
+            var wallFilter = new ElementCategoryFilter(BuiltInCategory.OST_Walls);
+            var floorFilter = new ElementCategoryFilter(BuiltInCategory.OST_Floors);
+            var notElementTypeFilter = new ElementIsElementTypeFilter(false);
+            var combinedFilter = new LogicalAndFilter(new List<ElementFilter> { wallFilter, notElementTypeFilter });
+
+            var elements = new FilteredElementCollector(linkDoc)
+                .WherePasses(combinedFilter)
+                .OfType<Wall>()
                 .Where(w => w.WallType.Kind != WallKind.Curtain)
-                .Cast<Element>();
-
-            IEnumerable<Element> floors = new FilteredElementCollector(linkDoc)
-                .OfClass(typeof(Floor))
-                .WhereElementIsNotElementType()
-                .Cast<Element>();
-
-            IEnumerable<Element> elements = walls.Concat(floors);
+                .Cast<Element>()
+                .Concat(new FilteredElementCollector(linkDoc)
+                    .WherePasses(floorFilter)
+                    .WherePasses(notElementTypeFilter)
+                    .OfType<Floor>());
+            var elementsdebag = elements.Count();
 
             var solidElementMap = GetTransformedSolidsFromElements(elements, linkTransform);
             var bboxElementMap = TransformSolidsToBoundingBoxes(solidElementMap);
-            var intersectingElements = FindIntersectingElements(mepBoundingBox, bboxElementMap, 0);
-
-            double debag = intersectingElements.Count();
-
-            return intersectingElements;
+            var debag = FindIntersectingElements(mepBoundingBox, bboxElementMap, 0);
+            var debaga = debag.Count();
+            return debag;
         }
+
         public static Dictionary<Solid, Element> GetTransformedSolidsFromElements(IEnumerable<Element> elements, Transform transform)
         {
             var solidElementMap = new Dictionary<Solid, Element>();
@@ -70,6 +71,7 @@ namespace Strana.Revit.HoleTask.ElementCollections
             }
             return solidElementMap;
         }
+
         public static Dictionary<BoundingBoxXYZ, Element> TransformSolidsToBoundingBoxes(Dictionary<Solid, Element> solidElementMap)
         {
             var bboxElementMap = new Dictionary<BoundingBoxXYZ, Element>();
@@ -90,6 +92,7 @@ namespace Strana.Revit.HoleTask.ElementCollections
             }
             return bboxElementMap;
         }
+
         public static IEnumerable<Element> FindIntersectingElements(BoundingBoxXYZ box1, Dictionary<BoundingBoxXYZ, Element> bboxElementMap, double tolerance)
         {
             Outline outline1 = new Outline(box1.Min, box1.Max);
@@ -100,11 +103,10 @@ namespace Strana.Revit.HoleTask.ElementCollections
                 Outline outline2 = new Outline(box2.Min, box2.Max);
                 if (outline1.Intersects(outline2, tolerance))
                 {
-                    yield return element; 
+                    yield return element;
                 }
             }
         }
-  
     }
 }
 
