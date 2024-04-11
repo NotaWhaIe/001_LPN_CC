@@ -24,10 +24,11 @@ namespace Strana.Revit.HoleTask.Extensions
             Document linkDoc = linkInstance.GetLinkDocument();
 
             IEnumerable<Element> mepElements = MepElementSelector.GetSelectedOrAllMepElements();
+            var test = WallFloorLinkCollectionsBBox.AllElementsByMepBBox();
 
             foreach (Element mepElement in mepElements)
             {
-                var wallAndFloorsInMepBBox = mepElement.AllElementsByMepBBox(linkInstance);
+                var wallAndFloorsInMepBBox = mepElement.AllElementsByMepBBox(linkInstance,);
                 foreach (Element intersectingElement in wallAndFloorsInMepBBox)
                 {
                     if (intersectingElement.GetSolidWithoutHoles(linkInstance) is { } floorWallSolid &&
