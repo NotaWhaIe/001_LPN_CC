@@ -78,49 +78,6 @@ namespace Strana.Revit.HoleTask.Extension.RevitElement
             }
         }
 
-        //public static Solid GetSolidWithoutHoles(this Element element, RevitLinkInstance revitLink)
-        //{
-        //    Transform transform = revitLink.GetTotalTransform();
-        //    Solid solidWithHoles = element.GetSolidWithHoles();
-        //    if (!arePlaceHoleTaskInOpenings)
-        //    {
-        //        return SolidUtils.CreateTransformed(solidWithHoles, transform);
-        //    }
-        //    try
-        //    {
-        //        Face solidFacade = GetSolidMainFace(solidWithHoles);
-        //        if (solidFacade != null)
-        //        {
-        //            XYZ solidFacadeNormal = solidFacade.ComputeNormal(new UV(0, 0));
-        //        }
-        //        //XYZ solidFacadeNormal = solidFacade.ComputeNormal(new UV(0, 0));
-        //        CurveLoop outerСontour = MainOuterContourFromFace(solidFacade);
-        //        List<CurveLoop> outerLoops = [outerСontour];
-        //        double GetCurveLoopLength(CurveLoop curveLoop)
-        //        {
-        //            double totalLength = 0.0;
-        //            foreach (Curve curve in curveLoop)
-        //            {
-        //                totalLength += curve.Length;
-        //            }
-        //            return totalLength;
-        //        }
-        //        double sweepPathLenght = element.GetInterctedElementThickness();
-        //        XYZ start_point = outerСontour.GetCurveLoopIterator().Current.GetEndPoint(0);
-        //        XYZ end_point = start_point - sweepPathLenght * solidFacadeNormal.Normalize();
-        //        Curve curve = Line.CreateBound(start_point, end_point);
-        //        List<Curve> curvel = [curve];
-        //        CurveLoop edgeMinCurvesLoop = CurveLoop.Create(curvel);
-        //        Solid solidWithoutHoles = GeometryCreationUtilities
-        //            .CreateSweptGeometry(edgeMinCurvesLoop, 0, 0, outerLoops);
-
-        //        return SolidUtils.CreateTransformed(solidWithoutHoles, transform);
-        //    }
-        //    catch
-        //    {
-        //        return SolidUtils.CreateTransformed(solidWithHoles, transform);
-        //    }
-        //}
         public static Solid GetSolidWithHoles(this Element element)
         {
             GeometryElement geometryElement = element.get_Geometry(Opt);

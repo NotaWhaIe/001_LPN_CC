@@ -15,17 +15,13 @@ using Autodesk.Revit.DB.Plumbing;
 using Autodesk.Revit.UI;
 using Strana.Revit.HoleTask.Utils;
 using Autodesk.Revit.Attributes;
+using Strana.Revit.HoleTask.Extension.RevitElement;
+using System.Xml.Linq;
 
 namespace Strana.Revit.HoleTask.ElementCollections
 {
-    /// <summary> Class contains all mep elements in revit model. </summary>
     public static class WallFloorLinkElementCollections
     {
-        /// <summary> Gets all cable trays to check intersecting + fastFilterBB. </summary>
-        /// <param name="mepElement"> This is a duct, cable tray or pipe.</param>
-        /// <param name="doc"><seealso cref="Document"/></param>
-        /// <param name="transform"></param>
-        /// <returns></returns>
         public static IEnumerable<Element> AllElementsByMepBBox(this Element mepElement, RevitLinkInstance linkInstance)
         {
             Document doc = linkInstance.Document;
@@ -37,111 +33,78 @@ namespace Strana.Revit.HoleTask.ElementCollections
             {
                 return Enumerable.Empty<Element>();
             }
-            if (linkTransform != null)
-            {
-                mepBoundingBox.Transform = linkTransform;
-            }
-            Outline mepOutline = new Outline(mepBoundingBox.Min, mepBoundingBox.Max);
-            BoundingBoxIntersectsFilter mepFilter = new BoundingBoxIntersectsFilter(mepOutline);
 
             IEnumerable<Element> walls = new FilteredElementCollector(linkDoc)
-                .OfCategory(BuiltInCategory.OST_Walls)
                 .OfClass(typeof(Wall))
                 .WhereElementIsNotElementType()
-                .WherePasses(mepFilter)
                 .Cast<Wall>()
                 .Where(w => w.WallType.Kind != WallKind.Curtain)
                 .Cast<Element>();
 
             IEnumerable<Element> floors = new FilteredElementCollector(linkDoc)
-                .OfCategory(BuiltInCategory.OST_Floors)
                 .OfClass(typeof(Floor))
                 .WhereElementIsNotElementType()
-                .WherePasses(mepFilter)
                 .Cast<Element>();
 
-            ///test
-            var firstFloor = floors.FirstOrDefault();
-            if (firstFloor != null)
-            {
-                BoundingBoxXYZ boundingBox = firstFloor.get_BoundingBox(null);
-                if (boundingBox != null)
-                {
-                    XYZ minPoint = boundingBox.Min;
-                    XYZ maxPoint = boundingBox.Max;
-                    SphereByPoint.CreateSphereByPoint(minPoint, doc, "firstFloor");
-                    SphereByPoint.CreateSphereByPoint(maxPoint, doc, "firstFloor");
+            IEnumerable<Element> elements = walls.Concat(floors);
 
+            var solidElementMap = GetTransformedSolidsFromElements(elements, linkTransform);
+            var bboxElementMap = TransformSolidsToBoundingBoxes(solidElementMap);
+            var intersectingElements = FindIntersectingElements(mepBoundingBox, bboxElementMap, 0);
+
+            double debag = intersectingElements.Count();
+
+            return intersectingElements;
+        }
+        public static Dictionary<Solid, Element> GetTransformedSolidsFromElements(IEnumerable<Element> elements, Transform transform)
+        {
+            var solidElementMap = new Dictionary<Solid, Element>();
+            foreach (Element element in elements)
+            {
+                Solid solidWithHoles = WallFloorSolidGetter.GetSolidWithHoles(element);
+                if (solidWithHoles != null)
+                {
+                    Solid transformedSolid = SolidUtils.CreateTransformed(solidWithHoles, transform);
+                    solidElementMap[transformedSolid] = element;
                 }
             }
-
-            return walls.Concat(floors);
+            return solidElementMap;
         }
-            //SphereByPoint.CreateSphereByPoint(transformedMin, doc, "mepElement");
-            //SphereByPoint.CreateSphereByPoint(transformedMax, doc, "mepElement");
-
-            //Outline mepOutline = new Outline(mepBoundingBox.Min, mepBoundingBox.Max);
-        public static XYZ TransformPoint(XYZ point, Transform transform)
+        public static Dictionary<BoundingBoxXYZ, Element> TransformSolidsToBoundingBoxes(Dictionary<Solid, Element> solidElementMap)
         {
-            // Получаем базовые векторы трансформации
-            XYZ bX = transform.BasisX;
-            XYZ bY = transform.BasisY;
-            XYZ bZ = transform.BasisZ;
-            XYZ origin = transform.Origin;
-
-            // Создаем матрицу 3x4
-            double[,] matrix3x4 = new double[,]
+            var bboxElementMap = new Dictionary<BoundingBoxXYZ, Element>();
+            foreach (var kvp in solidElementMap)
             {
-        { bX.X, bX.Y, bX.Z, origin.X },
-        { bY.X, bY.Y, bY.Z, origin.Y },
-        { bZ.X, bZ.Y, bZ.Z, origin.Z }
-            };
-
-            // Создаем матрицу 4x1
-            double[,] matrix4x1 = new double[,]
-            {
-        { point.X },
-        { point.Y },
-        { point.Z },
-        { 1 } // Элемент гомогенной координаты для трансформации
-            };
-
-            // Создаем матрицу-результат размером 3x1
-            double[,] resultMatrix = new double[3, 1];
-
-            // Выполняем умножение матриц
-            for (int i = 0; i < 3; i++)
-            {
-                for (int j = 0; j < 1; j++)
+                Solid solid = kvp.Key;
+                Element element = kvp.Value;
+                BoundingBoxXYZ bb = solid.GetBoundingBox();
+                if (bb != null)
                 {
-                    resultMatrix[i, j] = 0;
-                    for (int k = 0; k < 4; k++) // Матрица 3x4 требует k < 4
-                    {
-                        resultMatrix[i, j] += matrix3x4[i, k] * matrix4x1[k, j];
-                    }
+                    XYZ transformedMin = bb.Transform.OfPoint(bb.Min);
+                    XYZ transformedMax = bb.Transform.OfPoint(bb.Max);
+                    BoundingBoxXYZ transformedBoundingBox = new BoundingBoxXYZ();
+                    transformedBoundingBox.Min = transformedMin;
+                    transformedBoundingBox.Max = transformedMax;
+                    bboxElementMap[transformedBoundingBox] = element;
                 }
             }
-
-            // Получаем новые координаты элемента
-            double Xtemp = resultMatrix[0, 0];
-            double Ytemp = resultMatrix[1, 0];
-            double Ztemp = resultMatrix[2, 0];
-
-            return new XYZ(Xtemp, Ytemp, Ztemp);
+            return bboxElementMap;
         }
-
-        public static Outline TransformOutline(Outline originalOutline, Transform transform)
+        public static IEnumerable<Element> FindIntersectingElements(BoundingBoxXYZ box1, Dictionary<BoundingBoxXYZ, Element> bboxElementMap, double tolerance)
         {
-            // Трансформируем минимальную и максимальную точки исходного Outline
-            XYZ transformedMin = transform.OfPoint(originalOutline.MinimumPoint);
-            XYZ transformedMax = transform.OfPoint(originalOutline.MaximumPoint);
-
-            // Создаем новый Outline с трансформированными точками
-            Outline transformedOutline = new Outline(transformedMin, transformedMax);
-
-            return transformedOutline;
+            Outline outline1 = new Outline(box1.Min, box1.Max);
+            foreach (var kvp in bboxElementMap)
+            {
+                BoundingBoxXYZ box2 = kvp.Key;
+                Element element = kvp.Value;
+                Outline outline2 = new Outline(box2.Min, box2.Max);
+                if (outline1.Intersects(outline2, tolerance))
+                {
+                    yield return element; 
+                }
+            }
         }
-
+  
     }
 }
 
