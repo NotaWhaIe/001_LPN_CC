@@ -33,28 +33,27 @@ namespace Strana.Revit.HoleTask.ElementCollections
                 return Enumerable.Empty<Element>();
             }
 
-            // Использование LogicalAndFilter для оптимизации фильтрации
-            var wallFilter = new ElementCategoryFilter(BuiltInCategory.OST_Walls);
-            var floorFilter = new ElementCategoryFilter(BuiltInCategory.OST_Floors);
-            var notElementTypeFilter = new ElementIsElementTypeFilter(false);
-            var combinedFilter = new LogicalAndFilter(new List<ElementFilter> { wallFilter, notElementTypeFilter });
-
-            var elements = new FilteredElementCollector(linkDoc)
-                .WherePasses(combinedFilter)
-                .OfType<Wall>()
+            IEnumerable<Element> walls = new FilteredElementCollector(linkDoc)
+                .OfClass(typeof(Wall))
+                .WhereElementIsNotElementType()
+                .Cast<Wall>()
                 .Where(w => w.WallType.Kind != WallKind.Curtain)
-                .Cast<Element>()
-                .Concat(new FilteredElementCollector(linkDoc)
-                    .WherePasses(floorFilter)
-                    .WherePasses(notElementTypeFilter)
-                    .OfType<Floor>());
-            var elementsdebag = elements.Count();
+                .Cast<Element>();
+
+            IEnumerable<Element> floors = new FilteredElementCollector(linkDoc)
+                .OfClass(typeof(Floor))
+                .WhereElementIsNotElementType()
+                .Cast<Element>();
+
+            IEnumerable<Element> elements = walls.Concat(floors);
+            var debag0 = elements.Count();
+
 
             var solidElementMap = GetTransformedSolidsFromElements(elements, linkTransform);
             var bboxElementMap = TransformSolidsToBoundingBoxes(solidElementMap);
-            var debag = FindIntersectingElements(mepBoundingBox, bboxElementMap, 0);
-            var debaga = debag.Count();
-            return debag;
+            var debag1 = FindIntersectingElements(mepBoundingBox, bboxElementMap, 0);
+            var debag2 = debag1.Count();
+            return debag1;
         }
 
         public static Dictionary<Solid, Element> GetTransformedSolidsFromElements(IEnumerable<Element> elements, Transform transform)
