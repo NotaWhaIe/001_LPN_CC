@@ -22,6 +22,8 @@ namespace Strana.Revit.HoleTask.ElementCollections
 {
     public static class WallFloorLinkElementCollections
     {
+        private static Dictionary<Document, Dictionary<BoundingBoxXYZ, Element>> cachedBBoxMap = new Dictionary<Document, Dictionary<BoundingBoxXYZ, Element>>();
+
         public static IEnumerable<Element> AllElementsByMepBBox(this Element mepElement, RevitLinkInstance linkInstance)
         {
             Document linkDoc = linkInstance.GetLinkDocument();
@@ -33,12 +35,24 @@ namespace Strana.Revit.HoleTask.ElementCollections
                 return Enumerable.Empty<Element>();
             }
 
+            // Проверка наличия кэшированной карты для документа
+            if (!cachedBBoxMap.ContainsKey(linkDoc) || cachedBBoxMap[linkDoc].Count == 0)
+            {
+                CacheElements(linkDoc, linkTransform);
+            }
+
+            var bboxElementMap = cachedBBoxMap[linkDoc];
+            return FindIntersectingElements(mepBoundingBox, bboxElementMap, 0);
+        }
+
+        private static void CacheElements(Document linkDoc, Transform transform)
+        {
             IEnumerable<Element> walls = new FilteredElementCollector(linkDoc)
-                .OfClass(typeof(Wall))
-                .WhereElementIsNotElementType()
-                .Cast<Wall>()
-                .Where(w => w.WallType.Kind != WallKind.Curtain)
-                .Cast<Element>();
+                         .OfClass(typeof(Wall))
+                         .WhereElementIsNotElementType()
+                         .Cast<Wall>()
+                         .Where(w => w.WallType.Kind != WallKind.Curtain)
+                         .Cast<Element>();
 
             IEnumerable<Element> floors = new FilteredElementCollector(linkDoc)
                 .OfClass(typeof(Floor))
@@ -46,65 +60,44 @@ namespace Strana.Revit.HoleTask.ElementCollections
                 .Cast<Element>();
 
             IEnumerable<Element> elements = walls.Concat(floors);
-            var debag0 = elements.Count();
 
-
-            var solidElementMap = GetTransformedSolidsFromElements(elements, linkTransform);
+            var solidElementMap = GetTransformedSolidsFromElements(elements, transform);
             var bboxElementMap = TransformSolidsToBoundingBoxes(solidElementMap);
-            var debag1 = FindIntersectingElements(mepBoundingBox, bboxElementMap, 0);
-            var debag2 = debag1.Count();
-            return debag1;
+            cachedBBoxMap[linkDoc] = bboxElementMap;
         }
 
-        public static Dictionary<Solid, Element> GetTransformedSolidsFromElements(IEnumerable<Element> elements, Transform transform)
+        private static Dictionary<Solid, Element> GetTransformedSolidsFromElements(IEnumerable<Element> elements, Transform transform)
         {
-            var solidElementMap = new Dictionary<Solid, Element>();
-            foreach (Element element in elements)
+            return elements.Select(element =>
             {
                 Solid solidWithHoles = WallFloorSolidGetter.GetSolidWithHoles(element);
-                if (solidWithHoles != null)
-                {
-                    Solid transformedSolid = SolidUtils.CreateTransformed(solidWithHoles, transform);
-                    solidElementMap[transformedSolid] = element;
-                }
-            }
-            return solidElementMap;
+                return solidWithHoles != null ? new { Solid = SolidUtils.CreateTransformed(solidWithHoles, transform), Element = element } : null;
+            })
+            .Where(x => x != null)
+            .ToDictionary(x => x.Solid, x => x.Element);
         }
 
-        public static Dictionary<BoundingBoxXYZ, Element> TransformSolidsToBoundingBoxes(Dictionary<Solid, Element> solidElementMap)
+        private static Dictionary<BoundingBoxXYZ, Element> TransformSolidsToBoundingBoxes(Dictionary<Solid, Element> solidElementMap)
         {
-            var bboxElementMap = new Dictionary<BoundingBoxXYZ, Element>();
-            foreach (var kvp in solidElementMap)
-            {
-                Solid solid = kvp.Key;
-                Element element = kvp.Value;
-                BoundingBoxXYZ bb = solid.GetBoundingBox();
-                if (bb != null)
-                {
+            return solidElementMap.ToDictionary(
+                kvp => {
+                    Solid solid = kvp.Key;
+                    Element element = kvp.Value;
+                    BoundingBoxXYZ bb = solid.GetBoundingBox();
                     XYZ transformedMin = bb.Transform.OfPoint(bb.Min);
                     XYZ transformedMax = bb.Transform.OfPoint(bb.Max);
-                    BoundingBoxXYZ transformedBoundingBox = new BoundingBoxXYZ();
-                    transformedBoundingBox.Min = transformedMin;
-                    transformedBoundingBox.Max = transformedMax;
-                    bboxElementMap[transformedBoundingBox] = element;
-                }
-            }
-            return bboxElementMap;
+                    return new BoundingBoxXYZ { Min = transformedMin, Max = transformedMax };
+                },
+                kvp => kvp.Value
+            );
         }
 
         public static IEnumerable<Element> FindIntersectingElements(BoundingBoxXYZ box1, Dictionary<BoundingBoxXYZ, Element> bboxElementMap, double tolerance)
         {
             Outline outline1 = new Outline(box1.Min, box1.Max);
-            foreach (var kvp in bboxElementMap)
-            {
-                BoundingBoxXYZ box2 = kvp.Key;
-                Element element = kvp.Value;
-                Outline outline2 = new Outline(box2.Min, box2.Max);
-                if (outline1.Intersects(outline2, tolerance))
-                {
-                    yield return element;
-                }
-            }
+            return bboxElementMap
+                .Where(kvp => new Outline(kvp.Key.Min, kvp.Key.Max).Intersects(outline1, tolerance))
+                .Select(kvp => kvp.Value);
         }
     }
 }
