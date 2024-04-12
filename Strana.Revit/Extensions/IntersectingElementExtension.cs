@@ -14,9 +14,6 @@ namespace Strana.Revit.HoleTask.Extensions
 {
     public static class IntersectingElementExtension
     {
-        /// <summary> Create hole tasks by all intersected element off RevitLinkInstance. </summary>
-        /// <param name="linkInstance"><seealso cref="RevitLinkInstance"/></param>
-        /// <returns> list off holetasks items by intersected element (wall or floor).</returns>
         public static List<FamilyInstance> CreateHoleTasksByIntersectedElements(RevitLinkInstance linkInstance)
         {
             List<FamilyInstance> intersectedItemHoleTasks = new List<FamilyInstance>();
@@ -24,11 +21,11 @@ namespace Strana.Revit.HoleTask.Extensions
             Document linkDoc = linkInstance.GetLinkDocument();
 
             IEnumerable<Element> mepElements = MepElementSelector.GetSelectedOrAllMepElements();
-            var test = WallFloorLinkCollectionsBBox.AllElementsByMepBBox();
+            var carrentLinkBBoxes = WallFloorLinkCollectionsBBox.AllCarrentLinksBBox(linkInstance);
 
             foreach (Element mepElement in mepElements)
             {
-                var wallAndFloorsInMepBBox = mepElement.AllElementsByMepBBox(linkInstance,);
+                var wallAndFloorsInMepBBox = WallFloorLinkElementCollections.AllElementsByMepBBox(mepElement, linkInstance, carrentLinkBBoxes);
                 foreach (Element intersectingElement in wallAndFloorsInMepBBox)
                 {
                     if (intersectingElement.GetSolidWithoutHoles(linkInstance) is { } floorWallSolid &&
@@ -49,7 +46,6 @@ namespace Strana.Revit.HoleTask.Extensions
                     }
                 }
             }
-
             return intersectedItemHoleTasks;
         }
     }

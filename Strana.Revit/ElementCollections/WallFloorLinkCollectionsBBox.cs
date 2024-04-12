@@ -8,16 +8,11 @@ namespace Strana.Revit.HoleTask.ElementCollections
 {
     public static class WallFloorLinkCollectionsBBox
     {
-        public static (Dictionary<Solid, Element> SolidElementMap, Dictionary<BoundingBoxXYZ, Element> BBoxElementMap) AllElementsByMepBBox(Element mepElement, RevitLinkInstance linkInstance)
+        public static Dictionary<BoundingBoxXYZ, Element> AllCarrentLinksBBox(RevitLinkInstance linkInstance)
         {
             Document linkDoc = linkInstance.GetLinkDocument();
             Transform transform = linkInstance.GetTransform();
 
-            BoundingBoxXYZ mepBoundingBox = mepElement.get_BoundingBox(null);
-            if (mepBoundingBox == null)
-            {
-                return (new Dictionary<Solid, Element>(), new Dictionary<BoundingBoxXYZ, Element>());
-            }
 
             IEnumerable<Element> elements = new FilteredElementCollector(linkDoc)
                 .WhereElementIsNotElementType()
@@ -28,10 +23,10 @@ namespace Strana.Revit.HoleTask.ElementCollections
             IEnumerable<Element> floors = elements.OfType<Floor>();
             IEnumerable<Element> combinedElements = walls.Concat(floors);
 
-            var solidElementMap = GetTransformedSolidsFromElements(combinedElements, transform);
-            var bboxElementMap = TransformSolidsToBoundingBoxes(solidElementMap);
+            Dictionary<Solid, Element> solidElementMap = GetTransformedSolidsFromElements(combinedElements, transform);
+            Dictionary<BoundingBoxXYZ, Element> bboxElementMap = TransformSolidsToBoundingBoxes(solidElementMap);
 
-            return (solidElementMap, bboxElementMap);
+            return  bboxElementMap;
         }
 
         private static Dictionary<Solid, Element> GetTransformedSolidsFromElements(IEnumerable<Element> elements, Transform transform)

@@ -22,9 +22,10 @@ namespace Strana.Revit.HoleTask.ElementCollections
 {
     public static class WallFloorLinkElementCollections
     {
-        private static Dictionary<Document, Dictionary<BoundingBoxXYZ, Element>> cachedBBoxMap = new Dictionary<Document, Dictionary<BoundingBoxXYZ, Element>>();
-
-        public static IEnumerable<Element> AllElementsByMepBBox(this Element mepElement, RevitLinkInstance linkInstance)
+        public static IEnumerable<Element> AllElementsByMepBBox(
+                Element mepElement,
+                RevitLinkInstance linkInstance,
+                Dictionary<BoundingBoxXYZ, Element> bboxElementMap)
         {
             Document linkDoc = linkInstance.GetLinkDocument();
             Transform linkTransform = linkInstance.GetTransform();
@@ -34,14 +35,7 @@ namespace Strana.Revit.HoleTask.ElementCollections
             {
                 return Enumerable.Empty<Element>();
             }
-
-            if (!cachedBBoxMap.ContainsKey(linkDoc) || cachedBBoxMap[linkDoc].Count == 0)
-            {
-                WallFloorLinkCollectionsBBox.CacheElements(linkDoc, linkTransform);
-            }
-
-            var bboxElementMap = cachedBBoxMap[linkDoc];
-            return FindIntersectingElements(mepBoundingBox, bboxElementMap, 0);
+            return FindIntersectingElements(mepBoundingBox,bboxElementMap, 0);
         }
 
         public static IEnumerable<Element> FindIntersectingElements(BoundingBoxXYZ box1, Dictionary<BoundingBoxXYZ, Element> bboxElementMap, double tolerance)
