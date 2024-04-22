@@ -31,6 +31,37 @@ namespace Strana.Revit.HoleTask.Extensions.RevitElement
                 }
             }
         }
+        public static void AddFamilyInstancesToList(Document doc, string familyName1, List<FamilyInstance> list1, string familyName2, List<FamilyInstance> list2)
+        {
+            var collector = new FilteredElementCollector(doc)
+                .OfClass(typeof(FamilyInstance))
+                .WhereElementIsNotElementType()
+                .Cast<FamilyInstance>(); // Удаление .ToElements().ToList() для улучшения производительности
+
+            foreach (FamilyInstance fi in collector)
+            {
+                // Проверяем, является ли семейство родительским (нет вышестоящего компонента)
+                if (fi.SuperComponent == null)
+                {
+                    // Проверяем, имеет ли семейство вложенные компоненты
+                    var subComponentIds = fi.GetSubComponentIds();
+                    if (!subComponentIds.Any())
+                    {
+                        // Проверяем, соответствует ли имя семейства первому заданному имени
+                        if (fi.Symbol.FamilyName == familyName1)
+                        {
+                            list1.Add(fi);
+                        }
+                        // Проверяем, соответствует ли имя семейства второму заданному имени
+                        else if (fi.Symbol.FamilyName == familyName2)
+                        {
+                            list2.Add(fi);
+                        }
+                    }
+                }
+            }
+        }
+
         public static void AddFamilyInstancesToList(Document doc, string familyName, List<FamilyInstance> list, string parameterName, string parameterValue)
         {
             var collector = new FilteredElementCollector(doc)
@@ -54,6 +85,7 @@ namespace Strana.Revit.HoleTask.Extensions.RevitElement
                 }
             }
         }
+
     }
 
 }

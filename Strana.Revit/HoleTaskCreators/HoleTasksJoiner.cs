@@ -592,28 +592,5 @@ namespace Strana.Revit.HoleTask.Utils
             }
             return allFamilyInstances00;
         }
-
-       public static bool FindMatchingInstance(
-        List<FamilyInstance> startHoleTask,
-        XYZ newCenterPoint,
-        double tolerance)
-        {
-            foreach (var instance in startHoleTask)
-            {
-                LocationPoint locationPoint = instance.Location as LocationPoint;
-                if (locationPoint != null)
-                {
-                    // Вычисляем расстояние от центра экземпляра до новой точки центра
-                    double distance = (locationPoint.Point - newCenterPoint).GetLength();
-                    // Проверяем, находится ли расстояние в пределах допуска
-                    if (distance <= tolerance)
-                    {
-                        return true; // Найдено совпадение
-                    }
-                }
-            }
-
-            return false; // Совпадений не найдено
-        }
     }
 }

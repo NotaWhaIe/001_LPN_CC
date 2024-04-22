@@ -38,13 +38,22 @@ namespace Strana.Revit.HoleTask.RevitCommands
             List<FamilyInstance> startHoleTask = new();
             List<FamilyInstance> intersectionRectangularWall = new();
             List<FamilyInstance> intersectionRectangularFloor = new();
-            HoleTasksGetter.AddFamilyInstancesToList(doc, "(Отв_Задание)_Стены_Прямоугольное", intersectionRectangularWall);
-            HoleTasksGetter.AddFamilyInstancesToList(doc, "(Отв_Задание)_Перекрытия_Прямоугольное", intersectionRectangularFloor);
+
+            ///заменить на один коллектор
+            //HoleTasksGetter.AddFamilyInstancesToList(doc, "(Отв_Задание)_Стены_Прямоугольное", intersectionRectangularWall);
+            //HoleTasksGetter.AddFamilyInstancesToList(doc, "(Отв_Задание)_Перекрытия_Прямоугольное", intersectionRectangularFloor);
+            HoleTasksGetter.AddFamilyInstancesToList(doc, "(Отв_Задание)_Стены_Прямоугольное", intersectionRectangularWall, "(Отв_Задание)_Перекрытия_Прямоугольное", intersectionRectangularFloor);
+
 
             GlobalParameters.ЕxistingTaskWall = intersectionRectangularWall;
             GlobalParameters.ЕxistingTaskFloor = intersectionRectangularFloor;
             GlobalParameters.OldTasksWall = intersectionRectangularWall.Count.ToString();
             GlobalParameters.OldTasksFloor = intersectionRectangularFloor.Count.ToString();
+
+           /// moved collectors from cycle
+
+
+            ///
 
             if (taskView.ShouldExecuteProgram)
             {

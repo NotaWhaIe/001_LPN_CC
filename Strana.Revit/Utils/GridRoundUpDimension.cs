@@ -13,7 +13,6 @@ namespace Strana.Revit.HoleTask.Utils
     internal class GridRoundUpDimension
     {
         private static bool areRoundHoleTaskInPlane => Confing.Default.areRoundHoleTaskInPlane;
-        //private static int roundHoleTaskInPlane => Confing.Default.roundHoleTaskInPlane;
 
         internal static HoleTaskGridDelta DeltaHoleTaskToGrids(Document doc, XYZ intersectionCenter, double thickness, double width, double angle)
         {
@@ -66,46 +65,6 @@ namespace Strana.Revit.HoleTask.Utils
             {
                 return depth;
             }
-        }
-
-        //public static double MeasureDistanceToGridY(XYZ intersectionCurveCenter, XYZ leftBottomIntersection)
-        //{
-
-
-        //    XYZ pointInXYPlane = new XYZ(intersectionCurveCenter.X, intersectionCurveCenter.Y, gridLine.GetEndPoint(0).Z);
-        //    //SphereByPoint.CreateSphereByPoint(pointInXYPlane);
-        //    //SphereByPoint.CreateSphereByPoint(gridLine.GetEndPoint(0));
-        //    //SphereByPoint.CreateSphereByPoint(gridLine.GetEndPoint(1));
-
-        //    var distance = gridLine.Distance(pointInXYPlane);
-        //    // Вычисление горизонтального расстояния и конвертация из футов в миллиметры
-        //    return UnitUtils.ConvertFromInternalUnits(distance, UnitTypeId.Millimeters);
-        //    //return pointInXYPlane.DistanceTo(closestPoint);
-        //}
-        public static double MeasureDistanceToGrid(Document doc, XYZ intersectionCurveCenter, string gridName)
-        {
-
-            // Найти ось с заданным именем
-            Grid grid = new FilteredElementCollector(doc)
-                            .OfClass(typeof(Grid))
-                            .Cast<Grid>()
-                            .FirstOrDefault(g => g.Name.Equals(gridName, StringComparison.OrdinalIgnoreCase));
-
-            if (grid == null || !(grid.Curve is Line gridLine))
-            {
-                return 0;
-            }
-
-            // Проекция точки на линию сетки в плоскости XY
-            XYZ pointInXYPlane = new XYZ(intersectionCurveCenter.X, intersectionCurveCenter.Y, gridLine.GetEndPoint(0).Z);
-            //SphereByPoint.CreateSphereByPoint(pointInXYPlane);
-            //SphereByPoint.CreateSphereByPoint(gridLine.GetEndPoint(0));
-            //SphereByPoint.CreateSphereByPoint(gridLine.GetEndPoint(1));
-
-            var distance = gridLine.Distance(pointInXYPlane);
-            // Вычисление горизонтального расстояния и конвертация из футов в миллиметры
-            return UnitUtils.ConvertFromInternalUnits(distance, UnitTypeId.Millimeters);
-            //return pointInXYPlane.DistanceTo(closestPoint);
         }
 
         public static XYZ FindLeftBottomIntersection(Document doc)
