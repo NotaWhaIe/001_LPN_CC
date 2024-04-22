@@ -1,0 +1,308 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Strana.Revit.HoleTask.Confing" Collapsed="true">
+    <Position X="8" Y="17.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAAAAAAAgAABAAAAAAEIAAMQAABgCAAAEACBQAAAAE=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Strana.Revit.HoleTask.ElementCollections.MepElementSelector" Collapsed="true">
+    <Position X="13.75" Y="3.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAUAAAAAEAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ElementCollections\MepElementSelector.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Strana.Revit.HoleTask.ElementCollections.WallFloorLinkCollectionsBBox" Collapsed="true">
+    <Position X="13.75" Y="5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>CAAAAAAAAAAAAgAAAAAAAAAAAAAAAAABAAAAAAAAAAA=</HashCode>
+      <FileName>ElementCollections\WallFloorLinkCollectionsBBox.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Strana.Revit.HoleTask.ElementCollections.WallFloorLinkElementCollections" Collapsed="true">
+    <Position X="13.75" Y="4.25" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAABAA=</HashCode>
+      <FileName>ElementCollections\WallFloorLinkElementCollections.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Strana.Revit.HoleTask.ElementCollections.SabFamilyInstenceCollections" Collapsed="true">
+    <Position X="9" Y="2" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAIAAAABAAAAAAAQQAAAAAgAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>HoleTaskCreators\SabFamilyInstenceCollections.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Strana.Revit.HoleTask.Extensions.HoleTaskSolidGetter" Collapsed="true">
+    <Position X="13.5" Y="8.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAQAAAAA=</HashCode>
+      <FileName>Extensions\HoleTaskSolidGetter.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Strana.Revit.HoleTask.Extensions.IntersectingElementExtension" Collapsed="true">
+    <Position X="11.5" Y="3.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAA=</HashCode>
+      <FileName>Extensions\IntersectingElementExtension.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Strana.Revit.HoleTask.Extensions.RevitLinkInstanceExtension" Collapsed="true">
+    <Position X="9" Y="2.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Extensions\RevitLinkInstanceExtension.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Strana.Revit.HoleTask.Extensions.RevitElement.HoleTasksGetter" Collapsed="true">
+    <Position X="9" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Extensions\RevitElement\HoleTasksGetter.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Strana.Revit.HoleTask.Extension.RevitElement.WallFloorSolidGetter" Collapsed="true">
+    <Position X="16.25" Y="5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AACAAAAAAAAAACAAAACAAAAAAAACgAAAAAAAAAAACAA=</HashCode>
+      <FileName>Extensions\RevitElement\WallFloorSolidGetter.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Strana.Revit.HoleTask.FailuresProcessing.ListProcessor" Collapsed="true">
+    <Position X="6.25" Y="23.25" Width="1.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>FailuresProcessing\DeletedHoleTasksId.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Strana.Revit.HoleTask.FailuresProcessing.Log" Collapsed="true">
+    <Position X="6.25" Y="17.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>FailuresProcessing\Log.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Strana.Revit.HoleTask.FailuresProcessing.TaskProcessor" Collapsed="true">
+    <Position X="8" Y="22.75" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>FailuresProcessing\TaskProcessor.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Strana.Revit.HoleTask.FailuresProcessing.TaskStatistics" Collapsed="true">
+    <Position X="8" Y="21.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>FailuresProcessing\TaskStatistics.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Strana.Revit.HoleTask.Utils.GlobalParameters" Collapsed="true">
+    <Position X="9" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAABAAgAAAAAiAAAAAAAACAUAEQAAEADCQAAAAAAAAA=</HashCode>
+      <FileName>FailuresProcessing\GlobalParameters.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Strana.Revit.HoleTask.Utils.HoleTaskCreator" Collapsed="true">
+    <Position X="13.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAEgAAAAAAIAAAAMAIIAAAAAIoAAAkAAAAkAEAAAEA=</HashCode>
+      <FileName>HoleTaskCreators\HoleTaskCreator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Strana.Revit.HoleTask.Utils.HoleTasksJoiner" Collapsed="true">
+    <Position X="11.5" Y="8.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQACAAA=</HashCode>
+      <FileName>HoleTaskCreators\HoleTasksJoiner.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Strana.Revit.HoleTask.Utils.GridRoundUpDimension" Collapsed="true">
+    <Position X="15.5" Y="8" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAACAAAAAAAAABAAAAAAAAAAAACACAAAAAAAAAAACA=</HashCode>
+      <FileName>Utils\GridRoundUpDimension.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Strana.Revit.HoleTask.Utils.HoleTaskFamilyLoader" Collapsed="true">
+    <Position X="15.5" Y="6.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAIAAggCCAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Utils\HoleTaskFamilyLoader.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Strana.Revit.HoleTask.Utils.HoleTaskGridDelta" Collapsed="true">
+    <Position X="17.75" Y="8" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAgAAAAAAAgAAAAAAAAAAAAAAAAAACAAAAAAAAAA=</HashCode>
+      <FileName>Utils\HoleTaskGridDelta.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Strana.Revit.HoleTask.Utils.HoleTasksLineStretch" Collapsed="true">
+    <Position X="11.5" Y="9.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAABAAAAAAAAQAAYAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Utils\HoleTasksLineStretch.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Strana.Revit.HoleTask.Utils.HoleTasksRoundUpDimension" Collapsed="true">
+    <Position X="15.5" Y="7.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAgAAAA=</HashCode>
+      <FileName>Utils\HoleTasksRoundUpDimension.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Strana.Revit.HoleTask.Utils.HoleTasksStatusDeterminator" Collapsed="true">
+    <Position X="8" Y="23.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAA=</HashCode>
+      <FileName>Utils\HoleTasksStatusDeterminator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Strana.Revit.HoleTask.Utils.SphereByPoint" Collapsed="true">
+    <Position X="6.25" Y="18" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Utils\SphereByPoint.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FirstRevitPlugin.FailuresProcessing.TransactionHandler" Collapsed="true">
+    <Position X="11.5" Y="2.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>FailuresProcessing\TransactionHandler.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FirstRevitPlugin.FailuresProcessing.WarningSkipper" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="6.25" Y="18.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>FailuresProcessing\WarningSkipper.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Strana.Revit.HoleTask.Properties.Resources" Collapsed="true">
+    <Position X="6.25" Y="21.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAABEAAAAQAQAAAAAAAAAAAAAIA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Strana.Revit.HoleTask.RevitCommands.App" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="8" Y="19" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAABAAAAAAAAAAAgAAAAAAAAAAAAAAAAAABAAAAAAAA=</HashCode>
+      <FileName>RevitCommands\App.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Orientation="Left" Position="0.235" Collapsed="true" />
+  </Class>
+  <Class Name="Strana.Revit.HoleTask.RevitCommands.CreateHoleTasks" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="7.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQIAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>RevitCommands\CreateHoleTasks.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Orientation="Left" Position="0.216" Collapsed="true" />
+  </Class>
+  <Class Name="Strana.Revit.HoleTask.RevitCommands.docsaver" Collapsed="true">
+    <Position X="8" Y="19.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>RevitCommands\CreateHoleTasks.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Strana.Revit.HoleTask.RevitCommands.Test" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="8" Y="20.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQAAAAAAABAAAAAAAAIAAACAAAAAAA=</HashCode>
+      <FileName>RevitCommands\Test.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Strana.Revit.NavisReportViewer.ViewModels.Base.BaseViewModel" Collapsed="true">
+    <Position X="6.75" Y="14.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAIAAAAAAAgAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ViewModel\Base\BaseViewModel.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Strana.Revit.NavisReportViewer.ViewModels.Base.CommandHandler" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="8" Y="22" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABAAAAABCAAQAAEAAAABAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ViewModel\Base\CommandHandler.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Strana.Revit.NavisReportViewer.ViewModels.Base.RouteCommands" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="6.25" Y="19.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAACAAQAAEAAAAAgAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ViewModel\Base\RouteCommands.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Strana.Revit.HoleTask.ViewModel.HoleTaskView" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="6.25" Y="22.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAQACAAAAAQABAAAAAAAAAAAAAQAAAAAAAAAAA=</HashCode>
+      <FileName>ViewModel\HoleTaskView.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Strana.Revit.HoleTask.ViewModel.HoleTaskViewModel" Collapsed="true">
+    <Position X="7.75" Y="15.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>4ABgEAAAQgAAhAIAABAAAAAMQIBAgCABAMACQQAYAAE=</HashCode>
+      <FileName>ViewModel\HoleTaskViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Strana.Revit.HoleTask.ViewModel.RelayCommand" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="6.25" Y="20.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAEACAAQAAECAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ViewModel\RelayCommand.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Strana.Revit.HoleTask.ViewModel.RevitLinkData" Collapsed="true">
+    <Position X="5.5" Y="15.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAQAAAAEAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ViewModel\RevitLinkData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Strana.Revit.HoleTask.ViewModel.WpfSettings" Collapsed="true">
+    <Position X="8" Y="18.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAAAAAQAAAAAIAAAAAAAAAAABAAAAAAIAAAAAIAAA=</HashCode>
+      <FileName>ViewModel\WpfSettings.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Strana.Revit.HoleTask.Extensions.GetterElementThickness" Collapsed="true">
+    <Position X="18.25" Y="5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Extensions\GetterElementThickness.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Strana.Revit.Extension.RevitDocumentExstensions" Collapsed="true">
+    <Position X="6.5" Y="16" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAIAAAUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Extensions\RevitDocumentExstensions.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Enum Name="Strana.Revit.HoleTask.Utils.OrientaionType" Collapsed="true">
+    <Position X="15.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAABAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Utils\OrientaionType.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

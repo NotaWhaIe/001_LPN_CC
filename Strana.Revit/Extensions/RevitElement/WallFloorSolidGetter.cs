@@ -122,32 +122,6 @@ namespace Strana.Revit.HoleTask.Extension.RevitElement
             return faceMaxSquare;
         }
 
-        //private static Face GetSolidMainFace(Solid solid)
-        //{
-        //    Face faceMaxSquare = null;
-
-        //    var faces = solid.Faces;
-        //    foreach (Face solidFace in faces)
-        //    {
-        //        if (faceMaxSquare == null || faceMaxSquare.Area < solidFace.Area)
-        //        {
-        //            faceMaxSquare = solidFace;
-        //        }
-        //    }
-
-        //    if (faceMaxSquare == null)
-        //    {
-        //        foreach (Face solidFace in faces)
-        //        {
-        //            if (faceMaxSquare == null || faceMaxSquare.Area < solidFace.Area)
-        //            {
-        //                faceMaxSquare = solidFace;
-        //            }
-        //        }
-        //    }
-
-        //    return faceMaxSquare;
-        //}
         private static CurveLoop MainOuterContourFromFace(Face faceWithHoles)
         {
             EdgeArrayArray allFaceEdges = faceWithHoles.EdgeLoops;

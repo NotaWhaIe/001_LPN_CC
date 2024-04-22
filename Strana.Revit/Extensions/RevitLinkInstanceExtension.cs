@@ -38,6 +38,7 @@ namespace Strana.Revit.HoleTask.Extensions
                 // HoleTasksJoiner 
                 List<FamilyInstance> roundHoleTaskList = new HoleTasksJoiner().JoinAllHoleTask(allHoleTaskByRevitLinkInstance);
 
+                ///!!! Вынести из цикла линков
                 // растянуть по высоте
                 new HoleTasksLineStretch().StretchLinesAllHoleTask(linkInstance);
 

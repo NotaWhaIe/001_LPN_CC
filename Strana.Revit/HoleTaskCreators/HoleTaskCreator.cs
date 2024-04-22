@@ -46,7 +46,7 @@ namespace Strana.Revit.HoleTask.Utils
         /// <param name="roundHoleSizesUpIncrement">The increment used for rounding up hole sizes.</param>
         /// <param name="floorHoleFamilySymbol">The family symbol for creating the hole in the floor.</param>
         /// <returns>
-        /// The created FamilyInstance representing the hole task.
+        /// The created FamilyInstance representing the hole task.  
         /// </returns>
         public FamilyInstance? PlaceHoleTaskFamilyInstance(
             Element mepElement,

@@ -153,17 +153,6 @@ namespace Strana.Revit.HoleTask.ViewModel
                 OnPropertyChanged(nameof(this.offSetJoin));
             }
         }
-        //public bool ArePickUpElements
-        //{
-        //    get => this.arePickUpElements;
-        //    set
-        //    {
-        //        this.arePickUpElements = value;
-        //        Confing.Default.arePickUpElements = this.arePickUpElements;
-        //        Confing.Default.Save();
-        //        OnPropertyChanged(nameof(this.arePickUpElements));
-        //    }
-        //}
         public bool ArePlaceHoleTaskInOpenings
         {
             get => this.arePlaceHoleTaskInOpenings;
