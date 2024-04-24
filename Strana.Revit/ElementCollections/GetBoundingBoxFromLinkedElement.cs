@@ -6,7 +6,7 @@ using Strana.Revit.HoleTask.Extension.RevitElement;
 
 namespace Strana.Revit.HoleTask.ElementCollections
 {
-    public static class WallFloorLinkCollectionsBBox
+    public static class GetBoundingBoxFromLinkedElement
     {
         public static Dictionary<BoundingBoxXYZ, Element> AllCarrentLinksBBox(RevitLinkInstance linkInstance)
         {

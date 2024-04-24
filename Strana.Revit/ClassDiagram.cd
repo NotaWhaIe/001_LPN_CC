@@ -88,11 +88,11 @@
       <FileName>ElementCollections\MepElementSelector.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Strana.Revit.HoleTask.ElementCollections.WallFloorLinkCollectionsBBox" Collapsed="true">
-    <Position X="14.75" Y="6.75" Width="2.25" />
+  <Class Name="Strana.Revit.HoleTask.ElementCollections.GetBoundingBoxFromLinkedElement" Collapsed="true">
+    <Position X="14.75" Y="6.75" Width="2.75" />
     <TypeIdentifier>
       <HashCode>CAAAAAAAAAAAAgAAAAAAAAAAAAAAAAABAAAAAAAAAAA=</HashCode>
-      <FileName>ElementCollections\WallFloorLinkCollectionsBBox.cs</FileName>
+      <FileName>ElementCollections\GetBoundingBoxFromLinkedElement.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Strana.Revit.HoleTask.ElementCollections.WallFloorLinkElementCollections" Collapsed="true">

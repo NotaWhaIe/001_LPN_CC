@@ -21,7 +21,7 @@ namespace Strana.Revit.HoleTask.Extensions
             Document linkDoc = linkInstance.GetLinkDocument();
 
             IEnumerable<Element> mepElements = MepElementSelector.GetSelectedOrAllMepElements();
-            var carrentLinkBBoxes = WallFloorLinkCollectionsBBox.AllCarrentLinksBBox(linkInstance);
+            var carrentLinkBBoxes = GetBoundingBoxFromLinkedElement.AllCarrentLinksBBox(linkInstance);
 
             foreach (Element mepElement in mepElements)
             {

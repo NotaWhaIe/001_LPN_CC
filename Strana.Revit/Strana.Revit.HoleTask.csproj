@@ -104,7 +104,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Confing.settings</DependentUpon>
     </Compile>
-    <Compile Include="ElementCollections\WallFloorLinkCollectionsBBox.cs" />
+    <Compile Include="ElementCollections\GetBoundingBoxFromLinkedElement.cs" />
     <Compile Include="ElementCollections\WallFloorLinkElementCollections.cs" />
     <Compile Include="ElementCollections\MepElementSelector.cs" />
     <Compile Include="Extensions\GetterElementThickness.cs" />

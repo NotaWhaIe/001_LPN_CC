@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.ExtensibleStorage;
 using Autodesk.Revit.UI;
+
 using Strana.Revit.HoleTask.ElementCollections;
 using Strana.Revit.HoleTask.Extension.RevitElement;
 using Strana.Revit.HoleTask.Extensions;
@@ -21,9 +23,11 @@ namespace Strana.Revit.HoleTask.RevitCommands
     {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
-            GlobalParameters.ResetParameters();
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
+
+
+            GlobalParameters.ResetParameters();
 
             UIDocument uidoc = commandData.Application.ActiveUIDocument;
             MepElementSelector.UIDocument = uidoc;
@@ -39,10 +43,12 @@ namespace Strana.Revit.HoleTask.RevitCommands
             List<FamilyInstance> intersectionRectangularWall = new();
             List<FamilyInstance> intersectionRectangularFloor = new();
 
-            ///заменить на один коллектор
+            ///заменить на один коллектор0
             //HoleTasksGetter.AddFamilyInstancesToList(doc, "(Отв_Задание)_Стены_Прямоугольное", intersectionRectangularWall);
             //HoleTasksGetter.AddFamilyInstancesToList(doc, "(Отв_Задание)_Перекрытия_Прямоугольное", intersectionRectangularFloor);
-            HoleTasksGetter.AddFamilyInstancesToList(doc, "(Отв_Задание)_Стены_Прямоугольное", intersectionRectangularWall, "(Отв_Задание)_Перекрытия_Прямоугольное", intersectionRectangularFloor);
+            HoleTasksGetter.AddFamilyInstancesToList(doc, 
+                "(Отв_Задание)_Стены_Прямоугольное", intersectionRectangularWall, 
+                "(Отв_Задание)_Перекрытия_Прямоугольное", intersectionRectangularFloor);
 
 
             GlobalParameters.ЕxistingTaskWall = intersectionRectangularWall;
@@ -50,7 +56,7 @@ namespace Strana.Revit.HoleTask.RevitCommands
             GlobalParameters.OldTasksWall = intersectionRectangularWall.Count.ToString();
             GlobalParameters.OldTasksFloor = intersectionRectangularFloor.Count.ToString();
 
-           /// moved collectors from cycle
+            /// moved collectors from cycle
 
 
             ///
@@ -101,8 +107,9 @@ namespace Strana.Revit.HoleTask.RevitCommands
             GlobalParameters.DeletedTasks = deletedTasks.ToString();
 
             stopwatch.Stop();
-            TimeSpan elapsedTime = stopwatch.Elapsed;
             var taskStatistics = new TaskStatistics();
+            TimeSpan ts = stopwatch.Elapsed;
+            string elapsedTime = String.Format("{0:00} мин. {1:00} сек.", ts.Minutes, ts.Seconds);
             taskStatistics.ShowTaskStatistics(elapsedTime);
 
             return Result.Succeeded;
