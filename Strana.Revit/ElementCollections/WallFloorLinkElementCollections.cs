@@ -24,12 +24,8 @@ namespace Strana.Revit.HoleTask.ElementCollections
     {
         public static IEnumerable<Element> AllElementsByMepBBox(
                 Element mepElement,
-                RevitLinkInstance linkInstance,
                 Dictionary<BoundingBoxXYZ, Element> bboxElementMap)
         {
-            Document linkDoc = linkInstance.GetLinkDocument();
-            Transform linkTransform = linkInstance.GetTransform();
-
             BoundingBoxXYZ mepBoundingBox = mepElement.get_BoundingBox(null);
             if (mepBoundingBox == null)
             {

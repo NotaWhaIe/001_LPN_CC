@@ -30,6 +30,8 @@ namespace Strana.Revit.HoleTask.ElementCollections
                 TransactionHandler.SetWarningResolver(trans);
                 trans.Start();
 
+               /// два коллектора в один 
+               /// потом запихать в коллектора который выдаст через свой ство и будет фильтровать семейсва стен и перекрытий
                 var levels = new FilteredElementCollector(doc)
                 .OfClass(typeof(Level))
                 .Cast<Level>()
@@ -88,8 +90,6 @@ namespace Strana.Revit.HoleTask.ElementCollections
                         }
                     }
                 }
-
-
                 trans.Commit();
             }
 

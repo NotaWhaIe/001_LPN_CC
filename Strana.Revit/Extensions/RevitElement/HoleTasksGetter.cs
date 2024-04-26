@@ -1,4 +1,5 @@
 ﻿using Autodesk.Revit.DB;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,44 +32,9 @@ namespace Strana.Revit.HoleTask.Extensions.RevitElement
                 }
             }
         }
-        public static void AddFamilyInstancesToList(Document doc, string familyName1, List<FamilyInstance> list1, string familyName2, List<FamilyInstance> list2)
+        public static void FilterFamilyInstancesToList(IEnumerable<FamilyInstance> collector, string familyName,
+            List<FamilyInstance> list, string parameterName, string parameterValue)
         {
-            var collector = new FilteredElementCollector(doc)
-                .OfClass(typeof(FamilyInstance))
-                .WhereElementIsNotElementType()
-                .Cast<FamilyInstance>(); // Удаление .ToElements().ToList() для улучшения производительности
-
-            foreach (FamilyInstance fi in collector)
-            {
-                // Проверяем, является ли семейство родительским (нет вышестоящего компонента)
-                if (fi.SuperComponent == null)
-                {
-                    // Проверяем, имеет ли семейство вложенные компоненты
-                    var subComponentIds = fi.GetSubComponentIds();
-                    if (!subComponentIds.Any())
-                    {
-                        // Проверяем, соответствует ли имя семейства первому заданному имени
-                        if (fi.Symbol.FamilyName == familyName1)
-                        {
-                            list1.Add(fi);
-                        }
-                        // Проверяем, соответствует ли имя семейства второму заданному имени
-                        else if (fi.Symbol.FamilyName == familyName2)
-                        {
-                            list2.Add(fi);
-                        }
-                    }
-                }
-            }
-        }
-
-        public static void AddFamilyInstancesToList(Document doc, string familyName, List<FamilyInstance> list, string parameterName, string parameterValue)
-        {
-            var collector = new FilteredElementCollector(doc)
-                .OfClass(typeof(FamilyInstance))
-                .WhereElementIsNotElementType()
-                .ToElements().ToList();
-
             foreach (FamilyInstance fi in collector)
             {
                 if (fi.Name == familyName && fi.SuperComponent == null)
@@ -85,7 +51,54 @@ namespace Strana.Revit.HoleTask.Extensions.RevitElement
                 }
             }
         }
+        public class CollectFamilyInstances
+        {
+            private static CollectFamilyInstances _instance;
+            private readonly List<FamilyInstance> _list1 = new List<FamilyInstance>();
+            private readonly List<FamilyInstance> _list2 = new List<FamilyInstance>();
+            public static CollectFamilyInstances Instance
+            {
+                get
+                {
+                    if (_instance == null)
+                    {
+                        _instance = new CollectFamilyInstances();
+                    }
+                    return _instance;
+                }
+            }
+            
+            public IReadOnlyList<FamilyInstance> List1 => _list1;
+            public IReadOnlyList<FamilyInstance> List2 => _list2;
+            private CollectFamilyInstances() { }
+            public void AddToListFamilyInstances(Document doc, string familyName1, string familyName2)
+            {
+                var collector = new FilteredElementCollector(doc)
+                    .OfClass(typeof(FamilyInstance))
+                    .WhereElementIsNotElementType()
+                    .Cast<FamilyInstance>();
 
+                foreach (FamilyInstance fi in collector)
+                {
+                    if (fi.SuperComponent == null && !fi.GetSubComponentIds().Any())
+                    {
+                        if (fi.Symbol.FamilyName == familyName1)
+                        {
+                            _list1.Add(fi);
+                        }
+                        else if (fi.Symbol.FamilyName == familyName2)
+                        {
+                            _list2.Add(fi);
+                        }
+                    }
+                }
+            }
+            public void ClearData()
+            {
+                _list1.Clear();
+                _list2.Clear();
+            }
+        }
     }
 
 }

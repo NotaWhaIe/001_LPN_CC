@@ -16,6 +16,8 @@ using Strana.Revit.HoleTask.Extensions.RevitElement;
 using Strana.Revit.HoleTask.RevitCommands;
 using Strana.Revit.HoleTask.ViewModel;
 
+using static Strana.Revit.HoleTask.Extensions.RevitElement.HoleTasksGetter;
+
 namespace Strana.Revit.HoleTask.Utils
 {
 #nullable enable
@@ -55,7 +57,9 @@ namespace Strana.Revit.HoleTask.Utils
             Document linkDoc,
             RevitLinkInstance linkInstance)
         {
-            IEnumerable<FamilyInstance> existHoleTasksInProject = GetElementsWithTwoFamilyNames("(Отв_Задание)_Стены_Прямоугольное", "(Отв_Задание)_Перекрытия_Прямоугольное");
+            IEnumerable<FamilyInstance> existHoleTasksInProject = CollectFamilyInstances.Instance.List1.Concat(CollectFamilyInstances
+                .Instance.List2);
+
             double offSetHoleTaskInFeet = UnitUtils.ConvertToInternalUnits(WpfSettings.OffSetHoleTask, UnitTypeId.Millimeters);
             double clearance = offSetHoleTaskInFeet * 2;
             OrientaionType orientation = this.GetElementOrientationType(mepElement);
@@ -131,8 +135,8 @@ namespace Strana.Revit.HoleTask.Utils
             Level lvl = GetClosestFloorLevel(docLvlList, linkDoc, intersectedElement);
             XYZ intersectionCurveCenter = this.GetIntersectionCurveCenter(intersection);
 
-            intersectionCurveCenter = new XYZ(intersectionCurveCenter.X, intersectionCurveCenter.Y, intersectionCurveCenter.Z /*- lvl.ProjectElevation*/);
-            //SphereByPoint.CreateSphereByPoint(intersectionCurveCenter, this.doc);
+            intersectionCurveCenter = new XYZ(intersectionCurveCenter.X, intersectionCurveCenter.Y, intersectionCurveCenter.Z 
+                /*- lvl.ProjectElevation*/);
 
             double holeTaskWidthEX = this.ExchangeParameters(orientation, holeTaskWidth, holeTaskHeight);
             double holeTaskHeightEX = this.ExchangeParameters(orientation, holeTaskHeight, holeTaskWidth);
@@ -142,7 +146,8 @@ namespace Strana.Revit.HoleTask.Utils
             double roundHTHeight = HoleTasksRoundUpDimension.RoundUpParameter(holeTaskHeightEX);
 
             /// проверка есть ли в intersectionCurveCenter уже ЗНО с теми же геометрическими размерами и в том же месте
-            if (!DoesFamilyInstanceExistAtLocation(intersectionCurveCenter, existHoleTasksInProject, roundHTThickness, roundHTWidth, roundHTHeight))
+            if (!DoesFamilyInstanceExistAtLocation(intersectionCurveCenter, existHoleTasksInProject, roundHTThickness, roundHTWidth,
+                roundHTHeight))
             {
                 holeTask = this.doc.Create.NewFamilyInstance(
                     new XYZ(intersectionCurveCenter.X, intersectionCurveCenter.Y, intersectionCurveCenter.Z - lvl.ProjectElevation),
@@ -152,14 +157,16 @@ namespace Strana.Revit.HoleTask.Utils
                 GlobalParameters.SetScriptCreationMethod(holeTask);
                 this.intersectionRectangularCombineList.Add(holeTask);
 
-                double holeTaskAngle = this.RotateHoleTaskAngle(mepElement, orientation, holeTask, intersection, intersectedElement, lvl, linkInstance);
+                double holeTaskAngle = this.RotateHoleTaskAngle(mepElement, orientation, holeTask, intersection, intersectedElement,
+                    lvl, linkInstance);
 
                 holeTask.LookupParameter("Глубина").Set(roundHTThickness);
                 holeTask.LookupParameter("Ширина").Set(roundHTWidth);
                 holeTask.LookupParameter("Высота").Set(roundHTHeight);
                 this.RotateHoleTask(mepElement, orientation, holeTask, intersection, intersectedElement, lvl, linkInstance);
 
-                HoleTaskGridDelta delta = GridRoundUpDimension.DeltaHoleTaskToGrids(this.doc, intersectionCurveCenter, roundHTThickness, roundHTWidth, holeTaskAngle);
+                HoleTaskGridDelta delta = GridRoundUpDimension.DeltaHoleTaskToGrids(this.doc, intersectionCurveCenter, roundHTThickness,
+                    roundHTWidth, holeTaskAngle);
                 double O1 = UnitUtils.ConvertToInternalUnits(delta.DeltaGridNumber, UnitTypeId.Millimeters);
                 MoveFamilyInstance(holeTask, O1, "X");
                 ///сдвинуть семейство по оси У в верх, от оси и А
@@ -265,7 +272,8 @@ namespace Strana.Revit.HoleTask.Utils
 
             return collector;
         }
-        private bool DoesFamilyInstanceExistAtLocation(XYZ location, IEnumerable<Element> elements, double roundHTThickness, double roundHTWidth, double roundHTHeight)
+        private bool DoesFamilyInstanceExistAtLocation(XYZ location, IEnumerable<Element> elements, double roundHTThickness,
+            double roundHTWidth, double roundHTHeight)
         {
             double tolerance = 10 / 304.8;
 
@@ -421,7 +429,8 @@ namespace Strana.Revit.HoleTask.Utils
             return 0;
         }
 
-        private void RotateHoleTask(Element mepElement, OrientaionType orientaionType, FamilyInstance holeTask, SolidCurveIntersection intersection, Element intersectedElement, Level lvl, RevitLinkInstance linkInstance)
+        private void RotateHoleTask(Element mepElement, OrientaionType orientaionType, FamilyInstance holeTask,
+            SolidCurveIntersection intersection, Element intersectedElement, Level lvl, RevitLinkInstance linkInstance)
         {
             {
                 Wall wall = intersectedElement as Wall;
@@ -463,7 +472,8 @@ namespace Strana.Revit.HoleTask.Utils
             }
         }
 
-        private double RotateHoleTaskAngle(Element mepElement, OrientaionType orientaionType, FamilyInstance holeTask, SolidCurveIntersection intersection, Element intersectedElement, Level lvl, RevitLinkInstance linkInstance)
+        private double RotateHoleTaskAngle(Element mepElement, OrientaionType orientaionType, FamilyInstance holeTask, 
+            SolidCurveIntersection intersection, Element intersectedElement, Level lvl, RevitLinkInstance linkInstance)
         {
             Wall wall = intersectedElement as Wall;
             MEPCurve curve = mepElement as MEPCurve;

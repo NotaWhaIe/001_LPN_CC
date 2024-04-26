@@ -27,20 +27,20 @@ namespace Strana.Revit.HoleTask.Utils
         internal List<FamilyInstance> JoinAllHoleTask(List<FamilyInstance> allFamilyInstances00)
         {
             var firstInstance = allFamilyInstances00.FirstOrDefault();
-
-            // Если нет элементов или документ первого элемента равен null, возвращаем исходный список
+            Document doc = firstInstance.Document;
             if (firstInstance == null || firstInstance.Document == null)
             {
                 return allFamilyInstances00;
             }
 
-            Document doc = firstInstance.Document;
             List<FamilyInstance> intersectionWallRectangularCombineList01 = new();
             List<FamilyInstance> intersectionFloorRectangularCombineList02 = new();
-            HoleTasksGetter.AddFamilyInstancesToList(doc, "(Отв_Задание)_Стены_Прямоугольное", intersectionWallRectangularCombineList01, "SD_Способ создания задания", "СКРИПТ");
-            HoleTasksGetter.AddFamilyInstancesToList(doc, "(Отв_Задание)_Перекрытия_Прямоугольное", intersectionFloorRectangularCombineList02, "SD_Способ создания задания", "СКРИПТ");
+            HoleTasksGetter.FilterFamilyInstancesToList(allFamilyInstances00, "(Отв_Задание)_Стены_Прямоугольное",
+                intersectionWallRectangularCombineList01, "SD_Способ создания задания", "СКРИПТ");
+            HoleTasksGetter.FilterFamilyInstancesToList(allFamilyInstances00, "(Отв_Задание)_Перекрытия_Прямоугольное",
+                intersectionFloorRectangularCombineList02, "SD_Способ создания задания", "СКРИПТ");
 
-            if (!areJoin)
+            if (!areJoin)  
             {
                 return allFamilyInstances00;
             }
@@ -588,7 +588,6 @@ namespace Strana.Revit.HoleTask.Utils
                 allFamilyInstances00 = intersectionWallRectangularCombineList01
                 .Concat(intersectionFloorRectangularCombineList02)
                 .ToList();
-
             }
             return allFamilyInstances00;
         }

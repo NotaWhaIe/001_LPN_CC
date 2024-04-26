@@ -16,6 +16,8 @@ using Strana.Revit.HoleTask.FailuresProcessing;
 using Strana.Revit.HoleTask.Utils;
 using Strana.Revit.HoleTask.ViewModel;
 
+using static Strana.Revit.HoleTask.Extensions.RevitElement.HoleTasksGetter;
+
 namespace Strana.Revit.HoleTask.RevitCommands
 {
     [Transaction(TransactionMode.Manual)]
@@ -25,9 +27,6 @@ namespace Strana.Revit.HoleTask.RevitCommands
         {
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
-
-
-            GlobalParameters.ResetParameters();
 
             UIDocument uidoc = commandData.Application.ActiveUIDocument;
             MepElementSelector.UIDocument = uidoc;
@@ -39,27 +38,17 @@ namespace Strana.Revit.HoleTask.RevitCommands
             HoleTaskView taskView = new(doc);
             taskView.ShowDialog();
 
-            List<FamilyInstance> startHoleTask = new();
-            List<FamilyInstance> intersectionRectangularWall = new();
-            List<FamilyInstance> intersectionRectangularFloor = new();
-
-            ///заменить на один коллектор0
-            //HoleTasksGetter.AddFamilyInstancesToList(doc, "(Отв_Задание)_Стены_Прямоугольное", intersectionRectangularWall);
-            //HoleTasksGetter.AddFamilyInstancesToList(doc, "(Отв_Задание)_Перекрытия_Прямоугольное", intersectionRectangularFloor);
-            HoleTasksGetter.AddFamilyInstancesToList(doc, 
-                "(Отв_Задание)_Стены_Прямоугольное", intersectionRectangularWall, 
-                "(Отв_Задание)_Перекрытия_Прямоугольное", intersectionRectangularFloor);
+            CollectFamilyInstances.Instance.AddToListFamilyInstances(doc,
+                "(Отв_Задание)_Стены_Прямоугольное", "(Отв_Задание)_Перекрытия_Прямоугольное");
+            IEnumerable<FamilyInstance> intersectionRectangularWall = new List<FamilyInstance>(CollectFamilyInstances.Instance.List1);
+            IEnumerable<FamilyInstance> intersectionRectangularFloor = new List<FamilyInstance>(CollectFamilyInstances.Instance.List2);
+            var debag = intersectionRectangularWall.Count()+ intersectionRectangularFloor.Count();
 
 
-            GlobalParameters.ЕxistingTaskWall = intersectionRectangularWall;
-            GlobalParameters.ЕxistingTaskFloor = intersectionRectangularFloor;
-            GlobalParameters.OldTasksWall = intersectionRectangularWall.Count.ToString();
-            GlobalParameters.OldTasksFloor = intersectionRectangularFloor.Count.ToString();
-
-            /// moved collectors from cycle
-
-
-            ///
+            GlobalParameters.ExistingTaskWall = intersectionRectangularWall;
+            GlobalParameters.ExistingTaskFloor = intersectionRectangularFloor;
+            GlobalParameters.OldTasksWall = intersectionRectangularWall.Count().ToString();
+            GlobalParameters.OldTasksFloor = intersectionRectangularFloor.Count().ToString();
 
             if (taskView.ShouldExecuteProgram)
             {
@@ -95,13 +84,17 @@ namespace Strana.Revit.HoleTask.RevitCommands
                 }
             }
 
-            List<FamilyInstance> intersectionWallRectangularCombineList01 = new();
-            List<FamilyInstance> intersectionFloorRectangularCombineList02 = new();
-            HoleTasksGetter.AddFamilyInstancesToList(doc, "(Отв_Задание)_Стены_Прямоугольное", intersectionWallRectangularCombineList01);
-            HoleTasksGetter.AddFamilyInstancesToList(doc, "(Отв_Задание)_Перекрытия_Прямоугольное", intersectionFloorRectangularCombineList02);
-            double createdTasksWall = intersectionWallRectangularCombineList01.Count - intersectionRectangularWall.Count;
+            CollectFamilyInstances.Instance.ClearData();
+            CollectFamilyInstances.Instance.AddToListFamilyInstances(doc, 
+                "(Отв_Задание)_Стены_Прямоугольное", "(Отв_Задание)_Перекрытия_Прямоугольное");
+            IEnumerable<FamilyInstance> intersectionWallRectangularCombineList01 = new List<FamilyInstance>(CollectFamilyInstances.Instance.List1);
+            IEnumerable<FamilyInstance> intersectionFloorRectangularCombineList02 = new List<FamilyInstance>(CollectFamilyInstances.Instance.List2);
+
+            /// тут из верхнего коллектора в отдельной транзакции в классе объединение и растягивание
+
+            double createdTasksWall = intersectionWallRectangularCombineList01.Count() - intersectionRectangularWall.Count();
             GlobalParameters.СreatedTasksWall = (createdTasksWall > 0 ? createdTasksWall : 0).ToString();
-            double createdTasksFloor = intersectionFloorRectangularCombineList02.Count - intersectionRectangularFloor.Count;
+            double createdTasksFloor = intersectionFloorRectangularCombineList02.Count() - intersectionRectangularFloor.Count();
             GlobalParameters.СreatedTasksFloor = (createdTasksFloor > 0 ? createdTasksFloor : 0).ToString();
             double deletedTasks = -((createdTasksFloor < 0 ? createdTasksFloor : 0) + (createdTasksWall < 0 ? createdTasksWall : 0));
             GlobalParameters.DeletedTasks = deletedTasks.ToString();
@@ -111,6 +104,9 @@ namespace Strana.Revit.HoleTask.RevitCommands
             TimeSpan ts = stopwatch.Elapsed;
             string elapsedTime = String.Format("{0:00} мин. {1:00} сек.", ts.Minutes, ts.Seconds);
             taskStatistics.ShowTaskStatistics(elapsedTime);
+
+            CollectFamilyInstances.Instance.ClearData();
+            GlobalParameters.ResetParameters();
 
             return Result.Succeeded;
         }

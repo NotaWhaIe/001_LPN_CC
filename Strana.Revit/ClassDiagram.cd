@@ -4,16 +4,10 @@
     <Position X="9.024" Y="4.535" Height="0.503" Width="0.7" />
   </Comment>
   <Comment CommentText="Collector">
-    <Position X="9.001" Y="1.454" Height="0.291" Width="0.7" />
+    <Position X="8.985" Y="5.323" Height="0.291" Width="0.7" />
   </Comment>
-  <Comment CommentText="Collector">
-    <Position X="9.016" Y="1.833" Height="0.291" Width="0.7" />
-  </Comment>
-  <Comment CommentText="Collector">
-    <Position X="9.018" Y="5.103" Height="0.291" Width="0.7" />
-  </Comment>
-  <Comment CommentText="Collector">
-    <Position X="9.003" Y="5.412" Height="0.291" Width="0.7" />
+  <Comment CommentText="set CollectFamilyInstances get">
+    <Position X="9.045" Y="1.523" Height="0.513" Width="1.763" />
   </Comment>
   <Comment CommentText="Collector">
     <Position X="10.557" Y="3.01" Height="0.55" Width="0.7" />
@@ -24,20 +18,14 @@
   <Comment CommentText="foreach">
     <Position X="15.493" Y="8.293" Height="2.009" Width="0.7" />
   </Comment>
-  <Comment CommentText="Collector FI">
-    <Position X="18.056" Y="9.839" Height="0.291" Width="0.907" />
+  <Comment CommentText="get from Collector">
+    <Position X="18.056" Y="9.839" Height="0.291" Width="1.376" />
   </Comment>
   <Comment CommentText="Collector levels">
     <Position X="18.06" Y="10.871" Height="0.291" Width="1.104" />
   </Comment>
   <Comment CommentText="Collector FI">
     <Position X="19.833" Y="11.387" Height="0.291" Width="0.907" />
-  </Comment>
-  <Comment CommentText="Collector FI">
-    <Position X="16.561" Y="13.503" Height="0.291" Width="0.907" />
-  </Comment>
-  <Comment CommentText="Collector FI">
-    <Position X="16.571" Y="13.862" Height="0.291" Width="0.907" />
   </Comment>
   <Comment CommentText="while">
     <Position X="16.603" Y="14.298" Height="0.291" Width="0.7" />
@@ -58,7 +46,7 @@
     <Position X="17.395" Y="16.204" Height="0.291" Width="1.104" />
   </Comment>
   <Comment CommentText="">
-    <Position X="9" Y="5.778" Height="10.833" Width="0.7" />
+    <Position X="9" Y="5.882" Height="10.729" Width="0.7" />
   </Comment>
   <Comment CommentText="">
     <Position X="9.806" Y="9.848" Height="0.291" Width="5.658" />
@@ -74,6 +62,12 @@
   </Comment>
   <Comment CommentText="">
     <Position X="9.833" Y="15.445" Height="1.013" Width="4.811" />
+  </Comment>
+  <Comment CommentText="Collector levels">
+    <Position X="11.279" Y="3.725" Height="0.291" Width="1.104" />
+  </Comment>
+  <Comment CommentText="Collector FI">
+    <Position X="11.333" Y="4.022" Height="0.291" Width="0.907" />
   </Comment>
   <Class Name="Strana.Revit.HoleTask.Confing" Collapsed="true">
     <Position X="8.25" Y="20.75" Width="1.5" />
@@ -133,7 +127,7 @@
   <Class Name="Strana.Revit.HoleTask.Extensions.RevitElement.HoleTasksGetter" Collapsed="true">
     <Position X="9" Y="3" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAQAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Extensions\RevitElement\HoleTasksGetter.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -178,7 +172,7 @@
   <Class Name="Strana.Revit.HoleTask.Utils.GlobalParameters" Collapsed="true">
     <Position X="9" Y="2.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAABAAgAAAAAiAAAAAAAACAUAEQAAEADCQAAAAAAAAA=</HashCode>
+      <HashCode>AAABAAAAAAAQiAgAAAAIACAEAEQAAEADAQAAAAAAAAA=</HashCode>
       <FileName>FailuresProcessing\GlobalParameters.cs</FileName>
     </TypeIdentifier>
   </Class>

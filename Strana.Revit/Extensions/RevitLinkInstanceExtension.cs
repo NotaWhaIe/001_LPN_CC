@@ -26,22 +26,13 @@ namespace Strana.Revit.HoleTask.Extensions
                 t.Start();
                 Document linkDoc = linkInstance.GetLinkDocument();
                 Document doc = linkInstance.Document;
-                List<FamilyInstance> allHoleTaskByRevitLinkInstance = new();
-                HoleTasksGetter.AddFamilyInstancesToList(doc, "(Отв_Задание)_Стены_Прямоугольное", allHoleTaskByRevitLinkInstance);
-                HoleTasksGetter.AddFamilyInstancesToList(doc, "(Отв_Задание)_Перекрытия_Прямоугольное", allHoleTaskByRevitLinkInstance);
-                double debag = allHoleTaskByRevitLinkInstance.Count;
 
-                allHoleTaskByRevitLinkInstance = allHoleTaskByRevitLinkInstance
-                    .Concat(IntersectingElementExtension.CreateHoleTasksByIntersectedElements(linkInstance))
-                    .ToList();
+                List<FamilyInstance> allHoleTaskByRevitLinkInstance = IntersectingElementExtension.CreateHoleTasksByIntersectedElements(
+                    linkInstance).ToList();
                 
-                // HoleTasksJoiner 
                 List<FamilyInstance> roundHoleTaskList = new HoleTasksJoiner().JoinAllHoleTask(allHoleTaskByRevitLinkInstance);
 
-                ///!!! Вынести из цикла линков
-                // растянуть по высоте
                 new HoleTasksLineStretch().StretchLinesAllHoleTask(linkInstance);
-
                 t.Commit();
             }
 

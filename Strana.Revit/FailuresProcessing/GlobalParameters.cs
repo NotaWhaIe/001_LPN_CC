@@ -19,9 +19,9 @@ namespace Strana.Revit.HoleTask.Utils
         public static string СreatedTasksFloor { get; set; }
         public static string DeletedTasks { get; set; }
 
-        public static List<FamilyInstance> ЕxistingTask { get; set; } = new List<FamilyInstance>();
-        public static List<FamilyInstance> ЕxistingTaskWall { get; set; } = new List<FamilyInstance>();
-        public static List<FamilyInstance> ЕxistingTaskFloor { get; set; } = new List<FamilyInstance>();
+        public static IEnumerable<FamilyInstance> ExistingTask { get; set; } = new List<FamilyInstance>();
+        public static IEnumerable<FamilyInstance> ExistingTaskWall { get; set; } = new List<FamilyInstance>();
+        public static IEnumerable<FamilyInstance> ExistingTaskFloor { get; set; } = new List<FamilyInstance>();
 
         public static void SetScriptCreationMethod(FamilyInstance instance)
         {
@@ -49,9 +49,9 @@ namespace Strana.Revit.HoleTask.Utils
             СreatedTasksWall = null;
             СreatedTasksFloor = null;
             DeletedTasks = null;
-            ЕxistingTask = new List<FamilyInstance>();
-            ЕxistingTaskWall = new List<FamilyInstance>();
-            ЕxistingTaskFloor = new List<FamilyInstance>();
+            ExistingTask = new List<FamilyInstance>();
+            ExistingTaskWall = new List<FamilyInstance>();
+            ExistingTaskFloor = new List<FamilyInstance>();
         }
     }
 }
