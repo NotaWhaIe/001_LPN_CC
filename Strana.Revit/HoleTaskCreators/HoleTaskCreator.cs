@@ -57,8 +57,8 @@ namespace Strana.Revit.HoleTask.Utils
             Document linkDoc,
             RevitLinkInstance linkInstance)
         {
-            IEnumerable<FamilyInstance> existHoleTasksInProject = CollectFamilyInstances.Instance.List1.Concat(CollectFamilyInstances
-                .Instance.List2);
+            IEnumerable<FamilyInstance> existHoleTasksInProject = CollectFamilyInstances.Instance.FamilyInstance1.Concat(CollectFamilyInstances
+                .Instance.FamilyInstance2);
 
             double offSetHoleTaskInFeet = UnitUtils.ConvertToInternalUnits(WpfSettings.OffSetHoleTask, UnitTypeId.Millimeters);
             double clearance = offSetHoleTaskInFeet * 2;
@@ -126,7 +126,7 @@ namespace Strana.Revit.HoleTask.Utils
             }
 
             FamilyInstance holeTask;
-            IEnumerable<Level> docLvlList = this.GetDocumentLevels(this.doc);
+            IEnumerable<Level> docLvlList = new List<Level>(CollectFamilyInstances.Instance.Level);
 
             double holeTaskWidth = (mepHeight + clearance);
             double holeTaskThickness = (this.CalculatedWidth(mepWidth, intersectedElement, intersection) + clearance);
@@ -259,19 +259,6 @@ namespace Strana.Revit.HoleTask.Utils
             ElementTransformUtils.MoveElement(doc, familyInstance.Id, moveVector);
         }
 
-        public IEnumerable<FamilyInstance> GetElementsWithTwoFamilyNames(string taskFamilyName1, string taskFamilyName2)
-        {
-            // Создаем коллектор для поиска экземпляров семейств по двум именам семейств
-            var collector = new FilteredElementCollector(doc)
-                .OfClass(typeof(FamilyInstance))
-                .WhereElementIsNotElementType()
-                .Cast<FamilyInstance>() // Приводим результаты к типу FamilyInstance
-                .Where(fi =>
-                    fi.Symbol.FamilyName == taskFamilyName1 ||
-                    fi.Symbol.FamilyName == taskFamilyName2);
-
-            return collector;
-        }
         private bool DoesFamilyInstanceExistAtLocation(XYZ location, IEnumerable<Element> elements, double roundHTThickness,
             double roundHTWidth, double roundHTHeight)
         {
@@ -325,23 +312,6 @@ namespace Strana.Revit.HoleTask.Utils
             }
             return lvl;
         }
-
-        /// <summary>
-        /// Get a collection of levels from the carrent Revit document.
-        /// </summary>
-        /// <param name="document">The Revit document to retrieve levels from.</param>
-        /// <returns>
-        /// List collection of Level objects representing the levels in the document.
-        /// </returns>
-        private IEnumerable<Level> GetDocumentLevels(Document document)
-        {
-            return new FilteredElementCollector(document)
-                .OfCategory(BuiltInCategory.OST_Levels)
-                .WhereElementIsNotElementType()
-                .Cast<Level>()
-                .ToList();
-        }
-
         /// <summary>
         /// MEP element orienteering type.
         /// </summary>

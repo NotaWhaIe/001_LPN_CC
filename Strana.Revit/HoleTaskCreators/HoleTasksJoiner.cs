@@ -588,6 +588,8 @@ namespace Strana.Revit.HoleTask.Utils
                 allFamilyInstances00 = intersectionWallRectangularCombineList01
                 .Concat(intersectionFloorRectangularCombineList02)
                 .ToList();
+
+                var debag = allFamilyInstances00.Count;
             }
             return allFamilyInstances00;
         }

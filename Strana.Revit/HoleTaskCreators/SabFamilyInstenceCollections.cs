@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Strana.Revit.HoleTask.Utils;
 using System.Windows.Media.Media3D;
 using System.Windows;
+using static Strana.Revit.HoleTask.Extensions.RevitElement.HoleTasksGetter;
 
 namespace Strana.Revit.HoleTask.ElementCollections
 {
@@ -30,13 +31,7 @@ namespace Strana.Revit.HoleTask.ElementCollections
                 TransactionHandler.SetWarningResolver(trans);
                 trans.Start();
 
-               /// два коллектора в один 
-               /// потом запихать в коллектора который выдаст через свой ство и будет фильтровать семейсва стен и перекрытий
-                var levels = new FilteredElementCollector(doc)
-                .OfClass(typeof(Level))
-                .Cast<Level>()
-                .OrderBy(l => l.Elevation)
-                .ToList();
+                IEnumerable<Level> levels = new List<Level>(CollectFamilyInstances.Instance.Level);
 
                 var allInstances = new FilteredElementCollector(doc)
                     .OfClass(typeof(FamilyInstance))
@@ -66,7 +61,6 @@ namespace Strana.Revit.HoleTask.ElementCollections
                                     if (CanPlaceFamilyInstanceAtLocation(doc, locationPoint.Point, nestedFamilyNames))
                                     {
                                         FamilyInstance newInstance = CreateFamilyInstanceWithLevel(doc, nestedInstance, locationPoint.Point, chosenLevel, offset);
-                                        // Копирование значений параметров
                                         CopyParameters(nestedInstance, newInstance);
 
                                         double thickness = nestedInstance.LookupParameter("Ширина").AsDouble();
@@ -94,7 +88,7 @@ namespace Strana.Revit.HoleTask.ElementCollections
             }
 
         }
-        public static Level ChooseLevel(List<Level> levels, double zPoint)
+        public static Level ChooseLevel(IEnumerable<Level> levels, double zPoint)
         {
             Level closestLevelBelow = levels.LastOrDefault(l => l.Elevation < zPoint);
             Level closestLevelAbove = levels.FirstOrDefault(l => l.Elevation > zPoint);

@@ -1,58 +1,70 @@
 ﻿using Autodesk.Revit.DB;
+
+using FirstRevitPlugin.FailuresProcessing;
+
 using Strana.Revit.HoleTask.Extensions.RevitElement;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using static Strana.Revit.HoleTask.Extensions.RevitElement.HoleTasksGetter;
+
 namespace Strana.Revit.HoleTask.Utils
 {
     internal class HoleTasksLineStretch
     {
-        private readonly Document doc;
-        internal void StretchLinesAllHoleTask(RevitLinkInstance linkInstance)
+        internal void StretchLinesAllHoleTask(Document doc)
         {
-            Document doc = linkInstance.Document;
-
-            List<FamilyInstance> intersectionWallRectangularCombineList = new();
-            HoleTasksGetter.AddFamilyInstancesToList(doc, "(Отв_Задание)_Стены_Прямоугольное", intersectionWallRectangularCombineList);
-
-            foreach (var holeTask in intersectionWallRectangularCombineList)
+            using (var t = new Transaction(doc, "Stretch Lines All Hole Task"))
             {
-                Location loc = holeTask.Location;
-                if (loc is LocationPoint locPoint && locPoint.Point != null)
+                TransactionHandler.SetWarningResolver(t);
+                t.Start();
+
+                List<FamilyInstance> intersectionWallRectangularCombineList = new List<FamilyInstance>(CollectFamilyInstances.Instance.FamilyInstance1);
+
+                foreach (var holeTask in intersectionWallRectangularCombineList)
                 {
-                    XYZ intersectionCurveCenter = locPoint.Point;
-
-                    double upperLevelElevation = ElevationOfNearestUpperLevel(doc, intersectionCurveCenter);
-                    if (upperLevelElevation != -1)
+                    Location loc = holeTask.Location;
+                    if (loc is LocationPoint locPoint && locPoint.Point != null)
                     {
-                        holeTask.LookupParameter("Отметка этажа над заданием").Set(upperLevelElevation);
-                    }
+                        XYZ intersectionCurveCenter = locPoint.Point;
 
-                    double lowerLevelElevation = ElevationOfNearestLowerLevel(doc, intersectionCurveCenter);
-                    if (lowerLevelElevation != -1)
-                    {
-                        holeTask.LookupParameter("Отметка этажа под заданием").Set(lowerLevelElevation);
-                    }
+                        double upperLevelElevation = ElevationOfNearestUpperLevel(doc, intersectionCurveCenter);
+                        if (upperLevelElevation != -1)
+                        {
+                            holeTask.LookupParameter("Отметка этажа над заданием").Set(upperLevelElevation - 870 / 304.8);
+                        }
 
-                    double zeroLevelElevation = DistanceFromZeroElevationLevelToFamilyInstance(doc, intersectionCurveCenter);
-                    if (zeroLevelElevation != -1)
-                    {
-                        if (holeTask?.LookupParameter("ADSK_Отверстие_Отметка от нуля") is { IsReadOnly: false } parameter) parameter.Set(zeroLevelElevation);
+                        double lowerLevelElevation = ElevationOfNearestLowerLevel(doc, intersectionCurveCenter);
+                        if (lowerLevelElevation != -1)
+                        {
+                            holeTask.LookupParameter("Отметка этажа под заданием").Set(lowerLevelElevation-870/304.8);
+                        }
+
+                        double zeroLevelElevation = DistanceFromZeroElevationLevelToFamilyInstance(doc, intersectionCurveCenter);
+                        if (zeroLevelElevation != -1)
+                        {
+                            if (holeTask?.LookupParameter("ADSK_Отверстие_Отметка от нуля") is { IsReadOnly: false } parameter) parameter.Set(zeroLevelElevation);
+                        }
                     }
                 }
+                t.Commit();
             }
-        }
 
+        }
         public static double ElevationOfNearestUpperLevel(Document doc, XYZ point)
         {
-            var levels = new FilteredElementCollector(doc)
-                .OfClass(typeof(Level))
-                .Cast<Level>()
-                .OrderBy(l => l.Elevation)
-                .ToList();
+            //var levels = new FilteredElementCollector(doc)
+            //    .OfClass(typeof(Level))
+            //    .Cast<Level>()
+            //    .OrderBy(l => l.Elevation)
+            //    .ToList();
+
+            IEnumerable<Level> levels = new List<Level>(CollectFamilyInstances.Instance.Level);
+
 
             foreach (var level in levels)
             {
@@ -65,11 +77,13 @@ namespace Strana.Revit.HoleTask.Utils
         }
         public static double ElevationOfNearestLowerLevel(Document doc, XYZ point)
         {
-            var levels = new FilteredElementCollector(doc)
-                .OfClass(typeof(Level))
-                .Cast<Level>()
-                .OrderByDescending(l => l.Elevation)
-                .ToList();
+            //var levels = new FilteredElementCollector(doc)
+            //    .OfClass(typeof(Level))
+            //    .Cast<Level>()
+            //    .OrderByDescending(l => l.Elevation)
+            //    .ToList();
+
+            IEnumerable<Level> levels = new List<Level>(CollectFamilyInstances.Instance.Level);
 
             foreach (var level in levels)
             {
@@ -83,10 +97,11 @@ namespace Strana.Revit.HoleTask.Utils
         }
         public static double DistanceFromZeroElevationLevelToFamilyInstance(Document doc, XYZ intersectionCurveCenter)
         {
-            // Получаем все уровни в документе
-            var levels = new FilteredElementCollector(doc)
-                .OfClass(typeof(Level))
-                .Cast<Level>();
+            //var levels = new FilteredElementCollector(doc)
+            //    .OfClass(typeof(Level))
+            //    .Cast<Level>();
+            IEnumerable<Level> levels = new List<Level>(CollectFamilyInstances.Instance.Level);
+
 
             // Ищем уровень с отметкой, равной нулю
             Level zeroElevationLevel = levels.FirstOrDefault(level =>

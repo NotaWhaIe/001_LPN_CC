@@ -31,22 +31,22 @@
     <Position X="16.603" Y="14.298" Height="0.291" Width="0.7" />
   </Comment>
   <Comment CommentText="Collector FI">
-    <Position X="16.603" Y="15.04" Height="0.291" Width="0.907" />
+    <Position X="10.843" Y="15.05" Height="0.291" Width="0.907" />
   </Comment>
   <Comment CommentText="Collector levels">
-    <Position X="17.36" Y="15.439" Height="0.291" Width="1.104" />
+    <Position X="11.61" Y="15.439" Height="0.291" Width="1.104" />
   </Comment>
   <Comment CommentText="foreach">
-    <Position X="16.618" Y="15.43" Height="1.091" Width="0.7" />
+    <Position X="10.868" Y="15.43" Height="1.091" Width="0.7" />
   </Comment>
   <Comment CommentText="Collector levels">
-    <Position X="17.392" Y="15.831" Height="0.291" Width="1.104" />
+    <Position X="11.642" Y="15.831" Height="0.291" Width="1.104" />
   </Comment>
   <Comment CommentText="Collector levels">
-    <Position X="17.395" Y="16.204" Height="0.291" Width="1.104" />
+    <Position X="11.645" Y="16.204" Height="0.291" Width="1.104" />
   </Comment>
   <Comment CommentText="">
-    <Position X="9" Y="5.882" Height="10.729" Width="0.7" />
+    <Position X="9" Y="5.882" Height="9.021" Width="0.7" />
   </Comment>
   <Comment CommentText="">
     <Position X="9.806" Y="9.848" Height="0.291" Width="5.658" />
@@ -59,9 +59,6 @@
   </Comment>
   <Comment CommentText="">
     <Position X="9.889" Y="13.82" Height="0.291" Width="4.811" />
-  </Comment>
-  <Comment CommentText="">
-    <Position X="9.833" Y="15.445" Height="1.013" Width="4.811" />
   </Comment>
   <Comment CommentText="Collector levels">
     <Position X="11.279" Y="3.725" Height="0.291" Width="1.104" />
@@ -212,9 +209,9 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Strana.Revit.HoleTask.Utils.HoleTasksLineStretch" Collapsed="true">
-    <Position X="14.75" Y="15" Width="1.75" />
+    <Position X="9" Y="15" Width="1.75" />
     <TypeIdentifier>
-      <HashCode>BAAAAAABAAAAAAAAQAAYAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>BAAAAAABAAAAAAAAQAAQAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Utils\HoleTasksLineStretch.cs</FileName>
     </TypeIdentifier>
   </Class>

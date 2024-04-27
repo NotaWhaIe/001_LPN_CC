@@ -56,6 +56,8 @@ namespace Strana.Revit.HoleTask.Extensions.RevitElement
             private static CollectFamilyInstances _instance;
             private readonly List<FamilyInstance> _list1 = new List<FamilyInstance>();
             private readonly List<FamilyInstance> _list2 = new List<FamilyInstance>();
+            private readonly List<Level> _list3 = new List<Level>();
+
             public static CollectFamilyInstances Instance
             {
                 get
@@ -67,10 +69,13 @@ namespace Strana.Revit.HoleTask.Extensions.RevitElement
                     return _instance;
                 }
             }
-            
-            public IReadOnlyList<FamilyInstance> List1 => _list1;
-            public IReadOnlyList<FamilyInstance> List2 => _list2;
+
+            public IReadOnlyList<FamilyInstance> FamilyInstance1 => _list1;
+            public IReadOnlyList<FamilyInstance> FamilyInstance2 => _list2;
+            public IReadOnlyList<Level> Level => _list3;
+
             private CollectFamilyInstances() { }
+
             public void AddToListFamilyInstances(Document doc, string familyName1, string familyName2)
             {
                 var collector = new FilteredElementCollector(doc)
@@ -93,12 +98,27 @@ namespace Strana.Revit.HoleTask.Extensions.RevitElement
                     }
                 }
             }
-            public void ClearData()
+            
+            public void AddToListLevels(Document doc)
+            {
+                var levels = new FilteredElementCollector(doc)
+                    .OfCategory(BuiltInCategory.OST_Levels)
+                     .WhereElementIsNotElementType()
+                     .Cast<Level>()
+                     .ToList();
+
+                _list3.AddRange(levels);
+            }
+            public void ClearDataFamilyInstance()
             {
                 _list1.Clear();
                 _list2.Clear();
             }
+
+            public void ClearDataLevel()
+            {
+                _list3.Clear();
+            }
         }
     }
-
 }

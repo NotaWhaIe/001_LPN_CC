@@ -13,6 +13,8 @@ using Strana.Revit.HoleTask.ElementCollections;
 using Strana.Revit.HoleTask.Extensions.RevitElement;
 using Strana.Revit.HoleTask.Utils;
 
+using static Strana.Revit.HoleTask.Extensions.RevitElement.HoleTasksGetter;
+
 namespace Strana.Revit.HoleTask.Extensions
 {
     public static class RevitLinkInstanceExtension
@@ -29,13 +31,11 @@ namespace Strana.Revit.HoleTask.Extensions
 
                 List<FamilyInstance> allHoleTaskByRevitLinkInstance = IntersectingElementExtension.CreateHoleTasksByIntersectedElements(
                     linkInstance).ToList();
-                
-                List<FamilyInstance> roundHoleTaskList = new HoleTasksJoiner().JoinAllHoleTask(allHoleTaskByRevitLinkInstance);
 
-                new HoleTasksLineStretch().StretchLinesAllHoleTask(linkInstance);
+                List<FamilyInstance> roundHoleTaskList = new HoleTasksJoiner().JoinAllHoleTask(allHoleTaskByRevitLinkInstance);
                 t.Commit();
             }
-
+            
         }
     }
 }
