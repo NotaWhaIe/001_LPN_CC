@@ -87,8 +87,10 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Management" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -104,65 +106,33 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Confing.settings</DependentUpon>
     </Compile>
-    <Compile Include="ElementCollections\GetBoundingBoxFromLinkedElement.cs" />
-    <Compile Include="ElementCollections\WallFloorLinkElementCollections.cs" />
-    <Compile Include="ElementCollections\MepElementSelector.cs" />
-    <Compile Include="Extensions\GetterElementThickness.cs" />
-    <Compile Include="Extensions\RevitDocumentExstensions.cs" />
-    <Compile Include="FailuresProcessing\DeletedHoleTasksId.cs" />
-    <Compile Include="FailuresProcessing\Log.cs" />
-    <Compile Include="FailuresProcessing\TaskProcessor.cs" />
-    <Compile Include="FailuresProcessing\TaskStatistics.cs" />
-    <Compile Include="HoleTaskCreators\SabFamilyInstenceCollections.cs" />
-    <Compile Include="Extensions\RevitElement\HoleTasksGetter.cs" />
-    <Compile Include="FailuresProcessing\TransactionHandler.cs" />
-    <Compile Include="FailuresProcessing\WarningSkipper.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="RevitCommands\App.cs" />
-    <Compile Include="FailuresProcessing\GlobalParameters.cs" />
-    <Compile Include="Utils\SphereByPoint.cs" />
-    <Compile Include="Utils\HoleTaskGridDelta.cs" />
-    <Compile Include="Utils\HoleTasksLineStretch.cs" />
-    <Compile Include="Utils\HoleTasksRoundUpDimension.cs" />
-    <Compile Include="Utils\HoleTasksStatusDeterminator.cs" />
-    <Compile Include="Extensions\RevitElement\WallFloorSolidGetter.cs" />
-    <Compile Include="Extensions\RevitLinkInstanceExtension.cs" />
-    <Compile Include="Extensions\IntersectingElementExtension.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RevitCommands\CreateHoleTasks.cs" />
     <Compile Include="RevitCommands\Test.cs" />
-    <Compile Include="HoleTaskCreators\HoleTaskCreator.cs" />
-    <Compile Include="Utils\HoleTaskFamilyLoader.cs" />
-    <Compile Include="HoleTaskCreators\HoleTasksJoiner.cs" />
-    <Compile Include="Extensions\HoleTaskSolidGetter.cs" />
-    <Compile Include="Utils\OrientaionType.cs" />
-    <Compile Include="Utils\GridRoundUpDimension.cs" />
-    <Compile Include="ViewModel\Base\BaseViewModel.cs" />
-    <Compile Include="ViewModel\Base\CommandHandler.cs" />
-    <Compile Include="ViewModel\Base\RouteCommands.cs" />
-    <Compile Include="ViewModel\HoleTaskView.xaml.cs">
-      <DependentUpon>HoleTaskView.xaml</DependentUpon>
+    <Compile Include="ViewModelTest\MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ViewModel\HoleTaskViewModel.cs" />
-    <Compile Include="ViewModel\RelayCommand.cs" />
-    <Compile Include="ViewModel\RevitLinkData.cs" />
-    <Compile Include="ViewModel\WpfSettings.cs" />
+    <Compile Include="ViewModelTest\Window1.xaml.cs">
+      <DependentUpon>Window1.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ViewModelTest\Window2.xaml.cs">
+      <DependentUpon>Window2.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.editorconfig">
       <Link>.editorconfig</Link>
     </None>
     <None Include="app.config" />
-    <None Include="ClassDiagram.cd" />
     <None Include="Confing.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Confing.Designer.cs</LastGenOutput>
     </None>
-    <None Include="HoleCuterPlugin.cd" />
     <None Include="packages.config" />
     <AdditionalFiles Include="stylecop.json" />
     <None Include="Resources\GloryHole.addin" />
@@ -178,20 +148,21 @@
     <Analyzer Include="..\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\GloryHole\GloryHole.csproj">
-      <Project>{11f04b26-6601-47a1-be40-c22370664e4b}</Project>
-      <Name>GloryHole</Name>
-      <Private>False</Private>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Resources\holeTask.png" />
     <Resource Include="Resources\holeTaskLegend.png" />
     <Resource Include="Resources\holeTask0.png" />
     <Content Include="Resources\RevitRuneasyexample.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="ViewModel\HoleTaskView.xaml">
+    <Page Include="ViewModelTest\MainWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ViewModelTest\Window1.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ViewModelTest\Window2.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

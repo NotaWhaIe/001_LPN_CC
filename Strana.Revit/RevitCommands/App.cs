@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using System.Windows.Media;
 
-namespace Strana.Revit.HoleTask.RevitCommands
+namespace Strana.Revit.RevitCommands
 {
     public class App : IExternalApplication
     {
@@ -21,8 +21,8 @@ namespace Strana.Revit.HoleTask.RevitCommands
 
         public RibbonPanel CreateRibbonPanel(UIControlledApplication application, string tabName = "Strana")
         {
-            RibbonPanel ribbonPanel = application.CreateRibbonPanel(tabName, "ИОС");
-            AddPushButton(ribbonPanel, "Задание\nна отверстия", Assembly.GetExecutingAssembly().Location, "Strana.Revit.HoleTask.RevitCommands.CreateHoleTasks", "Разместить задания на отверстия");
+            RibbonPanel ribbonPanel = application.CreateRibbonPanel(tabName, "СС");
+            AddPushButton(ribbonPanel, "Test", Assembly.GetExecutingAssembly().Location, "", "");
             return ribbonPanel;
         }
 
@@ -31,7 +31,7 @@ namespace Strana.Revit.HoleTask.RevitCommands
             var buttonData = new PushButtonData(buttonName, buttonName, path, linkToCommand);
             var button = ribbonPanel.AddItem(buttonData) as PushButton;
             button.ToolTip = toolTip;
-            button.LargeImage = (ImageSource)new BitmapImage(new Uri(@"/Strana.Revit.HoleTask;component/Resources/holeTask0.png", UriKind.RelativeOrAbsolute));
+            button.LargeImage = (ImageSource)new BitmapImage(new Uri(@"", UriKind.RelativeOrAbsolute));
         }
 
         public Result OnShutdown(UIControlledApplication application)

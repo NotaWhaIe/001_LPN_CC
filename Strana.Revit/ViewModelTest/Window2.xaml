@@ -1,0 +1,50 @@
+﻿<Window x:Class="Strana.Revit.ViewModelTest.Window2"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Выбор семейств" Height="450" Width="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Column 2a -->
+        <StackPanel Grid.Column="0" Grid.Row="0" Margin="10">
+            <TextBlock Text="LinkedDoc FamilyInstances ElectricalEquipment" FontWeight="Bold" Margin="0,0,0,10"/>
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <ListBox x:Name="familyInstances2aList" ItemsSource="{Binding FamilyInstances2aNames}" SelectionMode="Multiple" Height="200"/>
+            </ScrollViewer>
+        </StackPanel>
+
+        <!-- Column 2b -->
+        <StackPanel Grid.Column="0" Grid.Row="1" Margin="10">
+            <TextBlock Text="LinkedDoc FamilyInstances ElectricalEquipment" FontWeight="Bold" Margin="0,0,0,10"/>
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <ListBox x:Name="familyInstances2bList" ItemsSource="{Binding FamilyInstances2bNames}" SelectionMode="Multiple" Height="200"/>
+            </ScrollViewer>
+        </StackPanel>
+
+        <!-- Column 3a -->
+        <StackPanel Grid.Column="1" Grid.Row="0" Margin="10">
+            <TextBlock Text="Doc FamilySymbol ElectricalEquipment" FontWeight="Bold" Margin="0,0,0,10"/>
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <ListBox x:Name="familySymbols3aList" ItemsSource="{Binding FamilySymbols3aNames}" SelectionMode="Multiple" Height="200"/>
+            </ScrollViewer>
+        </StackPanel>
+
+        <!-- Column 3b -->
+        <StackPanel Grid.Column="1" Grid.Row="1" Margin="10">
+            <TextBlock Text="Doc FamilySymbol CommunicationDevices" FontWeight="Bold" Margin="0,0,0,10"/>
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <ListBox x:Name="familySymbols3bList" ItemsSource="{Binding FamilySymbols3bNames}" SelectionMode="Multiple" Height="200"/>
+            </ScrollViewer>
+        </StackPanel>
+
+        <Button Grid.Row="2" Grid.ColumnSpan="2" Content="OK" Click="OkButton_Click" HorizontalAlignment="Right" Margin="10"/>
+    </Grid>
+</Window>
+<!-- work -->
