@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Data.SQLite;
 
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using Strana.Revit.ViewModelTest;
-/// Work
+/// Work 
 namespace Strana.Revit.HoleTask.RevitCommands
 {
     [Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.Manual)]
@@ -88,7 +89,7 @@ namespace Strana.Revit.HoleTask.RevitCommands
                     TypeName = fs.Name
                 })
                 .ToList();
-
+            
             listFamilySymbol3b = new FilteredElementCollector(doc)
                 .OfCategory(BuiltInCategory.OST_CommunicationDevices)
                 .OfClass(typeof(FamilySymbol))
